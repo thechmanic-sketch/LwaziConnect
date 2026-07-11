@@ -1,14 +1,12 @@
 # LwaziConnect — Build Roadmap (0% → 100%)
 
-Goal: turn the current static `index.html` mockup into a real, installable School Operating System — available both as a **desktop app** (Electron, offline-capable) and a **self-hosted web app** (installed on a school's own server/network), sharing one core codebase.
+Goal: turn the current static `index.html` mockup into a real **self-hosted web app** — installed on a school's own server/network, accessed by staff via browser on-site.
 
 ## Architecture
 
-- **Backend**: Node.js + Express (REST API), SQLite by default (zero-config, file-based — fits "installable" software), with an option to point to Postgres for larger self-hosted deployments.
+- **Backend**: Node.js + Express (REST API), SQLite by default (zero-config, file-based, easy to install), with an option to point to Postgres for larger deployments.
 - **Frontend**: React (rebuilt from the current HTML/CSS into components), reusing the existing visual design/theme.
-- **Desktop packaging**: Electron wraps the same frontend + a bundled local backend + SQLite file — installs as a normal Windows/Mac app, works offline.
-- **Self-hosted packaging**: Same backend/frontend served over the school's LAN via Docker Compose (or a plain Node install) for staff to access from browsers on-site.
-- **Data layer** shared between both targets so features are built once.
+- **Deployment**: Docker Compose bundle (or plain Node install) so school IT can stand it up on a local server/network; accessed from any browser on-site.
 
 ## Phase 0 — Foundation (0–15%)
 - Set up monorepo structure: `/backend`, `/frontend`, `/desktop`.
@@ -34,10 +32,9 @@ Goal: turn the current static `index.html` mockup into a real, installable Schoo
 - Messaging inbox UI (the `.wa`/`.wp` themed elements already in the mockup).
 
 ## Phase 4 — Packaging & Installability (80–95%)
-- Electron build pipeline → signed installers for Windows/Mac.
-- Self-hosted deployment: Docker Compose bundle + setup wizard for school IT staff.
+- Docker Compose bundle + setup wizard for school IT staff.
 - Local backup/restore tooling (since data lives on-site, not in the cloud).
-- Auto-update mechanism for the desktop app.
+- Update mechanism for the self-hosted install.
 
 ## Phase 5 — Hardening & Launch (95–100%)
 - Multi-tenant safety (per-school data isolation) if one build is shared across schools.
