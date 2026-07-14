@@ -1,6 +1,7 @@
 // ══ ROLE SYSTEM ══
 let CU_ROLE = null;
 let selRole = null;
+let currentAllowedViews = null;
 
 const ROLE_PROFILES = {
  superadmin: {name:'Themba Moyo',ini:'TM',bg:'#FEF3C7',fg:'#B45309',label:'Super Admin',nav:['dashboard','students','admissions','parents','classes','teachers','subjects','timetable','attendance','reportcards','fees','messages','announcements','documents','calendar','health','discipline','analytics','superadmin','enterprise','licensing','settings','aiassist','idcards','homework','commscentre','hr','transport','sgb','compliance']},
@@ -49,19 +50,7 @@ function doLogout() {
 }
 
 function buildRoleNav(allowedViews) {
- document.querySelectorAll('.nav-item[data-v]').forEach(item => {
-  const v = item.dataset.v;
-  item.style.display = allowedViews.includes(v) ? '' : 'none';
- });
- document.querySelectorAll('.nav-sec').forEach(sec => {
-  // hide section label if all items below it are hidden
-  let next = sec.nextElementSibling;
-  let anyVisible = false;
-  while (next && !next.classList.contains('nav-sec')) {
-   if (next.style.display !== 'none') anyVisible = true;
-   next = next.nextElementSibling;
-  }
-  sec.style.display = anyVisible ? '' : 'none';
- });
+ currentAllowedViews = allowedViews;
+ applyNavVisibility();
 }
 

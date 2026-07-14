@@ -92,6 +92,13 @@
       <i class="ti ti-chevron-down" style="font-size:10px;color:rgba(255,255,255,.28);margin-left:auto"></i>
     </div>
   </div>
+  <div class="nav-search">
+    <i class="ti ti-search"></i>
+    <input type="text" id="navSearchInput" placeholder="Search menu..." oninput="filterNav(this.value)">
+    <i class="ti ti-x nav-search-clear hidden" id="navSearchClear" onclick="clearNavSearch()"></i>
+  </div>
+  <div class="nav-wrap">
+  <button class="nav-arrow nav-arrow-up" onclick="scrollNav(-1)" title="Scroll up"><i class="ti ti-chevron-up"></i></button>
   <nav class="nav" id="navEl">
     <div class="nav-sec">Overview</div>
     <div class="nav-item active" data-v="dashboard"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
@@ -134,7 +141,10 @@
     <div class="nav-item" data-v="enterprise"><i class="ti ti-building-skyscraper"></i>Enterprise / Multi-Campus</div>
     <div class="nav-item" data-v="licensing"><i class="ti ti-rosette"></i>Licensing</div>
     <div class="nav-item" data-v="settings"><i class="ti ti-settings"></i>Settings</div>
+    <div class="nav-empty hidden" id="navEmptyMsg">No menu items match your search</div>
   </nav>
+  <button class="nav-arrow nav-arrow-down" onclick="scrollNav(1)" title="Scroll down"><i class="ti ti-chevron-down"></i></button>
+  </div>
   <div class="sidebar-foot">
     <div class="user-row" onclick="doLogout()" style="cursor:pointer" title="Sign out">
       <div class="u-av" id="sideAvatar">NK</div>
