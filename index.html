@@ -165,7 +165,11 @@
     <div class="ibt" onclick="openWA()" style="color:var(--wd)"><i class="ti ti-brand-whatsapp" style="font-size:14px"></i></div>
     <button class="btn btn-g" id="topBtn" onclick="topAction()"><i class="ti ti-plus" id="topIco" style="font-size:12px"></i><span id="topLbl">Add Student</span></button>
   </div>
-  <div class="content" id="CA"></div>
+  <div class="content-wrap">
+   <button class="content-arrow content-arrow-up" onclick="scrollContent(-1)" title="Scroll up"><i class="ti ti-chevron-up"></i></button>
+   <div class="content" id="CA"></div>
+   <button class="content-arrow content-arrow-down" onclick="scrollContent(1)" title="Scroll down"><i class="ti ti-chevron-down"></i></button>
+  </div>
 </div>
 </div>
 

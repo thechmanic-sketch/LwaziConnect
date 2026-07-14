@@ -44,6 +44,12 @@ function scrollNav(dir){
  if(nav)nav.scrollBy({top:dir*140,behavior:'smooth'});
 }
 
+// ══ CONTENT SCROLL ARROWS ══
+function scrollContent(dir){
+ const c=document.getElementById('CA');
+ if(c)c.scrollBy({top:dir*280,behavior:'smooth'});
+}
+
 // ══ NAV BINDING ══
 document.querySelectorAll('.nav-item[data-v]').forEach(item=>{
  item.addEventListener('click',()=>{
