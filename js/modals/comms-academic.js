@@ -1,0 +1,72 @@
+function mNewMsg(){OM('New Message',`
+ <div class="fg"><div class="fl">Send To</div><select class="fs"><option>All Parents</option>${D.classes.map(c=>`<option>${c.name} Parents</option>`).join('')}${D.parents.map(p=>`<option>${p.name}</option>`).join('')}${D.teachers.map(t=>`<option>${t.name}</option>`).join('')}</select></div>
+ <div class="fg"><div class="fl">Subject</div><input class="fi" placeholder="Message subject..."></div>
+ <div class="fg"><div class="fl">Message</div><textarea class="fta" style="height:90px" placeholder="Type message..."></textarea></div>
+ <div style="display:flex;gap:10px;flex-wrap:wrap">
+  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>WhatsApp</label>
+  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--g)">Email</label>
+  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:var(--b)">SMS</label>
+ </div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Message sent via WhatsApp + Email','wa');CM()"><i class="ti ti-send" style="font-size:11px"></i>Send Message</button>`);}
+
+function mNewAnn(){OM('New Announcement',`
+ <div class="fg"><div class="fl">Title</div><input class="fi" placeholder="Announcement title..."></div>
+ <div class="fr"><div class="fg"><div class="fl">Category</div><select class="fs"><option>Urgent</option><option>Academic</option><option>Events</option><option>Finance</option><option>General</option></select></div><div class="fg"><div class="fl">Audience</div><select class="fs"><option>All</option><option>Parents only</option><option>Teachers only</option></select></div></div>
+ <div class="fg"><div class="fl">Message</div><textarea class="fta" style="height:90px" placeholder="Announcement body..."></textarea></div>
+ <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:5px">
+  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>WhatsApp</label>
+  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--g)">Email</label>
+  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:var(--g)">In-app</label>
+  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:var(--b)">Include RSVP button</label>
+ </div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Announcement published and sent via WhatsApp to all recipients','wa');CM()"><i class="ti ti-speakerphone" style="font-size:11px"></i>Publish & Send</button>`);}
+
+function mUploadDoc(){OM('Upload Document',`
+ <div class="drop-zone" onclick="T('File picker opened','')"><i class="ti ti-cloud-upload" style="font-size:30px;color:var(--gl);display:block;margin-bottom:7px"></i><div style="font-weight:600;font-size:13px;color:var(--s);margin-bottom:3px">Click to upload or drag and drop</div><div class="tsm">PDF, DOCX, XLSX, JPG — max 10MB</div></div>
+ <div class="fr" style="margin-top:10px"><div class="fg"><div class="fl">Category</div><select class="fs"><option>Forms</option><option>Finance</option><option>Policies</option><option>Academic</option><option>HR</option></select></div><div class="fg"><div class="fl">Access Level</div><select class="fs"><option>All</option><option>Parents</option><option>Staff</option><option>Admin only</option></select></div></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Document uploaded','success');CM()"><i class="ti ti-upload" style="font-size:11px"></i>Upload</button>`);}
+
+function mAddClass(){OM('Add Class',`
+ <div class="fr"><div class="fg"><div class="fl">Class Name</div><input class="fi" placeholder="e.g. Grade 4A"></div><div class="fg"><div class="fl">Room</div><input class="fi" placeholder="e.g. Room 5"></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Class Teacher</div><select class="fs">${D.teachers.map(t=>`<option>${t.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Max Capacity</div><input class="fi" type="number" placeholder="35"></div></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Class created','success');CM()">Create Class</button>`);}
+
+function mMarkAtt(){OM('Mark Attendance',`
+ <div class="fr" style="margin-bottom:10px"><div class="fg" style="margin-bottom:0"><div class="fl">Class</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg" style="margin-bottom:0"><div class="fl">Date</div><input class="fi" type="date" value="${new Date().toISOString().split('T')[0]}"></div></div>
+ <div style="max-height:250px;overflow-y:auto">${D.students.filter(s=>s.cls==='Grade 7A').map(s=>`<div class="flex ic g8" style="padding:6px 0;border-bottom:1px solid var(--sp)"><div class="av av-s" style="background:${s.bg};color:${s.fg}">${s.ini}</div><span style="flex:1;font-size:12px;font-weight:500">${s.name}</span>${[['P','Present'],['A','Absent'],['L','Late'],['E','Excused'],['S','Sick']].map(([o,lbl])=>`<label title="${lbl}" style="cursor:pointer"><input type="radio" name="ma_${s.id}" value="${o}" ${o==='P'?'checked':''} style="display:none"><div class="att-cell att-${o}">${o}</div></label>`).join('')}</div>`).join('')}</div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Attendance saved. 2 parents notified via WhatsApp','wa');CM()"><i class="ti ti-check" style="font-size:11px"></i>Save Attendance</button>`);}
+
+function mGenReports(){OM('Bulk Generate Report Cards',`
+ <div class="fg"><div class="fl">Class</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div>
+ <div class="fg"><div class="fl">Term</div><select class="fs"><option>Term 3 — 2025</option><option>Term 2</option><option>Term 1</option></select></div>
+ <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
+  <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--g)">Generate PDF report cards</label>
+  <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>Send via WhatsApp to all parents</label>
+  <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--g)">Email to parents</label>
+  <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:var(--b)">Track parent acknowledgement</label>
+ </div>
+ <div style="background:var(--ap);border:1px solid var(--a);border-radius:7px;padding:9px 12px;font-size:11px;color:var(--ad)"><i class="ti ti-info-circle" style="margin-right:4px"></i>This will generate report cards for all 32 students in the selected class and send via WhatsApp + email.</div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('32 report cards generated. Sending via WhatsApp to all parents...','wa');CM()"><i class="ti ti-certificate" style="font-size:11px"></i>Generate & Send All</button>`);}
+
+function mAddEvent(){OM('Add Calendar Event',`
+ <div class="fg"><div class="fl">Event Title</div><input class="fi" placeholder="e.g. Grade 7 Science Projects"></div>
+ <div class="fr"><div class="fg"><div class="fl">Date</div><input class="fi" type="date"></div><div class="fg"><div class="fl">Type</div><select class="fs"><option>Academic</option><option>Exam</option><option>Event</option><option>Holiday</option></select></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Applicable to</div><select class="fs"><option>All</option>${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Notify via WhatsApp</div><select class="fs"><option>Yes</option><option>No</option></select></div></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Event added. Parents notified.','success');CM()">Add Event</button>`);}
+
+function mAddHealth(){OM('Add Health Record',`
+ <div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
+ <div class="fr"><div class="fg"><div class="fl">Medical Condition</div><input class="fi" placeholder="e.g. Asthma or None"></div><div class="fg"><div class="fl">Allergy</div><input class="fi" placeholder="e.g. Peanuts or None"></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Blood Type</div><select class="fs"><option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option></select></div><div class="fg"><div class="fl">Medical Aid</div><input class="fi" placeholder="e.g. Discovery Kids"></div></div>
+ <div class="fg"><div class="fl">Emergency Contact</div><input class="fi" placeholder="e.g. 071 xxx xxxx (Parent name)"></div>
+ <div class="fg"><div class="fl">Family Doctor</div><input class="fi" placeholder="Dr. Name — 031 xxx xxxx"></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Health record saved','success');CM()">Save Record</button>`);}
+
+function mLogInc(){OM('Log Discipline Incident',`
+ <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option>${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Type</div><select class="fs"><option>Misconduct</option><option>Late</option><option>Absent</option><option>Bullying</option><option>Other</option></select></div></div>
+ <div class="fg"><div class="fl">Description</div><textarea class="fta" placeholder="Describe the incident..."></textarea></div>
+ <div class="fr"><div class="fg"><div class="fl">Date</div><input class="fi" type="date" value="${new Date().toISOString().split('T')[0]}"></div><div class="fg"><div class="fl">Reported by</div><select class="fs">${D.teachers.map(t=>`<option>${t.name}</option>`).join('')}</select></div></div>
+ <div class="fg"><div class="fl">Action Taken</div><input class="fi" placeholder="e.g. Verbal warning, Parent notified"></div>
+ <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-top:5px"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>Notify parent via WhatsApp</label>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Incident logged. Parent notified via WhatsApp.','wa');CM()">Log Incident</button>`);}
+
