@@ -8,7 +8,7 @@
 .login-sub{text-align:center;font-size:12px;color:#6B7280;margin-bottom:20px}
 
 /* ═══ TWO-PANEL LAYOUT ═══ */
-.ls-panels{flex:1;display:grid;grid-template-columns:1.35fr 1fr;min-height:640px}
+.ls-panels{flex:1;display:grid;grid-template-columns:1.7fr 1fr;min-height:640px}
 
 /* LEFT — image carousel */
 .ls-left{position:relative;overflow:hidden;background:#16332A;display:flex;flex-direction:column}
@@ -53,7 +53,8 @@
 .ls-chat-input button{width:28px;height:28px;border-radius:50%;background:#1B4332;color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 
 /* RIGHT — role picker / form */
-.ls-right{position:relative;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:36px 42px;margin:28px 28px 28px 0;border-radius:22px;box-shadow:0 26px 70px rgba(0,0,0,.9)}
+.ls-right{position:relative;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:36px 34px;margin:28px 28px 28px 0;border-radius:22px;box-shadow:0 26px 70px rgba(0,0,0,.9)}
+.ls-role-view{max-width:360px;margin:0 auto;width:100%}
 .ls-lock{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#1B4332,#2D6A4F);display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;margin:0 auto 14px;box-shadow:0 10px 26px rgba(27,67,50,.4)}
 .ls-role-title{text-align:center;font-family:'Outfit',sans-serif;font-weight:800;font-size:22px;color:#1F2937;margin-bottom:6px}
 .ls-role-title::after{content:'';display:block;width:40px;height:3px;background:#1B4332;margin:8px auto 0;border-radius:2px}
