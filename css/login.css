@@ -9,14 +9,25 @@
 .login-title{text-align:center;font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:#1F2937;margin-bottom:5px}
 .login-sub{text-align:center;font-size:12px;color:#6B7280;margin-bottom:22px}
 .login-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6B7280;margin-bottom:10px}
-.role-picks{display:flex;flex-direction:column;gap:8px}
-.role-pick{display:flex;align-items:center;gap:13px;padding:13px 15px;border:2px solid #E5E7EB;border-radius:11px;cursor:pointer;transition:all .18s;background:#fff}
-.role-pick:hover{border-color:#1B4332;background:#F0FDF4;transform:translateX(3px)}
-.role-pick.selected{border-color:#1B4332;background:#F0FDF4}
-.rp-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
-.rp-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;color:#1F2937}
-.rp-desc{font-size:11px;color:#6B7280;margin-top:1px}
-.rp-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:18px}
-.login-cta{width:100%;height:46px;background:#1B4332;color:#fff;border:none;border-radius:11px;font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:20px;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:7px}
+
+/* CLEAN LOGIN FORM */
+.lf-group{margin-bottom:16px}
+.lf-label{display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:6px}
+.lf-input-wrap{display:flex;align-items:center;gap:9px;border:1.5px solid #E5E7EB;border-radius:10px;padding:0 13px;height:46px;transition:border-color .15s,box-shadow .15s;background:#fff}
+.lf-input-wrap:focus-within{border-color:#1B4332;box-shadow:0 0 0 3px rgba(82,183,136,.14)}
+.lf-input-wrap i{color:#9CA3AF;font-size:16px;flex-shrink:0}
+.lf-input{flex:1;min-width:0;border:none;outline:none;background:transparent;font-size:13px;color:#1F2937;font-family:'Inter',sans-serif}
+.lf-input::placeholder{color:#C1C7D0}
+.lf-toggle-pw{cursor:pointer;transition:color .15s}
+.lf-toggle-pw:hover{color:#1B4332}
+.lf-select{width:100%;height:46px;border:1.5px solid #E5E7EB;border-radius:10px;padding:0 13px;font-size:13px;color:#1F2937;background:#fff;outline:none;font-family:'Inter',sans-serif;cursor:pointer;transition:border-color .15s}
+.lf-select:focus{border-color:#1B4332;box-shadow:0 0 0 3px rgba(82,183,136,.14)}
+.lf-row{display:flex;align-items:center;justify-content:space-between;margin:-4px 0 20px}
+.lf-remember{display:flex;align-items:center;gap:6px;font-size:12px;color:#6B7280;cursor:pointer;user-select:none}
+.lf-remember input{accent-color:#1B4332;width:14px;height:14px;cursor:pointer}
+.lf-forgot{font-size:12px;color:#1B4332;font-weight:600;text-decoration:none}
+.lf-forgot:hover{text-decoration:underline}
+
+.login-cta{width:100%;height:46px;background:#1B4332;color:#fff;border:none;border-radius:11px;font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:7px}
 .login-cta:hover{background:#2D6A4F}
 .login-cta:disabled{background:#E5E7EB;color:#9CA3AF;cursor:not-allowed}

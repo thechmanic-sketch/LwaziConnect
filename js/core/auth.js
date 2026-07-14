@@ -11,15 +11,20 @@ const ROLE_PROFILES = {
  student:    {name:'Amahle Dlamini',ini:'AD',bg:'#EDE9FE',fg:'#5B21B6',label:'Student',nav:['dashboard','subjects','timetable','attendance','homework','announcements','documents','calendar']},
 };
 
-function selectRole(role, el) {
- selRole = role;
- document.querySelectorAll('.role-pick').forEach(e => e.classList.remove('selected'));
- el.classList.add('selected');
- document.getElementById('loginCTA').disabled = false;
+function togglePwVisibility() {
+ const pw = document.getElementById('loginPassword');
+ const icon = document.getElementById('pwToggleIcon');
+ const showing = pw.type === 'text';
+ pw.type = showing ? 'password' : 'text';
+ icon.classList.toggle('ti-eye', showing);
+ icon.classList.toggle('ti-eye-off', !showing);
 }
 
 function doLogin() {
- if (!selRole) return;
+ const email = document.getElementById('loginEmail').value.trim();
+ const password = document.getElementById('loginPassword').value;
+ if (!email || !password) { T('Enter your email and password','error'); return; }
+ selRole = document.getElementById('loginRole').value;
  CU_ROLE = selRole;
  const p = ROLE_PROFILES[selRole];
  // hide login, show app
@@ -45,8 +50,7 @@ function doLogout() {
  CU_ROLE = null; selRole = null;
  document.getElementById('appWrap').classList.add('hidden');
  document.getElementById('loginScreen').style.display = 'flex';
- document.querySelectorAll('.role-pick').forEach(e => e.classList.remove('selected'));
- document.getElementById('loginCTA').disabled = true;
+ document.getElementById('loginForm').reset();
 }
 
 function buildRoleNav(allowedViews) {
