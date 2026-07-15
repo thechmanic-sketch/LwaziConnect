@@ -109,17 +109,19 @@
  .ls-chat{right:16px;bottom:16px}
 }
 
-/* ═══ MOBILE — form floats on the background image, single screen, no scroll ═══ */
+/* ═══ MOBILE — form floats on the background image ═══ */
 @media (max-width:768px){
- .login-screen{overflow:hidden}
- .ls-panels{display:block;position:relative;height:100vh;min-height:0}
+ .login-screen{overflow-y:auto}
+ .ls-panels{display:block;position:relative;min-height:calc(100vh - 56px)}
  .ab-right{position:absolute;inset:0;min-height:0}
  .ab-right-inner,.ls-bottombar{display:none}
  .ab-left{
-  position:absolute;inset:0;z-index:5;padding:0;overflow:hidden;
+  position:absolute;inset:0;z-index:5;padding:70px 0 16px;overflow:hidden;
   align-items:center;justify-content:center;background:transparent
  }
- .ab-topbar{display:none}
+ .ab-topbar{position:absolute;top:16px}
+ .ab-logo-icon{height:28px}
+ .ab-logo-text{font-size:14px;color:#fff}
  .ab-form-wrap{
   margin:0;max-width:320px;width:calc(100% - 32px);
   background:rgba(15,36,28,.72);backdrop-filter:blur(6px);
@@ -134,6 +136,8 @@
  .ab-forgot:hover{color:#fff}
  .ab-headrow{margin-bottom:16px}
  .ab-field{margin-bottom:12px}
- .ls-footer{display:none}
+ .ls-footer{position:relative;z-index:5;padding:10px 16px 12px}
+ .ls-footer-brand{font-size:10px}
+ .ls-footer-contact{font-size:9px;gap:6px}
  .ls-chat{right:14px;bottom:14px}
 }
