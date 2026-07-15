@@ -1,6 +1,7 @@
-// ══ LOGIN SCREEN — LOGIN <-> SIGNUP SWITCH ══
+// ══ LOGIN SCREEN — LOGIN <-> SIGNUP <-> STAFF SWITCH ══
 function openSignup() {
  document.getElementById('lsFormView').classList.add('hidden');
+ document.getElementById('lsStaffView').classList.add('hidden');
  document.getElementById('lsSignupView').classList.remove('hidden');
  const school = document.getElementById('suSchool');
  if (school) school.focus();
@@ -8,10 +9,30 @@ function openSignup() {
 
 function backToRoles() {
  document.getElementById('lsSignupView').classList.add('hidden');
+ document.getElementById('lsStaffView').classList.add('hidden');
  document.getElementById('lsFormView').classList.remove('hidden');
  const email = document.getElementById('loginEmail');
  if (email) email.focus();
 }
+
+// Super Admin / Techmanic staff sign-in is intentionally NOT exposed anywhere
+// on the public login form or role dropdown — it's only reachable via a
+// direct link carrying #staff in the URL (e.g. index.html#staff).
+function openStaffLogin() {
+ document.getElementById('lsFormView').classList.add('hidden');
+ document.getElementById('lsSignupView').classList.add('hidden');
+ document.getElementById('lsStaffView').classList.remove('hidden');
+ const email = document.getElementById('staffEmail');
+ if (email) email.focus();
+}
+
+(function () {
+ function checkStaffHash() {
+  if (window.location.hash === '#staff') openStaffLogin();
+ }
+ checkStaffHash();
+ window.addEventListener('hashchange', checkStaffHash);
+})();
 
 function toggleSuPwVisibility(inputId, iconId) {
  const pw = document.getElementById(inputId);
@@ -25,8 +46,9 @@ function doSignup() {
  const password = document.getElementById('suPassword').value;
  const confirm = document.getElementById('suConfirm').value;
  if (password !== confirm) { T('Passwords do not match','error'); return; }
+ const roleLabel = document.getElementById('suRole').selectedOptions[0].textContent;
  const school = document.getElementById('suSchool').value.trim();
- T(`Account request received for ${school || 'your school'} — check your email to confirm (demo)`, 'success');
+ T(`Registration request sent as ${roleLabel} at ${school || 'your school'} — check your email to confirm (demo)`, 'success');
  document.getElementById('signupForm').reset();
  backToRoles();
 }

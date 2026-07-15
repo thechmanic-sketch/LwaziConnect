@@ -24,9 +24,20 @@ function doLogin() {
  const email = document.getElementById('loginEmail').value.trim();
  const password = document.getElementById('loginPassword').value;
  if (!email || !password) { T('Enter your email and password','error'); return; }
- selRole = document.getElementById('loginRole').value;
- CU_ROLE = selRole;
- const p = ROLE_PROFILES[selRole];
+ completeLogin(document.getElementById('loginRole').value);
+}
+
+function doStaffLogin() {
+ const email = document.getElementById('staffEmail').value.trim();
+ const password = document.getElementById('staffPassword').value;
+ if (!email || !password) { T('Enter your email and password','error'); return; }
+ completeLogin('superadmin');
+}
+
+function completeLogin(role) {
+ selRole = role;
+ CU_ROLE = role;
+ const p = ROLE_PROFILES[role];
  // hide login, show app
  document.getElementById('loginScreen').style.display = 'none';
  document.getElementById('appWrap').classList.remove('hidden');
@@ -41,8 +52,8 @@ function doLogin() {
  // rebuild nav — show only items for this role
  buildRoleNav(p.nav);
  // go to dashboard
- if (selRole === 'parent') { rParentPortal(); document.getElementById('ptitle').textContent = 'My Child'; }
- else if (selRole === 'student') { rStudentPortal(); document.getElementById('ptitle').textContent = 'My Portal'; }
+ if (role === 'parent') { rParentPortal(); document.getElementById('ptitle').textContent = 'My Child'; }
+ else if (role === 'student') { rStudentPortal(); document.getElementById('ptitle').textContent = 'My Portal'; }
  else V('dashboard');
 }
 

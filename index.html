@@ -66,7 +66,6 @@
       <label for="loginRole">Sign in as</label>
       <select class="ab-select" id="loginRole">
        <option value="admin" selected>Admin</option>
-       <option value="superadmin">Super Admin</option>
        <option value="principal">Principal</option>
        <option value="teacher">Teacher</option>
        <option value="student">Student</option>
@@ -87,7 +86,17 @@
 
     <form id="signupForm" onsubmit="event.preventDefault();doSignup();">
      <div class="ab-field">
-      <label for="suSchool">School Name</label>
+      <label for="suRole">Register As</label>
+      <select class="ab-select" id="suRole">
+       <option value="principal" selected>Principal</option>
+       <option value="admin">Admin</option>
+       <option value="teacher">Teacher</option>
+       <option value="parent">Parent</option>
+       <option value="student">Student</option>
+      </select>
+     </div>
+     <div class="ab-field">
+      <label for="suSchool">Your School</label>
       <input id="suSchool" type="text" placeholder="e.g. Durban Primary School" required>
      </div>
      <div class="ab-field">
@@ -122,6 +131,30 @@
 
     <div class="ab-terms">By registering, you agree to our <a href="#" onclick="event.preventDefault()">Terms Of Use</a> and <a href="#" onclick="event.preventDefault()">Privacy Policy</a></div>
    </div>
+
+   <div class="ab-form-wrap hidden" id="lsStaffView">
+    <div class="ab-headrow">
+     <h1 class="ab-title">Staff Login.</h1>
+    </div>
+    <div class="ab-reg" style="margin-bottom:18px">Techmanic internal access only.</div>
+
+    <form id="staffForm" onsubmit="event.preventDefault();doStaffLogin();">
+     <div class="ab-field">
+      <label for="staffEmail">Email Address</label>
+      <input id="staffEmail" type="email" placeholder="Valid email address" autocomplete="username" required>
+     </div>
+     <div class="ab-field">
+      <label for="staffPassword">Password</label>
+      <div class="ab-pw-wrap">
+       <input id="staffPassword" type="password" placeholder="Your password" autocomplete="current-password" required>
+       <span class="ab-show" onclick="toggleSuPwVisibility('staffPassword','staffPwToggle')" id="staffPwToggle">SHOW</span>
+      </div>
+     </div>
+     <button class="ab-login-btn" id="staffCTA" type="submit">SIGN IN</button>
+    </form>
+
+    <div class="ab-reg" style="margin-top:18px"><a href="#" onclick="event.preventDefault();backToRoles()">Back to regular sign in</a></div>
+   </div>
    </div>
   </div>
 
@@ -137,7 +170,7 @@
    <div class="ab-right-inner">
     <div class="ab-headline">Start managing your<br>school in one place.</div>
     <div class="ab-sub">Students, staff, fees, and communication — all in one connected platform built for African schools.</div>
-    <a href="#" class="ab-more" onclick="event.preventDefault();openSignup()">Register your school.</a>
+    <a href="#" class="ab-more" onclick="event.preventDefault();openSignup()">Register for an account.</a>
    </div>
 
    <div class="ls-bottombar">
