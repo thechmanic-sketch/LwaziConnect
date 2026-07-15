@@ -6,7 +6,7 @@
 .ls-panels{flex:1;display:grid;grid-template-columns:1fr 1.15fr;min-height:640px}
 
 /* LEFT — plain white form panel */
-.ab-left{position:relative;display:flex;flex-direction:column;align-items:center;padding:32px 48px;overflow-y:auto}
+.ab-left{position:relative;display:flex;flex-direction:column;align-items:center;padding:32px 48px;overflow-y:auto;background:linear-gradient(180deg,#0F241C 0px,#1B4332 130px,#1B4332 190px,#fff 360px)}
 .ab-topbar{display:flex;align-items:center;justify-content:center;margin:auto auto 28px}
 .ab-logo-vertical-desktop{width:220px;height:auto}
 .ab-logo-lockup-mobile{display:none}
