@@ -9,6 +9,7 @@
 .ab-topbar{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:40px;position:absolute;top:32px;left:0;right:0}
 .ab-logo-icon{height:34px;width:auto}
 .ab-logo-text{font-family:'Outfit',sans-serif;font-weight:800;font-size:16px;color:#1F2937}
+.ab-logo-lockup-mobile{display:none}
 
 .ab-form-wrap{max-width:400px;width:100%;margin:auto 0}
 .ab-headrow{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:24px}
@@ -116,12 +117,11 @@
  .ab-right{position:absolute;inset:0;min-height:0}
  .ab-right-inner,.ls-bottombar{display:none}
  .ab-left{
-  position:absolute;inset:0;z-index:5;padding:70px 0 16px;overflow:hidden;
+  position:absolute;inset:0;z-index:5;padding:118px 0 16px;overflow:hidden;
   align-items:center;justify-content:center;background:transparent
  }
- .ab-topbar{position:absolute;top:16px}
- .ab-logo-icon{height:28px}
- .ab-logo-text{font-size:14px;color:#fff}
+ .ab-topbar{display:none}
+ .ab-logo-lockup-mobile{display:block;position:absolute;top:14px;left:50%;transform:translateX(-50%);width:210px;height:auto;z-index:6}
  .ab-form-wrap{
   margin:0;max-width:320px;width:calc(100% - 32px);
   background:rgba(15,36,28,.72);backdrop-filter:blur(6px);
