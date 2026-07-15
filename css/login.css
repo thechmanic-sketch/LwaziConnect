@@ -116,31 +116,49 @@
 /* ═══ MOBILE — form floats on the background image ═══ */
 @media (max-width:768px){
  .login-screen{overflow-y:auto}
- .ls-panels{display:block;position:relative;min-height:calc(100vh - 56px)}
+ .ls-panels{display:block;position:relative;min-height:calc(100vh - 46px)}
  .ab-right{position:absolute;inset:0;min-height:0}
  .ab-right-inner,.ls-bottombar{display:none}
  .ab-left{
-  position:absolute;inset:0;z-index:5;padding:56px 0 16px;overflow:hidden;
-  align-items:center;justify-content:flex-start;background:transparent
+  position:absolute;inset:0;z-index:5;padding:12px 0;overflow:hidden;
+  align-items:center;justify-content:center;background:transparent
  }
  .ab-topbar{display:none}
- .ab-logo-lockup-mobile{display:block;width:250px;height:auto;margin:0 auto 26px}
+ .ab-logo-lockup-mobile{display:block;width:210px;height:auto;margin:auto auto 16px;flex-shrink:0}
  .ab-form-wrap{
-  margin:0 auto auto auto;max-width:320px;width:calc(100% - 32px);
+  margin:0 auto auto;max-width:320px;width:calc(100% - 32px);
   background:rgba(15,36,28,.72);backdrop-filter:blur(6px);
-  border-radius:16px;padding:20px 18px;box-shadow:0 20px 50px rgba(0,0,0,.5)
+  border-radius:16px;padding:16px 18px;box-shadow:0 20px 50px rgba(0,0,0,.5);
+  flex-shrink:0
  }
- .ab-title{color:#fff;font-size:26px}
+ .ab-title{color:#fff;font-size:24px}
+ .ab-title::after{bottom:-4px}
  .ab-reg{color:rgba(255,255,255,.7)}
  .ab-reg a{color:#fff}
  .ab-social-row,.ab-divider,.ab-terms{display:none}
  .ab-field label{color:rgba(255,255,255,.85)}
  .ab-forgot{color:rgba(255,255,255,.7)}
  .ab-forgot:hover{color:#fff}
- .ab-headrow{margin-bottom:16px}
- .ab-field{margin-bottom:12px}
- .ls-footer{position:relative;z-index:5;padding:10px 16px 12px}
- .ls-footer-brand{font-size:10px}
- .ls-footer-contact{font-size:9px;gap:6px}
+ .ab-headrow{margin-bottom:12px}
+ .ab-field{margin-bottom:10px}
+ .ab-field input,.ab-select{height:40px}
+ .ab-login-btn{height:42px;margin-top:2px}
+ .ls-footer{position:relative;z-index:5;padding:6px 16px 8px}
+ .ls-footer-brand{font-size:9.5px}
+ .ls-footer-contact{font-size:8.5px;gap:5px}
  .ls-chat{right:14px;bottom:14px}
+}
+
+/* Extra-small phones — squeeze a bit more */
+@media (max-width:340px){
+ .ab-logo-lockup-mobile{width:170px;margin:auto auto 10px}
+ .ab-form-wrap{padding:12px 14px}
+ .ab-title{font-size:20px}
+ .ab-headrow{margin-bottom:8px}
+ .ab-field{margin-bottom:7px}
+ .ab-field label{font-size:9px;margin-bottom:4px}
+ .ab-field input,.ab-select{height:36px}
+ .ab-login-btn{height:38px}
+ .ls-footer{display:none}
+ .ls-panels{min-height:100vh}
 }
