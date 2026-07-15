@@ -56,7 +56,7 @@
 .ls-slide.active.ls-zoom-out{animation:lsZoomOut 9s ease-in-out forwards}
 @keyframes lsZoomIn{from{transform:scale(1)}to{transform:scale(1.14)}}
 @keyframes lsZoomOut{from{transform:scale(1.14)}to{transform:scale(1)}}
-.ls-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,26,19,.35) 0%,rgba(10,26,19,.2) 40%,rgba(10,26,19,.55) 100%)}
+.ls-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,16,12,.6) 0%,rgba(6,16,12,.45) 40%,rgba(6,16,12,.75) 100%)}
 
 .ab-right-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 48px;max-width:560px}
 .ab-headline{font-family:'Outfit',sans-serif;font-weight:800;font-size:36px;line-height:1.2;color:#fff;margin-bottom:18px}
