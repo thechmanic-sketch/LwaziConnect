@@ -40,11 +40,7 @@
    <div class="ls-scrim"></div>
 
    <div class="ls-header">
-    <div class="ls-badge"><i class="ti ti-shield-star"></i></div>
-    <div class="ls-welcome-txt">
-     <div class="ls-welcome-lg"><strong>LwaziConnect</strong></div>
-     <div class="ls-welcome-tag">Empowering minds. Building futures.</div>
-    </div>
+    <img class="ls-logo-img" src="images/logo.png" alt="LwaziConnect">
    </div>
 
    <div class="ls-contacts">
@@ -117,14 +113,14 @@
     <div class="ls-role-foot">
      One platform. One community. One goal.<br>
      <span>Excellence in Education.</span>
+     <div class="ls-signup-cta">New school? <a href="#" onclick="event.preventDefault();openSignup()">Create an account</a></div>
     </div>
    </div>
 
    <div class="ls-form-view hidden" id="lsFormView">
     <button class="ls-back" onclick="backToRoles()"><i class="ti ti-arrow-left"></i>Back</button>
     <div class="login-logo">
-     <div class="login-logo-ic">L</div>
-     <div class="login-logo-tx">LwaziConnect</div>
+     <img class="login-logo-img" src="images/logo.png" alt="LwaziConnect">
     </div>
     <div class="login-title">Sign in as <span id="lsChosenRoleLabel">Admin</span></div>
     <div class="login-sub">Enter your LwaziConnect account details to continue</div>
@@ -156,14 +152,79 @@
     </form>
    </div>
 
+   <div class="ls-form-view hidden" id="lsSignupView">
+    <button class="ls-back" onclick="backToRoles()"><i class="ti ti-arrow-left"></i>Back</button>
+    <div class="login-logo">
+     <img class="login-logo-img" src="images/logo.png" alt="LwaziConnect">
+    </div>
+    <div class="login-title">Create your account</div>
+    <div class="login-sub">Set up your school on LwaziConnect</div>
+
+    <form id="signupForm" onsubmit="event.preventDefault();doSignup();">
+     <div class="lf-group">
+      <label class="lf-label" for="suSchool">School Name</label>
+      <div class="lf-input-wrap">
+       <i class="ti ti-building"></i>
+       <input class="lf-input" type="text" id="suSchool" placeholder="e.g. Durban Primary School" required>
+      </div>
+     </div>
+     <div class="lf-group">
+      <label class="lf-label" for="suName">Your Full Name</label>
+      <div class="lf-input-wrap">
+       <i class="ti ti-user"></i>
+       <input class="lf-input" type="text" id="suName" placeholder="e.g. N. Khumalo" required>
+      </div>
+     </div>
+     <div class="lf-group">
+      <label class="lf-label" for="suEmail">Email</label>
+      <div class="lf-input-wrap">
+       <i class="ti ti-mail"></i>
+       <input class="lf-input" type="email" id="suEmail" placeholder="you@school.edu.za" autocomplete="username" required>
+      </div>
+     </div>
+     <div class="lf-group">
+      <label class="lf-label" for="suPhone">Phone</label>
+      <div class="lf-input-wrap">
+       <i class="ti ti-phone"></i>
+       <input class="lf-input" type="tel" id="suPhone" placeholder="071 234 5678" required>
+      </div>
+     </div>
+     <div class="lf-group">
+      <label class="lf-label" for="suPassword">Password</label>
+      <div class="lf-input-wrap">
+       <i class="ti ti-lock"></i>
+       <input class="lf-input" type="password" id="suPassword" placeholder="••••••••" autocomplete="new-password" required>
+       <i class="ti ti-eye lf-toggle-pw" onclick="toggleSuPwVisibility('suPassword','suPwToggle')" id="suPwToggle"></i>
+      </div>
+     </div>
+     <div class="lf-group">
+      <label class="lf-label" for="suConfirm">Confirm Password</label>
+      <div class="lf-input-wrap">
+       <i class="ti ti-lock"></i>
+       <input class="lf-input" type="password" id="suConfirm" placeholder="••••••••" autocomplete="new-password" required>
+       <i class="ti ti-eye lf-toggle-pw" onclick="toggleSuPwVisibility('suConfirm','suConfirmToggle')" id="suConfirmToggle"></i>
+      </div>
+     </div>
+     <div class="lf-row" style="margin-bottom:16px">
+      <label class="lf-remember"><input type="checkbox" id="suTerms" required> I agree to the Terms &amp; Privacy Policy</label>
+     </div>
+     <button class="login-cta" id="signupCTA" type="submit">
+      <i class="ti ti-user-plus" style="font-size:16px"></i>Create Account
+     </button>
+     <div class="ls-signup-cta" style="margin-top:14px">Already have an account? <a href="#" onclick="event.preventDefault();backToRoles()">Sign in</a></div>
+    </form>
+   </div>
+
   </div>
  </div>
 
  <div class="ls-bottombar">
-  <div class="ls-safe"><i class="ti ti-shield-check"></i><div><strong>Safe. Connected. Supported.</strong><span>Together, we create a better learning environment.</span></div></div>
   <div class="ls-quote">
    <i class="ti ti-quote"></i>
-   <div>“Education is the most powerful weapon which you can use to change the world.”<span>— Nelson Mandela</span></div>
+   <div class="ls-quote-inner" id="lsQuoteInner">
+    <span id="lsQuoteText">“Education is the most powerful weapon which you can use to change the world.”</span>
+    <span class="ls-quote-author" id="lsQuoteAuthor">— Nelson Mandela</span>
+   </div>
   </div>
  </div>
 
