@@ -10,7 +10,7 @@
 .ab-logo-icon{height:34px;width:auto}
 .ab-logo-text{font-family:'Outfit',sans-serif;font-weight:800;font-size:16px;color:#1F2937}
 
-.ab-form-wrap{max-width:400px;width:100%}
+.ab-form-wrap{max-width:400px;width:100%;margin:auto 0}
 .ab-headrow{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:24px}
 .ab-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:34px;color:#1F2937;margin:0}
 .ab-reg{font-size:12px;color:#6B7280}
