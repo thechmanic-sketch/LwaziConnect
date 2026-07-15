@@ -117,13 +117,13 @@
  .ab-right{position:absolute;inset:0;min-height:0}
  .ab-right-inner,.ls-bottombar{display:none}
  .ab-left{
-  position:absolute;inset:0;z-index:5;padding:118px 0 16px;overflow:hidden;
+  position:absolute;inset:0;z-index:5;padding:16px 0;overflow:hidden;
   align-items:center;justify-content:center;background:transparent
  }
  .ab-topbar{display:none}
- .ab-logo-lockup-mobile{display:block;position:absolute;top:14px;left:50%;transform:translateX(-50%);width:210px;height:auto;z-index:6}
+ .ab-logo-lockup-mobile{display:block;width:190px;height:auto;margin:auto auto 10px}
  .ab-form-wrap{
-  margin:0;max-width:320px;width:calc(100% - 32px);
+  margin:0 auto auto;max-width:320px;width:calc(100% - 32px);
   background:rgba(15,36,28,.72);backdrop-filter:blur(6px);
   border-radius:16px;padding:20px 18px;box-shadow:0 20px 50px rgba(0,0,0,.5)
  }
