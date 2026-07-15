@@ -17,8 +17,7 @@ function togglePwVisibility() {
  const icon = document.getElementById('pwToggleIcon');
  const showing = pw.type === 'text';
  pw.type = showing ? 'password' : 'text';
- icon.classList.toggle('ti-eye', showing);
- icon.classList.toggle('ti-eye-off', !showing);
+ icon.textContent = showing ? 'SHOW' : 'HIDE';
 }
 
 function doLogin() {

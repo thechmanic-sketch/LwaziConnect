@@ -1,28 +1,16 @@
-// ══ LOGIN SCREEN — ROLE PICKER ══
-const LS_ROLE_LABELS = {principal:'Principal',admin:'Admin',teacher:'Teacher',student:'Student',parent:'Parent'};
-
-function openRoleLogin(role) {
- document.getElementById('lsRoleView').classList.add('hidden');
- document.getElementById('lsFormView').classList.remove('hidden');
- document.getElementById('loginRole').value = role;
- document.getElementById('lsChosenRoleLabel').textContent = LS_ROLE_LABELS[role] || role;
- const email = document.getElementById('loginEmail');
- if (email) email.focus();
-}
-
-function backToRoles() {
- document.getElementById('lsFormView').classList.add('hidden');
- document.getElementById('lsSignupView').classList.add('hidden');
- document.getElementById('lsRoleView').classList.remove('hidden');
-}
-
-// ══ LOGIN SCREEN — CREATE ACCOUNT ══
+// ══ LOGIN SCREEN — LOGIN <-> SIGNUP SWITCH ══
 function openSignup() {
- document.getElementById('lsRoleView').classList.add('hidden');
  document.getElementById('lsFormView').classList.add('hidden');
  document.getElementById('lsSignupView').classList.remove('hidden');
  const school = document.getElementById('suSchool');
  if (school) school.focus();
+}
+
+function backToRoles() {
+ document.getElementById('lsSignupView').classList.add('hidden');
+ document.getElementById('lsFormView').classList.remove('hidden');
+ const email = document.getElementById('loginEmail');
+ if (email) email.focus();
 }
 
 function toggleSuPwVisibility(inputId, iconId) {
@@ -30,8 +18,7 @@ function toggleSuPwVisibility(inputId, iconId) {
  const icon = document.getElementById(iconId);
  const showing = pw.type === 'text';
  pw.type = showing ? 'password' : 'text';
- icon.classList.toggle('ti-eye', showing);
- icon.classList.toggle('ti-eye-off', !showing);
+ icon.textContent = showing ? 'SHOW' : 'HIDE';
 }
 
 function doSignup() {
@@ -44,10 +31,71 @@ function doSignup() {
  backToRoles();
 }
 
-// ══ LOGIN SCREEN — SUPPORT CHAT WIDGET ══
+// ══ LOGIN SCREEN — SUPPORT CHAT WIDGET (draggable balloon) ══
 function toggleLsChat() {
  document.getElementById('lsChatPanel').classList.toggle('hidden');
 }
+
+(function () {
+ const chat = document.getElementById('lsChat');
+ const fab = document.getElementById('lsChatFab');
+ if (!chat || !fab) return;
+
+ let dragging = false, moved = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+ function toXY(e) {
+  if (e.touches && e.touches.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+ }
+
+ function pinToLeftTop() {
+  const r = chat.getBoundingClientRect();
+  chat.style.left = r.left + 'px';
+  chat.style.top = r.top + 'px';
+  chat.style.right = 'auto';
+  chat.style.bottom = 'auto';
+ }
+
+ function onDown(e) {
+  dragging = true; moved = false;
+  const p = toXY(e);
+  startX = p.x; startY = p.y;
+  pinToLeftTop();
+  startLeft = parseFloat(chat.style.left);
+  startTop = parseFloat(chat.style.top);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchend', onUp);
+ }
+
+ function onMove(e) {
+  if (!dragging) return;
+  const p = toXY(e);
+  const dx = p.x - startX, dy = p.y - startY;
+  if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+  if (!moved) return;
+  e.preventDefault();
+  const w = chat.offsetWidth, h = chat.offsetHeight;
+  let newLeft = startLeft + dx, newTop = startTop + dy;
+  newLeft = Math.max(4, Math.min(window.innerWidth - w - 4, newLeft));
+  newTop = Math.max(4, Math.min(window.innerHeight - h - 4, newTop));
+  chat.style.left = newLeft + 'px';
+  chat.style.top = newTop + 'px';
+ }
+
+ function onUp() {
+  dragging = false;
+  document.removeEventListener('mousemove', onMove);
+  document.removeEventListener('touchmove', onMove);
+  document.removeEventListener('mouseup', onUp);
+  document.removeEventListener('touchend', onUp);
+  if (!moved) toggleLsChat();
+ }
+
+ fab.addEventListener('mousedown', onDown);
+ fab.addEventListener('touchstart', onDown, { passive: true });
+})();
 
 // ══ LOGIN SCREEN — IMAGE CAROUSEL (Ken Burns zoom/pan + crossfade) ══
 (function () {
