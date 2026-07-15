@@ -121,7 +121,7 @@
   align-items:center;justify-content:center;background:transparent
  }
  .ab-topbar{display:none}
- .ab-logo-lockup-mobile{display:block;width:190px;height:auto;margin:auto auto 10px}
+ .ab-logo-lockup-mobile{display:block;width:250px;height:auto;margin:auto auto 26px}
  .ab-form-wrap{
   margin:0 auto auto;max-width:320px;width:calc(100% - 32px);
   background:rgba(15,36,28,.72);backdrop-filter:blur(6px);
