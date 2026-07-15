@@ -98,8 +98,8 @@
 .ls-footer-contact{margin-top:5px;display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap;font-size:10.5px;color:rgba(255,255,255,.55)}
 .ls-pipe{color:rgba(255,255,255,.25)}
 
-/* ═══ RESPONSIVE ═══ */
-@media (max-width:900px){
+/* ═══ RESPONSIVE (tablet — still stacked panels) ═══ */
+@media (max-width:900px) and (min-width:769px){
  .ls-panels{grid-template-columns:1fr;min-height:0}
  .ab-left{padding:24px 22px}
  .ab-right{min-height:420px}
@@ -107,4 +107,33 @@
  .ab-headline{font-size:26px}
  .ls-bottombar{padding:16px 24px}
  .ls-chat{right:16px;bottom:16px}
+}
+
+/* ═══ MOBILE — form floats on the background image, single screen, no scroll ═══ */
+@media (max-width:768px){
+ .login-screen{overflow:hidden}
+ .ls-panels{display:block;position:relative;height:100vh;min-height:0}
+ .ab-right{position:absolute;inset:0;min-height:0}
+ .ab-right-inner,.ls-bottombar{display:none}
+ .ab-left{
+  position:absolute;inset:0;z-index:5;padding:0;overflow:hidden;
+  align-items:center;justify-content:center;background:transparent
+ }
+ .ab-topbar{display:none}
+ .ab-form-wrap{
+  margin:0;max-width:320px;width:calc(100% - 32px);
+  background:rgba(15,36,28,.72);backdrop-filter:blur(6px);
+  border-radius:16px;padding:20px 18px;box-shadow:0 20px 50px rgba(0,0,0,.5)
+ }
+ .ab-title{color:#fff;font-size:26px}
+ .ab-reg{color:rgba(255,255,255,.7)}
+ .ab-reg a{color:#fff}
+ .ab-social-row,.ab-divider,.ab-terms{display:none}
+ .ab-field label{color:rgba(255,255,255,.85)}
+ .ab-forgot{color:rgba(255,255,255,.7)}
+ .ab-forgot:hover{color:#fff}
+ .ab-headrow{margin-bottom:16px}
+ .ab-field{margin-bottom:12px}
+ .ls-footer{display:none}
+ .ls-chat{right:14px;bottom:14px}
 }
