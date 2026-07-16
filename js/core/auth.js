@@ -131,6 +131,25 @@ async function loadSchoolData(schoolId) {
  }));
 }
 
+// Pull every school on the platform for the Super Admin panel.
+// Billing/CRM fields (contact, amount, health, lastLogin) aren't
+// backed by any table yet, so they're placeholders until that's built.
+async function loadAllSchools() {
+ const { data: schoolsRaw } = await sb.from('schools').select('*');
+ const { data: studentsRaw } = await sb.from('students').select('school_id');
+ const schools = schoolsRaw || [];
+ const students = studentsRaw || [];
+ D.schools = schools.map(s => ({
+  id: s.id,
+  name: s.name,
+  plan: s.plan,
+  students: students.filter(x => x.school_id === s.id).length,
+  status: s.status,
+  contact: '—', amount: 0, health: 100, lastLogin: '—',
+  _id: s.id,
+ }));
+}
+
 async function enterAppAsProfile(profile) {
  CU_PROFILE = profile;
  selRole = profile.role;
@@ -138,7 +157,8 @@ async function enterAppAsProfile(profile) {
  const rp = ROLE_PROFILES[profile.role] || ROLE_PROFILES.admin;
  const ini = profile.initials || initialsFromName(profile.full_name);
 
- if (profile.role !== 'superadmin') await loadSchoolData(profile.school_id);
+ if (profile.role === 'superadmin') await loadAllSchools();
+ else await loadSchoolData(profile.school_id);
 
  document.getElementById('loginScreen').style.display = 'none';
  document.getElementById('appWrap').classList.remove('hidden');

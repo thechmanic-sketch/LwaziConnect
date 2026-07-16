@@ -1,11 +1,13 @@
 function rSuperAdmin(area){
  const mrr=D.schools.reduce((a,s)=>a+s.amount,0);
+ const activeCount=D.schools.filter(s=>s.status==='active').length;
+ const trialCount=D.schools.filter(s=>s.status==='trial').length;
  area.innerHTML=`
  <div class="g4 mb18">
-  <div class="sc" style="border-left:4px solid var(--a)"><div class="sc-icon ig"><i class="ti ti-building-school"></i></div><div class="sc-val">4</div><div class="sc-lbl">Schools on platform</div></div>
+  <div class="sc" style="border-left:4px solid var(--a)"><div class="sc-icon ig"><i class="ti ti-building-school"></i></div><div class="sc-val">${D.schools.length}</div><div class="sc-lbl">Schools on platform</div></div>
   <div class="sc" style="border-left:4px solid var(--g)"><div class="sc-icon ib"><i class="ti ti-users"></i></div><div class="sc-val">${D.schools.reduce((a,s)=>a+s.students,0).toLocaleString()}</div><div class="sc-lbl">Total students</div></div>
   <div class="sc" style="border-left:4px solid var(--gl)"><div class="sc-icon ia"><i class="ti ti-currency-dollar"></i></div><div class="sc-val">${fmt(mrr)}</div><div class="sc-lbl">Monthly recurring revenue</div><div class="sc-trend tu"><i class="ti ti-trending-up" style="font-size:10px"></i>${fmt(mrr*12)} projected/year</div></div>
-  <div class="sc" style="border-left:4px solid var(--p)"><div class="sc-icon ip"><i class="ti ti-crown"></i></div><div class="sc-val">3</div><div class="sc-lbl">Active licences · 1 trial</div></div>
+  <div class="sc" style="border-left:4px solid var(--p)"><div class="sc-icon ip"><i class="ti ti-crown"></i></div><div class="sc-val">${activeCount}</div><div class="sc-lbl">Active licences · ${trialCount} trial</div></div>
  </div>
  <div class="card mb18"><div class="card-head"><div class="card-title"><i class="ti ti-chart-bar"></i>Monthly Revenue</div><button class="btn btn-s" style="height:26px;font-size:10px" onclick="T('Revenue report exported','success')"><i class="ti ti-download" style="font-size:10px"></i>Export</button></div><div class="bar-chart" id="barRev"></div></div>
  <div class="card">
