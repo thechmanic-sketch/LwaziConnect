@@ -184,10 +184,37 @@ function grUpdateCount(clsName){
 }
 
 function mAddEvent(){OM('Add Calendar Event',`
- <div class="fg"><div class="fl">Event Title</div><input class="fi" placeholder="e.g. Grade 7 Science Projects"></div>
- <div class="fr"><div class="fg"><div class="fl">Date</div><input class="fi" type="date"></div><div class="fg"><div class="fl">Type</div><select class="fs"><option>Academic</option><option>Exam</option><option>Event</option><option>Holiday</option></select></div></div>
- <div class="fr"><div class="fg"><div class="fl">Applicable to</div><select class="fs"><option>All</option>${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Notify via WhatsApp</div><select class="fs"><option>Yes</option><option>No</option></select></div></div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Event added. Parents notified.','success');CM()">Add Event</button>`);}
+ <div class="fg"><div class="fl">Event Title</div><input class="fi" id="aeTitle" placeholder="e.g. Grade 7 Science Projects"></div>
+ <div class="fr"><div class="fg"><div class="fl">Date</div><input class="fi" id="aeDate" type="date"></div><div class="fg"><div class="fl">Type</div><select class="fs" id="aeType"><option value="academic">Academic</option><option value="exam">Exam</option><option value="event">Event</option><option value="holiday">Holiday</option></select></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Applicable to</div><select class="fs" id="aeClass"><option value="">All</option>${D.classes.map(c=>`<option value="${c._id}">${c.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Notify via WhatsApp</div><select class="fs"><option>Yes</option><option>No</option></select></div></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="aeSubmitBtn" onclick="submitAddEvent()">Add Event</button>`);}
+
+async function submitAddEvent(){
+ const title=document.getElementById('aeTitle').value.trim();
+ const date=document.getElementById('aeDate').value;
+ const type=document.getElementById('aeType').value;
+ const classId=document.getElementById('aeClass').value;
+ if(!title){T('Enter an event title','error');return;}
+ if(!date){T('Pick a date','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('aeSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Saving...';}
+ try{
+  const {error}=await sb.from('calendar_events').insert({
+   school_id:schoolId,title,event_date:date,type,
+   class_id:classId||null,created_by:CU_PROFILE?.id||null
+  });
+  if(error)throw error;
+  T('Event added','success');
+  CM();
+  await loadSchoolData(schoolId);
+  if(CV==='calendar')V('calendar');
+ }catch(err){
+  T(err.message||'Failed to add event','error');
+  if(btn){btn.disabled=false;btn.innerHTML='Add Event';}
+ }
+}
 
 function mAddHealth(){OM('Add Health Record',`
  <div class="fg"><div class="fl">Student</div><select class="fs" id="ahStu">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>

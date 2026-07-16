@@ -84,7 +84,7 @@ async function loadProfileAndEnter(userId) {
 // app. Superadmin spans schools, so it isn't school-scoped here.
 async function loadSchoolData(schoolId) {
  if (!schoolId) return;
- const [{ data: classesRaw }, { data: studentsRaw }, { data: teacherProfiles }, { data: teacherLinks }, { data: admissionsRaw }, { data: parentProfiles }, { data: parentLinks }, { data: documentsRaw }] = await Promise.all([
+ const [{ data: classesRaw }, { data: studentsRaw }, { data: teacherProfiles }, { data: teacherLinks }, { data: admissionsRaw }, { data: parentProfiles }, { data: parentLinks }, { data: documentsRaw }, { data: calEventsRaw }, { data: healthRaw }, { data: disciplineRaw }, { data: invoicesRaw }] = await Promise.all([
   sb.from('classes').select('*').eq('school_id', schoolId),
   sb.from('students').select('*').eq('school_id', schoolId),
   sb.from('profiles').select('*').eq('school_id', schoolId).eq('role','teacher'),
@@ -93,6 +93,10 @@ async function loadSchoolData(schoolId) {
   sb.from('profiles').select('*').eq('school_id', schoolId).eq('role','parent'),
   sb.from('parent_students').select('*'),
   sb.from('documents').select('*, uploader:profiles(full_name)').eq('school_id', schoolId).order('created_at', { ascending: false }),
+  sb.from('calendar_events').select('*').eq('school_id', schoolId).order('event_date', { ascending: true }),
+  sb.from('health_records').select('*').eq('school_id', schoolId),
+  sb.from('discipline_records').select('*').eq('school_id', schoolId).order('incident_date', { ascending: false }),
+  sb.from('invoices').select('*').eq('school_id', schoolId),
  ]);
 
  const classes = classesRaw || [];
@@ -154,6 +158,45 @@ async function loadSchoolData(schoolId) {
    phone: p.phone || '', email: '', portal: true, status: 'active',
   };
  });
+
+ D.calEvents = (calEventsRaw || []).map(e => ({
+  id: e.id,
+  title: e.title,
+  date: e.event_date,
+  type: e.type,
+  cls: e.class_id ? (classById[e.class_id] || 'All') : 'All',
+ }));
+
+ D.health = (healthRaw || []).map(h => ({
+  id: h.id,
+  student: studentById[h.student_id]?.name || '—',
+  condition: h.medical_condition || 'None',
+  allergy: h.allergy || 'None',
+  blood: h.blood_type || '—',
+  aid: h.medical_aid || '—',
+  emergency: h.emergency_contact || '—',
+ }));
+
+ D.discipline = (disciplineRaw || []).map(d => ({
+  id: d.id,
+  student: studentById[d.student_id]?.name || '—',
+  type: d.type,
+  desc: d.description || '',
+  date: d.incident_date,
+  teacher: teacherProfilesList.find(t => t.id === d.reported_by)?.full_name || '—',
+  action: d.action_taken || '—',
+  status: d.status,
+ }));
+
+ D.invoices = (invoicesRaw || []).map(i => ({
+  id: i.id,
+  student: studentById[i.student_id]?.name || '—',
+  term: i.term,
+  amount: Number(i.amount) || 0,
+  paid: Number(i.paid) || 0,
+  status: i.status,
+  due: i.due_date || '—',
+ }));
 
  D.documents = (documentsRaw || []).map(d => ({
   id: d.id,
