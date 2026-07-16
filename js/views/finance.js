@@ -1,4 +1,5 @@
 function rFees(area){
+ if(CU_ROLE==='parent')return rParentFees(area);
  area.innerHTML=`
  <div class="g3 mb18">
   <div class="sc"><div class="sc-icon ig"><i class="ti ti-circle-check"></i></div><div class="sc-val">R112,500</div><div class="sc-lbl">Collected — Term 3</div><div class="sc-trend tu"><i class="ti ti-trending-up" style="font-size:10px"></i>75% collection rate</div></div>
@@ -41,6 +42,33 @@ function rstInv(list){
  </tr>`;}).join('');
 }
 function filtInv(status,el){el.closest('.card-head').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');rstInv(status==='all'?D.invoices:D.invoices.filter(i=>i.status===status));}
+
+function rParentFees(area){
+ const child=D.students[0];
+ const myInvoices=D.invoices.filter(i=>i.student===child.name);
+ const totalDue=myInvoices.reduce((a,i)=>a+i.amount,0);
+ const totalPaid=myInvoices.reduce((a,i)=>a+i.paid,0);
+ const bal=totalDue-totalPaid;
+ area.innerHTML=`
+ <div class="g3 mb18">
+  <div class="sc" style="cursor:default"><div class="sc-icon ig"><i class="ti ti-receipt-2"></i></div><div class="sc-val">${fmt(totalDue)}</div><div class="sc-lbl">Billed — Term 3</div></div>
+  <div class="sc" style="cursor:default"><div class="sc-icon ib"><i class="ti ti-circle-check"></i></div><div class="sc-val">${fmt(totalPaid)}</div><div class="sc-lbl">Paid so far</div></div>
+  <div class="sc" style="cursor:default"><div class="sc-icon ${bal>0?'ir':'ig'}"><i class="ti ${bal>0?'ti-alert-triangle':'ti-circle-check'}"></i></div><div class="sc-val" style="color:${bal>0?'var(--r)':'var(--g)'}">${bal>0?fmt(bal):'R0'}</div><div class="sc-lbl">Outstanding</div></div>
+ </div>
+ <div class="card">
+  <div class="card-head"><div class="card-title"><i class="ti ti-receipt-2"></i>${child.name} — Invoices</div></div>
+  <div class="tw-wrap"><table class="dt"><thead><tr><th>Invoice</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Method</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+  ${myInvoices.map(inv=>{const b=inv.amount-inv.paid;return`<tr>
+   <td class="mono">${inv.id}</td>
+   <td style="font-weight:600">${fmt(inv.amount)}</td><td style="color:var(--g);font-weight:600">${fmt(inv.paid)}</td>
+   <td style="color:${b>0?'var(--r)':'var(--sl)'};font-weight:${b>0?600:400}">${b>0?fmt(b):'—'}</td>
+   <td><span class="pill pn">${inv.method}</span></td>
+   <td><span class="pill ${sc(inv.status)}">${sl(inv.status)}</span></td>
+   <td><div class="flex g6"><i class="ti ti-eye act" onclick="openInv('${inv.id}')"></i>${b>0?`<div class="pay-btn" onclick="T('PayFast link sent for ${fmt(b)}','success')"><i class="ti ti-link"></i>PayFast</div>`:''}<i class="ti ti-download act" onclick="T('Downloaded','success')"></i></div></td>
+  </tr>`;}).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--sl);padding:20px">No invoices yet</td></tr>'}
+  </tbody></table></div>
+ </div>`;
+}
 function openInv(id){
  const inv=D.invoices.find(i=>i.id===id);if(!inv)return;const bal=inv.amount-inv.paid;
  OM(`Invoice ${inv.id}`,`

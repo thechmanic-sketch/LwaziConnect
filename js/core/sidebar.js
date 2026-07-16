@@ -51,9 +51,17 @@ function scrollContent(dir){
 }
 
 // ══ NAV BINDING ══
+const STUDENT_TAB_VIEWS={dashboard:rStudentPortal,subjects:rStudentSubjects,timetable:rStudentTimetableView,attendance:rStudentAttendance,homework:rStudentHomework};
 document.querySelectorAll('.nav-item[data-v]').forEach(item=>{
  item.addEventListener('click',()=>{
-  if(CU_ROLE==='student'){rStudentPortal();document.getElementById('ptitle').textContent=item.textContent.trim();if(window.innerWidth<=860)closeSidebar();return;}
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  item.classList.add('active');
+  if(CU_ROLE==='student'){
+   const v=item.dataset.v;
+   (STUDENT_TAB_VIEWS[v]||(()=>{V(v);}))();
+   if(window.innerWidth<=860)closeSidebar();
+   return;
+  }
   V(item.dataset.v);if(window.innerWidth<=860)closeSidebar();
  });
 });

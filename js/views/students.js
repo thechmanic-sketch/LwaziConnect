@@ -1,4 +1,6 @@
 function rStudents(area){
+ const isTeacher=CU_ROLE==='teacher';
+ document.getElementById('topBtn')?.classList.toggle('hidden',isTeacher);
  area.innerHTML=`
  <div class="bulk-bar hidden" id="bulkBar">
   <span class="bc">0 selected</span>
@@ -6,7 +8,7 @@ function rStudents(area){
   <button class="bbt" onclick="mGenReports()"><i class="ti ti-certificate" style="font-size:12px"></i>Generate Report Cards</button>
   <button class="bbt" onclick="T(selRows.size+' records exported','success')"><i class="ti ti-download" style="font-size:12px"></i>Export</button>
   <button class="bbt" onclick="T('Attendance marked for '+selRows.size+' students','success')"><i class="ti ti-calendar-check" style="font-size:12px"></i>Mark Attendance</button>
-  <button class="bbt danger" onclick="T(selRows.size+' students removed','error');selRows=new Set();updBulk()"><i class="ti ti-trash" style="font-size:12px"></i>Delete</button>
+  ${isTeacher?'':`<button class="bbt danger" onclick="T(selRows.size+' students removed','error');selRows=new Set();updBulk()"><i class="ti ti-trash" style="font-size:12px"></i>Delete</button>`}
  </div>
  <div class="card">
   <div class="fbar">
@@ -16,12 +18,12 @@ function rStudents(area){
    <div class="chip" onclick="filtStuCls('at-risk',this)" style="border-color:var(--r);color:var(--r)">At Risk</div>
    <div style="margin-left:auto;display:flex;gap:7px">
     <button class="btn btn-s" onclick="T('CSV exported','success')"><i class="ti ti-download" style="font-size:11px"></i>Export</button>
-    <button class="btn btn-s" onclick="mImportCSV()"><i class="ti ti-upload" style="font-size:11px"></i>Import CSV</button>
-    <button class="btn btn-g" onclick="mAddStu()"><i class="ti ti-user-plus" style="font-size:11px"></i>Add Student</button>
+    ${isTeacher?'':`<button class="btn btn-s" onclick="mImportCSV()"><i class="ti ti-upload" style="font-size:11px"></i>Import CSV</button>
+    <button class="btn btn-g" onclick="mAddStu()"><i class="ti ti-user-plus" style="font-size:11px"></i>Add Student</button>`}
    </div>
   </div>
   <div class="tw-wrap"><table class="dt" id="stuT">
-   <thead><tr><th class="cc"><input type="checkbox" class="rc" onchange="togAll(this,'stuT')"></th><th>Student</th><th>ID</th><th>Class</th><th>Avg</th><th>Attendance</th><th>Balance</th><th>Status</th><th>Actions</th></tr></thead>
+   <thead><tr><th class="cc"><input type="checkbox" class="rc" onchange="togAll(this,'stuT')"></th><th>Student</th><th>ID</th><th>Class</th><th>Avg</th><th>Attendance</th>${isTeacher?'':'<th>Balance</th>'}<th>Status</th><th>Actions</th></tr></thead>
    <tbody id="stuB"></tbody>
   </table></div>
  </div>`;
@@ -30,19 +32,20 @@ function rStudents(area){
 
 function rstStu(list){
  const tb=document.getElementById('stuB');if(!tb)return;
+ const isTeacher=CU_ROLE==='teacher';
  tb.innerHTML=list.map(s=>`<tr>
   <td><input type="checkbox" class="rc" data-id="${s.id}" onchange="togRow(this,'${s.id}')"></td>
   <td><div class="flex ic g8"><div class="av av-s" style="background:${s.bg};color:${s.fg}">${s.ini}</div><div><div style="font-weight:600">${s.name}</div><div class="tsm">${s.gender}</div></div></div></td>
   <td class="mono">${s.id}</td><td>${s.cls}</td>
   <td>${s.avg}% <span class="pill ${gc(s.grade)}">${s.grade}</span></td>
   <td><div class="flex ic g6"><div class="pw-bar" style="width:46px"><div class="pb-bar" style="width:${s.att}%;background:${s.att<80?'var(--r)':s.att<90?'var(--a)':'var(--g)'}"></div></div><span style="font-size:11px;color:${s.att<80?'var(--r)':'var(--sl)'}">${s.att}%</span></div></td>
-  <td style="color:${s.balance>0?'var(--r)':'var(--sl)'};font-weight:${s.balance>0?600:400}">${s.balance>0?fmt(s.balance):'Settled'}</td>
+  ${isTeacher?'':`<td style="color:${s.balance>0?'var(--r)':'var(--sl)'};font-weight:${s.balance>0?600:400}">${s.balance>0?fmt(s.balance):'Settled'}</td>`}
   <td><span class="pill ${sc(s.status)}">${sl(s.status)}</span></td>
   <td><div class="flex g6">
    <i class="ti ti-eye act" onclick='openSP(${JSON.stringify(s).replace(/"/g,"'")})'></i>
    <i class="ti ti-brand-whatsapp act" style="color:var(--wd)" onclick="T('WhatsApp to ${s.parent}','wa')"></i>
    <i class="ti ti-edit act" onclick="T('Editing ${s.name}','')"></i>
-   <i class="ti ti-trash act" style="color:var(--r)" onclick="T('Removed','error')"></i>
+   ${isTeacher?'':`<i class="ti ti-trash act" style="color:var(--r)" onclick="T('Removed','error')"></i>`}
   </div></td>
  </tr>`).join('');
 }

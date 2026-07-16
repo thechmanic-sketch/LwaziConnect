@@ -51,6 +51,9 @@ function completeLogin(role) {
  document.getElementById('roleBadgeTxt').textContent = p.label;
  // rebuild nav — show only items for this role
  buildRoleNav(p.nav);
+ // parents/students have nothing appropriate to "Add" from the topbar
+ const topBtn = document.getElementById('topBtn');
+ if (topBtn) topBtn.classList.toggle('hidden', role === 'parent' || role === 'student');
  // go to dashboard
  if (role === 'parent') { rParentPortal(); document.getElementById('ptitle').textContent = 'My Child'; }
  else if (role === 'student') { rStudentPortal(); document.getElementById('ptitle').textContent = 'My Portal'; }

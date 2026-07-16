@@ -1,9 +1,10 @@
 function rMessages(area){
+ const myMessages=CU_ROLE==='parent'?D.messages.filter(m=>m.from===D.students[0].parent):D.messages;
  area.innerHTML=`<div style="display:grid;grid-template-columns:276px 1fr;gap:12px;height:calc(100vh-112px);height:calc(100vh - 112px)">
   <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
    <div style="padding:11px 13px;border-bottom:1px solid var(--sb)"><div style="background:var(--sp);border-radius:6px;padding:0 9px;height:28px;display:flex;align-items:center;gap:5px"><i class="ti ti-search" style="font-size:12px;color:var(--sx)"></i><input type="text" placeholder="Search messages..." style="border:none;background:transparent;font-size:12px;color:var(--s);outline:none;width:100%"></div></div>
    <div style="flex:1;overflow-y:auto" id="msgList">
-   ${D.messages.map(m=>`<div class="msg-li${m.id===CMsg?' active':''}${m.unread?' unread':''}" onclick="openMsg(${m.id})" id="mli-${m.id}">
+   ${myMessages.map(m=>`<div class="msg-li${m.id===CMsg?' active':''}${m.unread?' unread':''}" onclick="openMsg(${m.id})" id="mli-${m.id}">
     <div style="width:5px;height:5px;border-radius:50%;background:${m.unread?'var(--a)':'transparent'};flex-shrink:0;margin-top:5px"></div>
     <div class="av av-s" style="background:${m.bg};color:${m.fg}">${m.ini}</div>
     <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">${m.from}${m.wa?'<i class="ti ti-brand-whatsapp" style="font-size:10px;color:var(--wd);margin-left:3px"></i>':''}</div><div class="tsm" style="margin-bottom:1px">${m.role}</div><div style="font-size:11px;color:var(--sx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${m.thread[m.thread.length-1].text}</div></div>
