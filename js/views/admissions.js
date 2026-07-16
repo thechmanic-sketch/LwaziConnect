@@ -21,17 +21,39 @@ function rAdmissions(area){
    <td>${a.status==='approved'?'<span class="pill pg"><i class="ti ti-check"></i> Complete</span>':'<span class="pill pa"><i class="ti ti-clock"></i> Awaiting</span>'}</td>
    <td>${a.date}</td><td><span class="pill ${sc(a.status)}">${sl(a.status)}</span></td>
    <td><div class="flex g6"><i class="ti ti-eye act" onclick="T('Viewing ${a.id}','')"></i>
-    ${a.status==='pending'?`<button class="btn btn-g" style="height:24px;font-size:10px;padding:0 7px" onclick="appApprove('${a.id}',this)"><i class="ti ti-check" style="font-size:10px"></i>Approve</button><button class="btn btn-r" style="height:24px;font-size:10px;padding:0 7px" onclick="T('Rejected','error')">Reject</button>`:''}
+    ${a.status==='pending'?`<button class="btn btn-g" style="height:24px;font-size:10px;padding:0 7px" onclick="appApprove('${a.id}',this)"><i class="ti ti-check" style="font-size:10px"></i>Approve</button><button class="btn btn-r" style="height:24px;font-size:10px;padding:0 7px" onclick="appReject('${a.id}',this)">Reject</button>`:''}
    </div></td>
   </tr>`).join('')}
   </tbody></table></div>
  </div>`;
 }
-function appApprove(id,btn){
- const row=btn.closest('tr');
- row.querySelector('.pill').textContent='Approved';row.querySelector('.pill').className='pill pg';
- btn.closest('div').innerHTML='<span class="tsm" style="color:var(--g)"><i class="ti ti-circle-check"></i> Approved</span>';
- T(`${id} approved — student record created. WhatsApp sent to parent.`,'wa');
+async function appApprove(id,btn){
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ btn.disabled=true;
+ try{
+  const {error}=await sb.from('admissions').update({status:'approved'}).eq('id',id);
+  if(error)throw error;
+  T('Application approved','success');
+  await loadSchoolData(schoolId);
+  V('admissions');
+ }catch(err){
+  T(err.message||'Failed to approve application','error');
+  btn.disabled=false;
+ }
+}
+async function appReject(id,btn){
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ btn.disabled=true;
+ try{
+  const {error}=await sb.from('admissions').update({status:'rejected'}).eq('id',id);
+  if(error)throw error;
+  T('Application rejected','error');
+  await loadSchoolData(schoolId);
+  V('admissions');
+ }catch(err){
+  T(err.message||'Failed to reject application','error');
+  btn.disabled=false;
+ }
 }
 function openPublicForm(){
  OM('Online Application Form Preview',`

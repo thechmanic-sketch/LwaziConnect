@@ -71,16 +71,42 @@ function rLicensing(area){
 }
 function toggleLic(lt){document.getElementById('mP').classList.toggle('hidden',lt);document.getElementById('lP').classList.toggle('hidden',!lt);}
 
+async function submitSchoolProfile(){
+ const schoolId=CU_SCHOOL?.id;
+ if(!schoolId){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('stSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Saving...';}
+ try{
+  const {data,error}=await sb.from('schools').update({
+   name:document.getElementById('stName').value.trim(),
+   phone:document.getElementById('stPhone').value.trim()||null,
+   email:document.getElementById('stEmail').value.trim()||null,
+   address:document.getElementById('stAddr').value.trim()||null,
+   province:document.getElementById('stProv').value,
+   school_type:document.getElementById('stType').value
+  }).eq('id',schoolId).select().single();
+  if(error)throw error;
+  CU_SCHOOL=data;
+  const nameEl=document.getElementById('sideSchoolName');
+  if(nameEl)nameEl.textContent=data.name;
+  T('Profile saved','success');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy" style="font-size:11px"></i>Save Profile';}
+ }catch(err){
+  T(err.message||'Failed to save profile','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy" style="font-size:11px"></i>Save Profile';}
+ }
+}
+
 function rSettings(area){
  area.innerHTML=`<div class="g2" style="align-items:start">
   <div>
    <div class="card mb14">
     <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:var(--s);margin-bottom:12px;display:flex;align-items:center;gap:6px"><i class="ti ti-building-school" style="color:var(--g)"></i>School Profile</div>
-    <div class="fg"><div class="fl">School Name</div><input class="fi" value="${schoolName()}"></div>
-    <div class="fr"><div class="fg"><div class="fl">Phone</div><input class="fi" value="031 100 2000"></div><div class="fg"><div class="fl">Email</div><input class="fi" value="admin@durbanprimary.edu.za"></div></div>
-    <div class="fg"><div class="fl">Address</div><input class="fi" value="Private Bag X01, Durban, 4001"></div>
-    <div class="fr"><div class="fg"><div class="fl">Province</div><select class="fs"><option>KwaZulu-Natal</option><option>Gauteng</option><option>Western Cape</option></select></div><div class="fg"><div class="fl">School Type</div><select class="fs"><option>Primary School</option><option>High School</option><option>Combined</option></select></div></div>
-    <button class="btn btn-g" onclick="T('Profile saved','success')"><i class="ti ti-device-floppy" style="font-size:11px"></i>Save Profile</button>
+    <div class="fg"><div class="fl">School Name</div><input class="fi" id="stName" value="${schoolName()}"></div>
+    <div class="fr"><div class="fg"><div class="fl">Phone</div><input class="fi" id="stPhone" value="${CU_SCHOOL?.phone||''}"></div><div class="fg"><div class="fl">Email</div><input class="fi" id="stEmail" value="${CU_SCHOOL?.email||''}"></div></div>
+    <div class="fg"><div class="fl">Address</div><input class="fi" id="stAddr" value="${CU_SCHOOL?.address||''}"></div>
+    <div class="fr"><div class="fg"><div class="fl">Province</div><select class="fs" id="stProv">${['KwaZulu-Natal','Gauteng','Western Cape','Eastern Cape','Free State','Limpopo','Mpumalanga','North West','Northern Cape'].map(p=>`<option ${CU_SCHOOL?.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="fg"><div class="fl">School Type</div><select class="fs" id="stType">${['Primary School','High School','Combined'].map(t=>`<option ${CU_SCHOOL?.school_type===t?'selected':''}>${t}</option>`).join('')}</select></div></div>
+    <button class="btn btn-g" id="stSubmitBtn" onclick="submitSchoolProfile()"><i class="ti ti-device-floppy" style="font-size:11px"></i>Save Profile</button>
    </div>
    <div class="card mb14">
     <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:var(--s);margin-bottom:12px;display:flex;align-items:center;gap:6px"><i class="ti ti-currency-dollar" style="color:var(--g)"></i>Fee Structure</div>

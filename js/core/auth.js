@@ -84,11 +84,12 @@ async function loadProfileAndEnter(userId) {
 // app. Superadmin spans schools, so it isn't school-scoped here.
 async function loadSchoolData(schoolId) {
  if (!schoolId) return;
- const [{ data: classesRaw }, { data: studentsRaw }, { data: teacherProfiles }, { data: teacherLinks }] = await Promise.all([
+ const [{ data: classesRaw }, { data: studentsRaw }, { data: teacherProfiles }, { data: teacherLinks }, { data: admissionsRaw }] = await Promise.all([
   sb.from('classes').select('*').eq('school_id', schoolId),
   sb.from('students').select('*').eq('school_id', schoolId),
   sb.from('profiles').select('*').eq('school_id', schoolId).eq('role','teacher'),
   sb.from('teacher_classes').select('*'),
+  sb.from('admissions').select('*').eq('school_id', schoolId).order('submitted_at', { ascending: false }),
  ]);
 
  const classes = classesRaw || [];
@@ -132,6 +133,16 @@ async function loadSchoolData(schoolId) {
   classes: links.filter(l => l.teacher_id === t.id).map(l => classById[l.class_id]).filter(Boolean),
   phone: t.phone || '', email: '', status: 'active', joined: '',
   profile_id: t.id,
+ }));
+
+ D.admissions = (admissionsRaw || []).map(a => ({
+  id: a.id,
+  name: a.applicant_name,
+  grade: a.grade_applying || '—',
+  parent: a.parent_name || '—',
+  phone: a.phone || '—',
+  date: a.submitted_at ? a.submitted_at.split('T')[0] : '—',
+  status: a.status,
  }));
 }
 

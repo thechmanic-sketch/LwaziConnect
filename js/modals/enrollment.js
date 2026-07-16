@@ -52,11 +52,39 @@ function mAddParent(){OM('Add Parent',`
 
 function mAddAdmission(){OM('New Application',`
  <div class="step-ind"><div class="step-it"><div class="sc2 cur">1</div><div class="sl2 cur">Applicant</div></div><div class="sc3 pend"></div><div class="step-it"><div class="sc2 pend">2</div><div class="sl2 pend">Parent</div></div><div class="sc3 pend"></div><div class="step-it"><div class="sc2 pend">3</div><div class="sl2 pend">Documents</div></div></div>
- <div class="fr"><div class="fg"><div class="fl">First Name</div><input class="fi" placeholder="First name"></div><div class="fg"><div class="fl">Last Name</div><input class="fi" placeholder="Last name"></div></div>
- <div class="fr"><div class="fg"><div class="fl">Date of Birth</div><input class="fi" type="date"></div><div class="fg"><div class="fl">Grade Applying For</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div></div>
- <div class="fr"><div class="fg"><div class="fl">Parent Name</div><input class="fi" placeholder="Parent full name"></div><div class="fg"><div class="fl">Phone</div><input class="fi" placeholder="071 xxx xxxx"></div></div>
- <div class="fg"><div class="fl">Parent Email</div><input class="fi" placeholder="email@example.com" type="email"></div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Application submitted — APP-004 created','success');CM()">Submit Application</button>`);}
+ <div class="fr"><div class="fg"><div class="fl">First Name</div><input class="fi" id="aaFirst" placeholder="First name"></div><div class="fg"><div class="fl">Last Name</div><input class="fi" id="aaLast" placeholder="Last name"></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Date of Birth</div><input class="fi" id="aaDob" type="date"></div><div class="fg"><div class="fl">Grade Applying For</div><select class="fs" id="aaGrade">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Parent Name</div><input class="fi" id="aaParent" placeholder="Parent full name"></div><div class="fg"><div class="fl">Phone</div><input class="fi" id="aaPhone" placeholder="071 xxx xxxx"></div></div>
+ <div class="fg"><div class="fl">Parent Email</div><input class="fi" id="aaEmail" placeholder="email@example.com" type="email"></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="aaSubmitBtn" onclick="submitAddAdmission()">Submit Application</button>`);}
+
+async function submitAddAdmission(){
+ const first=document.getElementById('aaFirst').value.trim();
+ const last=document.getElementById('aaLast').value.trim();
+ const dob=document.getElementById('aaDob').value;
+ const grade=document.getElementById('aaGrade').value;
+ const parentName=document.getElementById('aaParent').value.trim();
+ const phone=document.getElementById('aaPhone').value.trim();
+ if(!first||!last){T('Enter applicant first and last name','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('aaSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Submitting...';}
+ try{
+  const {error}=await sb.from('admissions').insert({
+   school_id:schoolId,applicant_name:`${first} ${last}`,grade_applying:grade||null,
+   dob:dob||null,parent_name:parentName||null,phone:phone||null,status:'pending'
+  });
+  if(error)throw error;
+  T('Application submitted','success');
+  CM();
+  await loadSchoolData(schoolId);
+  if(CV==='admissions')V('admissions');
+ }catch(err){
+  T(err.message||'Failed to submit application','error');
+  if(btn){btn.disabled=false;btn.innerHTML='Submit Application';}
+ }
+}
 
 function mAddInv(){OM('New Invoice',`
  <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs" id="aivStu">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Term</div><select class="fs" id="aivTerm"><option>Term 3 — 2025</option><option>Term 4 — 2025</option><option>Term 1 — 2026</option></select></div></div>
