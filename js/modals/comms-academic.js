@@ -1,13 +1,44 @@
-function mNewMsg(){OM('New Message',`
- <div class="fg"><div class="fl">Send To</div><select class="fs"><option>All Parents</option>${D.classes.map(c=>`<option>${c.name} Parents</option>`).join('')}${D.parents.map(p=>`<option>${p.name}</option>`).join('')}${D.teachers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select></div>
- <div class="fg"><div class="fl">Subject</div><input class="fi" placeholder="Message subject..."></div>
- <div class="fg"><div class="fl">Message</div><textarea class="fta" style="height:90px" placeholder="Type message..."></textarea></div>
- <div style="display:flex;gap:10px;flex-wrap:wrap">
-  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>WhatsApp</label>
-  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--g)">Email</label>
-  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:var(--b)">SMS</label>
- </div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Message sent via WhatsApp + Email','wa');CM()"><i class="ti ti-send" style="font-size:11px"></i>Send Message</button>`);}
+function mNewMsg(){
+ const recipients=[...D.teachers.map(t=>({id:t.id,name:`${t.name} (Teacher)`})),...D.parents.map(p=>({id:p.id,name:`${p.name} (Parent)`}))].filter(r=>r.id!==CU_PROFILE?.id);
+ OM('New Message',`
+ <div class="fg"><div class="fl">Send To</div><select class="fs" id="nmTo">${recipients.length?recipients.map(r=>`<option value="${r.id}">${r.name}</option>`).join(''):'<option value="">No one else to message yet</option>'}</select></div>
+ <div class="fg"><div class="fl">Message</div><textarea class="fta" id="nmBody" style="height:90px" placeholder="Type message..."></textarea></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="nmSubmitBtn" onclick="submitNewMsg()"><i class="ti ti-send" style="font-size:11px"></i>Send Message</button>`);}
+
+async function submitNewMsg(){
+ const toId=document.getElementById('nmTo').value;
+ const body=document.getElementById('nmBody').value.trim();
+ if(!toId){T('Select a recipient','error');return;}
+ if(!body){T('Type a message','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId||!CU_PROFILE){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('nmSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Sending...';}
+ try{
+  const existing=D.messages.find(m=>m.recipientId===toId);
+  let threadId=existing?.id;
+  if(!threadId){
+   const {data:thread,error:tErr}=await sb.from('message_threads').insert({school_id:schoolId,created_by:CU_PROFILE.id}).select().single();
+   if(tErr)throw tErr;
+   threadId=thread.id;
+   const {error:pErr}=await sb.from('thread_participants').insert([
+    {thread_id:threadId,profile_id:CU_PROFILE.id},
+    {thread_id:threadId,profile_id:toId}
+   ]);
+   if(pErr)throw pErr;
+  }
+  const {error:mErr}=await sb.from('messages').insert({thread_id:threadId,sender_id:CU_PROFILE.id,body,channel:'app'});
+  if(mErr)throw mErr;
+  T('Message sent','success');
+  CM();
+  await loadMessages(CU_PROFILE.id);
+  CMsg=threadId;
+  if(CV==='messages')V('messages');
+ }catch(err){
+  T(err.message||'Failed to send message','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-send" style="font-size:11px"></i>Send Message';}
+ }
+}
 
 function mNewAnn(){OM('New Announcement',`
  <div class="fg"><div class="fl">Title</div><input class="fi" id="anTitle" placeholder="Announcement title..."></div>

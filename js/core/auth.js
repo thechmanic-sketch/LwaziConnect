@@ -345,6 +345,43 @@ async function loadMyStudent(profile) {
  return null;
 }
 
+// Loads the current user's message threads + messages into D.messages.
+// A thread is assumed to be 1:1 (the "other" participant is whoever
+// isn't me); avatar colour is just a deterministic pick from ROLE_PROFILES.
+async function loadMessages(profileId) {
+ D.messages = [];
+ const { data: myParticipation } = await sb.from('thread_participants').select('thread_id').eq('profile_id', profileId);
+ const threadIds = (myParticipation || []).map(p => p.thread_id);
+ if (!threadIds.length) return;
+
+ const [{ data: threadsRaw }, { data: allParticipants }, { data: messagesRaw }] = await Promise.all([
+  sb.from('message_threads').select('*').in('id', threadIds),
+  sb.from('thread_participants').select('*, profile:profiles(id, full_name, role)').in('thread_id', threadIds),
+  sb.from('messages').select('*').in('thread_id', threadIds).order('sent_at', { ascending: true }),
+ ]);
+
+ const fmtTime = iso => { const d = new Date(iso); return d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
+
+ D.messages = (threadsRaw || []).map(t => {
+  const others = (allParticipants || []).filter(p => p.thread_id === t.id && p.profile_id !== profileId);
+  const other = others[0]?.profile;
+  const rp = other ? (ROLE_PROFILES[other.role] || ROLE_PROFILES.admin) : null;
+  const threadMsgs = (messagesRaw || []).filter(m => m.thread_id === t.id);
+  const last = threadMsgs[threadMsgs.length - 1];
+  return {
+   id: t.id,
+   recipientId: other?.id || null,
+   from: other?.full_name || t.subject || 'Conversation',
+   role: rp?.label || '',
+   ini: other ? initialsFromName(other.full_name) : '?',
+   bg: rp?.bg || '#EFF6FF', fg: rp?.fg || '#1D6FA4',
+   unread: false,
+   time: last ? fmtTime(last.sent_at) : '',
+   thread: threadMsgs.map(m => ({ dir: m.sender_id === profileId ? 'out' : 'in', text: m.body, time: fmtTime(m.sent_at) })),
+  };
+ }).sort((a, b) => (b.time > a.time ? 1 : -1));
+}
+
 // Pull every school on the platform for the Super Admin panel.
 // Billing/CRM fields (contact, amount, health, lastLogin) aren't
 // backed by any table yet, so they're placeholders until that's built.
@@ -383,6 +420,7 @@ async function enterAppAsProfile(profile) {
  CU_PROFILE = profile;
  selRole = profile.role;
  CU_ROLE = profile.role;
+ await loadMessages(profile.id);
  const rp = ROLE_PROFILES[profile.role] || ROLE_PROFILES.admin;
  const ini = profile.initials || initialsFromName(profile.full_name);
 

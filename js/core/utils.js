@@ -43,7 +43,7 @@ function toggleTheme(){
  applyTheme(saved||(prefersDark?'dark':'light'));
 })();
 
-let CV='dashboard',CMsg=1,selRows=new Set();
+let CV='dashboard',CMsg=null,selRows=new Set();
 
 // ══ CONFIG ══
 const VC={

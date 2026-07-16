@@ -1,44 +1,38 @@
 function rMessages(area){
- const myMessages=CU_ROLE==='parent'?D.messages.filter(m=>CU_MY_STUDENT&&m.from===CU_MY_STUDENT.parent):D.messages;
+ const myMessages=D.messages;
+ if(!CMsg&&myMessages.length)CMsg=myMessages[0].id;
  area.innerHTML=`<div style="display:grid;grid-template-columns:276px 1fr;gap:12px;height:calc(100vh-112px);height:calc(100vh - 112px)">
   <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
-   <div style="padding:11px 13px;border-bottom:1px solid var(--sb)"><div style="background:var(--sp);border-radius:6px;padding:0 9px;height:28px;display:flex;align-items:center;gap:5px"><i class="ti ti-search" style="font-size:12px;color:var(--sx)"></i><input type="text" placeholder="Search messages..." style="border:none;background:transparent;font-size:12px;color:var(--s);outline:none;width:100%"></div></div>
+   <div style="padding:11px 13px;border-bottom:1px solid var(--sb);display:flex;gap:6px;align-items:center"><div style="flex:1;background:var(--sp);border-radius:6px;padding:0 9px;height:28px;display:flex;align-items:center;gap:5px"><i class="ti ti-search" style="font-size:12px;color:var(--sx)"></i><input type="text" placeholder="Search messages..." style="border:none;background:transparent;font-size:12px;color:var(--s);outline:none;width:100%"></div><div class="ibt" onclick="mNewMsg()" title="New Message"><i class="ti ti-square-plus" style="font-size:15px"></i></div></div>
    <div style="flex:1;overflow-y:auto" id="msgList">
-   ${myMessages.map(m=>`<div class="msg-li${m.id===CMsg?' active':''}${m.unread?' unread':''}" onclick="openMsg(${m.id})" id="mli-${m.id}">
+   ${myMessages.length?myMessages.map(m=>`<div class="msg-li${m.id===CMsg?' active':''}${m.unread?' unread':''}" onclick="openMsg('${m.id}')" id="mli-${m.id}">
     <div style="width:5px;height:5px;border-radius:50%;background:${m.unread?'var(--a)':'transparent'};flex-shrink:0;margin-top:5px"></div>
     <div class="av av-s" style="background:${m.bg};color:${m.fg}">${m.ini}</div>
-    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">${m.from}${m.wa?'<i class="ti ti-brand-whatsapp" style="font-size:10px;color:var(--wd);margin-left:3px"></i>':''}</div><div class="tsm" style="margin-bottom:1px">${m.role}</div><div style="font-size:11px;color:var(--sx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${m.thread[m.thread.length-1].text}</div></div>
+    <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">${m.from}</div><div class="tsm" style="margin-bottom:1px">${m.role}</div><div style="font-size:11px;color:var(--sx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${m.thread.length?m.thread[m.thread.length-1].text:'No messages yet'}</div></div>
     <div class="tsm">${m.time}</div>
-   </div>`).join('')}
+   </div>`).join(''):'<div class="tsm" style="padding:16px">No conversations yet.</div>'}
    </div>
   </div>
   <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column" id="chatPanel">${rChatPanel(CMsg)}</div>
  </div>`;
 }
 function rChatPanel(id){
- const m=D.messages.find(x=>x.id===id);if(!m)return'';
+ const m=D.messages.find(x=>x.id===id);if(!m)return'<div class="tsm" style="padding:16px">Select a conversation, or start a new one.</div>';
  return`<div style="padding:11px 14px;border-bottom:1px solid var(--sb);display:flex;align-items:center;gap:9px">
    <div class="av av-m" style="background:${m.bg};color:${m.fg}">${m.ini}</div>
-   <div><div style="font-weight:600;font-size:13px">${m.from}${m.wa?'<span class="pill pw" style="margin-left:5px"><i class="ti ti-brand-whatsapp"></i> WhatsApp</span>':''}</div><div class="tsm">${m.role}</div></div>
-   <div class="flex g6 ml-a"><div class="ibt" onclick="T('Call initiated','')"><i class="ti ti-phone" style="font-size:13px"></i></div><div class="ibt" onclick="T('Marked resolved','success')"><i class="ti ti-circle-check" style="font-size:13px;color:var(--g)"></i></div></div>
+   <div><div style="font-weight:600;font-size:13px">${m.from}</div><div class="tsm">${m.role}</div></div>
   </div>
   <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:1px" id="chatMsgs">
-   ${m.thread.map(msg=>`
-   <div class="chat-meta${msg.dir==='out'?' right':''}">${msg.dir==='out'?'You':m.from} · ${msg.time}${msg.wa?'<i class="ti ti-brand-whatsapp" style="color:var(--wd);font-size:10px;margin-left:2px"></i>':''}</div>
+   ${m.thread.length?m.thread.map(msg=>`
+   <div class="chat-meta${msg.dir==='out'?' right':''}">${msg.dir==='out'?'You':m.from} · ${msg.time}</div>
    <div style="display:flex;justify-content:${msg.dir==='out'?'flex-end':'flex-start'}">
-    <div class="chat-bubble ${msg.dir==='in'?'chat-in':msg.wa?'chat-wa':'chat-out'}">${msg.text}${msg.dir==='out'&&msg.status?`<div style="text-align:right;margin-top:3px"><span class="wast ${msg.status}"><i class="ti ti-checks" style="font-size:11px"></i>${msg.status}</span></div>`:''}</div>
-   </div>`).join('')}
+    <div class="chat-bubble ${msg.dir==='in'?'chat-in':'chat-out'}">${msg.text}</div>
+   </div>`).join(''):'<div class="tsm" style="padding:10px 0">No messages yet — say hello.</div>'}
   </div>
   <div style="padding:9px 12px;border-top:1px solid var(--sb)">
-   <div style="display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap">
-    ${['Fee reminder','Report card ready','Please call us','Meeting request'].map(t=>`<div onclick="document.getElementById('msgIn').value='${t}'" style="background:var(--sp);border:1px solid var(--sb);border-radius:16px;padding:2px 8px;font-size:10px;cursor:pointer;transition:all .12s" onmouseover="this.style.background='var(--gp)'" onmouseout="this.style.background='var(--sp)'">${t}</div>`).join('')}
-   </div>
    <div style="display:flex;gap:7px;align-items:flex-end">
-    <textarea id="msgIn" placeholder="Type a reply..." style="flex:1;border:1px solid var(--sb);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--s);resize:none;height:50px;outline:none;font-family:Inter" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg(${id});}"></textarea>
-    <div style="display:flex;flex-direction:column;gap:4px">
-     <button class="btn btn-w" style="height:22px;font-size:10px;padding:0 7px" onclick="sendMsg(${id},true)"><i class="ti ti-brand-whatsapp" style="font-size:10px"></i></button>
-     <button class="btn btn-g" style="height:22px;font-size:10px;padding:0 7px" onclick="sendMsg(${id},false)"><i class="ti ti-send" style="font-size:10px"></i></button>
-    </div>
+    <textarea id="msgIn" placeholder="Type a reply..." style="flex:1;border:1px solid var(--sb);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--s);resize:none;height:50px;outline:none;font-family:Inter" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg('${id}');}"></textarea>
+    <button class="btn btn-g" style="height:34px;font-size:10px;padding:0 10px" id="msgSendBtn" onclick="sendMsg('${id}')"><i class="ti ti-send" style="font-size:11px"></i></button>
    </div>
   </div>`;
 }
@@ -49,12 +43,23 @@ function openMsg(id){
  if(li){li.classList.add('active');li.classList.remove('unread');const dot=li.querySelector('div');if(dot)dot.style.background='transparent';}
  document.getElementById('chatPanel').innerHTML=rChatPanel(id);
 }
-function sendMsg(id,wa=false){
+async function sendMsg(id){
  const inp=document.getElementById('msgIn');const txt=inp?.value.trim();if(!txt)return;
- const m=D.messages.find(x=>x.id===id);const now=new Date();const time=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
- m.thread.push({dir:'out',text:txt,time,wa,status:'sent'});inp.value='';
- document.getElementById('chatPanel').innerHTML=rChatPanel(id);
- T(wa?'Sent via WhatsApp':'Message sent',wa?'wa':'success');
+ if(!CU_PROFILE){T('Please re-login','error');return;}
+ const btn=document.getElementById('msgSendBtn');
+ if(btn)btn.disabled=true;
+ try{
+  const {error}=await sb.from('messages').insert({thread_id:id,sender_id:CU_PROFILE.id,body:txt,channel:'app'});
+  if(error)throw error;
+  inp.value='';
+  await loadMessages(CU_PROFILE.id);
+  CMsg=id;
+  V('messages');
+ }catch(err){
+  T(err.message||'Failed to send message','error');
+ }finally{
+  if(btn)btn.disabled=false;
+ }
 }
 
 function annVisible(a){
