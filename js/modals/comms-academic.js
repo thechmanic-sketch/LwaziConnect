@@ -10,16 +10,42 @@ function mNewMsg(){OM('New Message',`
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Message sent via WhatsApp + Email','wa');CM()"><i class="ti ti-send" style="font-size:11px"></i>Send Message</button>`);}
 
 function mNewAnn(){OM('New Announcement',`
- <div class="fg"><div class="fl">Title</div><input class="fi" placeholder="Announcement title..."></div>
- <div class="fr"><div class="fg"><div class="fl">Category</div><select class="fs"><option>Urgent</option><option>Academic</option><option>Events</option><option>Finance</option><option>General</option></select></div><div class="fg"><div class="fl">Audience</div><select class="fs"><option>All</option><option>All Parents</option><option>Teachers only</option><option>Students only</option></select></div></div>
- <div class="fg"><div class="fl">Message</div><textarea class="fta" style="height:90px" placeholder="Announcement body..."></textarea></div>
+ <div class="fg"><div class="fl">Title</div><input class="fi" id="anTitle" placeholder="Announcement title..."></div>
+ <div class="fr"><div class="fg"><div class="fl">Category</div><select class="fs" id="anCat"><option>Urgent</option><option>Academic</option><option>Events</option><option>Finance</option><option>General</option></select></div><div class="fg"><div class="fl">Audience</div><select class="fs" id="anAud"><option value="all">All</option><option value="parents">All Parents</option><option value="teachers">Teachers only</option><option value="students">Students only</option></select></div></div>
+ <div class="fg"><div class="fl">Message</div><textarea class="fta" id="anBody" style="height:90px" placeholder="Announcement body..."></textarea></div>
  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:5px">
-  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>WhatsApp</label>
+  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="anWa" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>WhatsApp</label>
   <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--g)">Email</label>
   <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:var(--g)">In-app</label>
   <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:var(--b)">Include RSVP button</label>
  </div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Announcement published and sent via WhatsApp to all recipients','wa');CM()"><i class="ti ti-speakerphone" style="font-size:11px"></i>Publish & Send</button>`);}
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" id="anSubmitBtn" onclick="submitNewAnn()"><i class="ti ti-speakerphone" style="font-size:11px"></i>Publish & Send</button>`);}
+
+async function submitNewAnn(){
+ const title=document.getElementById('anTitle').value.trim();
+ const category=document.getElementById('anCat').value;
+ const audienceType=document.getElementById('anAud').value;
+ const body=document.getElementById('anBody').value.trim();
+ const waEnabled=document.getElementById('anWa').checked;
+ if(!title||!body){T('Enter a title and message','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId||!CU_PROFILE){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('anSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Publishing...';}
+ try{
+  const {error}=await sb.from('announcements').insert({
+   school_id:schoolId,author_id:CU_PROFILE.id,title,body,
+   tag:category,audience_type:audienceType,wa_enabled:waEnabled
+  });
+  if(error)throw error;
+  T(waEnabled?'Announcement published and sent via WhatsApp':'Announcement published','success');
+  CM();
+  if(typeof V==='function')V(CV);
+ }catch(err){
+  T(err.message||'Failed to publish announcement','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-speakerphone" style="font-size:11px"></i>Publish & Send';}
+ }
+}
 
 function mUploadDoc(){OM('Upload Document',`
  <div class="drop-zone" onclick="T('File picker opened','')"><i class="ti ti-cloud-upload" style="font-size:30px;color:var(--gl);display:block;margin-bottom:7px"></i><div style="font-weight:600;font-size:13px;color:var(--s);margin-bottom:3px">Click to upload or drag and drop</div><div class="tsm">PDF, DOCX, XLSX, JPG — max 10MB</div></div>
