@@ -12,7 +12,7 @@ function rTeachers(area){
    <td>${t.classes.map(c=>`<span class="pill pb" style="margin-right:2px">${c}</span>`).join('')}</td>
    <td>${t.phone}</td>
    <td><span class="pill ${sc(t.status)}">${sl(t.status)}</span>${t.status==='on-leave'?'<span class="tsm" style="color:var(--r);margin-left:5px">Sub needed</span>':''}</td>
-   <td><div class="flex g6"><i class="ti ti-eye act" onclick="T('Viewing ${t.name}','')"></i><i class="ti ti-edit act" onclick="T('Editing ${t.name}','')"></i><i class="ti ti-brand-whatsapp act" style="color:var(--wd)" onclick="T('WhatsApp to ${t.name}','wa')"></i></div></td>
+   <td><div class="flex g6"><i class="ti ti-eye act" onclick="T('Viewing ${t.name}','')"></i><i class="ti ti-edit act" onclick="T('Editing ${t.name}','')"></i><i class="ti ti-shield-star act" title="Capabilities" onclick="mCapabilities('${t.id}')"></i><i class="ti ti-brand-whatsapp act" style="color:var(--wd)" onclick="T('WhatsApp to ${t.name}','wa')"></i></div></td>
   </tr>`).join('')}
   </tbody></table></div>
  </div>`;

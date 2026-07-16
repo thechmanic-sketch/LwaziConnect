@@ -9,10 +9,10 @@ let currentAllowedViews = null;
 function schoolName(){ return (CU_SCHOOL && CU_SCHOOL.name) || 'Your School'; }
 
 const ROLE_PROFILES = {
- superadmin: {name:'Themba Moyo',ini:'TM',bg:'#FEF3C7',fg:'#B45309',label:'Super Admin',nav:['dashboard','students','admissions','parents','classes','teachers','subjects','timetable','attendance','reportcards','fees','messages','announcements','documents','calendar','health','discipline','analytics','superadmin','enterprise','licensing','settings','aiassist','idcards','homework','commscentre','hr','transport','sgb','compliance']},
- principal:  {name:'Dr. S. Nkosi',ini:'SN',bg:'#D8F3DC',fg:'#1B4332',label:'Principal',nav:['dashboard','students','admissions','parents','classes','teachers','subjects','timetable','attendance','reportcards','fees','messages','announcements','documents','calendar','health','discipline','analytics','settings','aiassist','idcards','homework','commscentre','hr','sgb','compliance']},
- admin:      {name:'N. Khumalo',ini:'NK',bg:'#EFF6FF',fg:'#1D6FA4',label:'Administrator',nav:['dashboard','students','admissions','parents','classes','teachers','subjects','timetable','attendance','reportcards','fees','messages','announcements','documents','calendar','health','discipline','settings','aiassist','idcards','homework','commscentre']},
- teacher:    {name:'Mr. T. Zulu',ini:'TZ',bg:'#D8F3DC',fg:'#1B4332',label:'Teacher',nav:['dashboard','students','classes','subjects','timetable','attendance','reportcards','homework','messages','announcements','documents','calendar']},
+ superadmin: {name:'Themba Moyo',ini:'TM',bg:'#FEF3C7',fg:'#B45309',label:'Super Admin',nav:['dashboard','students','admissions','parents','classes','teachers','subjects','timetable','attendance','reportcards','fees','messages','announcements','documents','calendar','health','discipline','analytics','superadmin','enterprise','licensing','settings','aiassist','idcards','homework','commscentre','hr','transport','sgb','compliance','groups']},
+ principal:  {name:'Dr. S. Nkosi',ini:'SN',bg:'#D8F3DC',fg:'#1B4332',label:'Principal',nav:['dashboard','students','admissions','parents','classes','teachers','subjects','timetable','attendance','reportcards','fees','messages','announcements','documents','calendar','health','discipline','analytics','settings','aiassist','idcards','homework','commscentre','hr','sgb','compliance','groups']},
+ admin:      {name:'N. Khumalo',ini:'NK',bg:'#EFF6FF',fg:'#1D6FA4',label:'Administrator',nav:['dashboard','students','admissions','parents','classes','teachers','subjects','timetable','attendance','reportcards','fees','messages','announcements','documents','calendar','health','discipline','settings','aiassist','idcards','homework','commscentre','groups']},
+ teacher:    {name:'Mr. T. Zulu',ini:'TZ',bg:'#D8F3DC',fg:'#1B4332',label:'Teacher',nav:['dashboard','students','classes','subjects','timetable','attendance','reportcards','homework','messages','announcements','documents','calendar','groups']},
  parent:     {name:'Lindiwe Dlamini',ini:'LD',bg:'#FFF8E7',fg:'#B45309',label:'Parent',nav:['dashboard','messages','announcements','fees','documents','calendar']},
  student:    {name:'Amahle Dlamini',ini:'AD',bg:'#EDE9FE',fg:'#5B21B6',label:'Student',nav:['dashboard','subjects','timetable','attendance','homework','announcements','documents','calendar']},
 };
@@ -109,6 +109,16 @@ async function loadSchoolData(schoolId) {
  const { data: marksRaw } = await sb.from('marks').select('*').eq('school_id', schoolId);
  const { data: timetableRaw } = await sb.from('timetable_slots').select('*').eq('school_id', schoolId);
  D.timetableSlots = timetableRaw || [];
+
+ const [{ data: capsRaw }, { data: profileCapsRaw }, { data: groupsRaw }, { data: groupLeadersRaw }, { data: groupMembersRaw }] = await Promise.all([
+  sb.from('capabilities').select('*'),
+  sb.from('profile_capabilities').select('*'),
+  sb.from('groups').select('*').eq('school_id', schoolId),
+  sb.from('group_leaders').select('*'),
+  sb.from('group_members').select('*'),
+ ]);
+ D.capabilities = capsRaw || [];
+ D.profileCapabilities = profileCapsRaw || [];
 
  const classes = classesRaw || [];
  const students = studentsRaw || [];
@@ -223,6 +233,17 @@ async function loadSchoolData(schoolId) {
   paid: Number(i.paid) || 0,
   status: i.status,
   due: i.due_date || '—',
+ }));
+
+ const groupLeadersList = groupLeadersRaw || [];
+ const groupMembersList = groupMembersRaw || [];
+ D.groups = (groupsRaw || []).map(g => ({
+  id: g.id,
+  name: g.name,
+  type: g.type,
+  leaders: groupLeadersList.filter(l => l.group_id === g.id).map(l => teacherProfilesList.find(t => t.id === l.teacher_id)?.full_name).filter(Boolean),
+  memberCount: groupMembersList.filter(m => m.group_id === g.id).length,
+  createdBy: g.created_by,
  }));
 
  D.staff = (staffRaw || []).map(s => ({

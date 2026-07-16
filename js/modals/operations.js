@@ -189,3 +189,67 @@ async function submitAddCampus(){
  }
 }
 
+function mAddGroup(){OM('Create Group',`
+ <div class="fg"><div class="fl">Group Name</div><input class="fi" id="agName" placeholder="e.g. Debate Club"></div>
+ <div class="fg"><div class="fl">Type</div><select class="fs" id="agType"><option value="club">Club</option><option value="team">Team</option><option value="committee">Committee</option><option value="other">Other</option></select></div>
+ <div class="tsm" style="margin-top:4px">You'll be added as the group's creator. Add a leader and members afterwards from the group card.</div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="agSubmitBtn" onclick="submitAddGroup()"><i class="ti ti-users-group" style="font-size:11px"></i>Create Group</button>`);}
+
+async function submitAddGroup(){
+ const name=document.getElementById('agName').value.trim();
+ const type=document.getElementById('agType').value;
+ if(!name){T('Enter a group name','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId||!CU_PROFILE){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('agSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Creating...';}
+ try{
+  const {data,error}=await sb.from('groups').insert({
+   school_id:schoolId,name,type,created_by:CU_PROFILE.id
+  }).select().single();
+  if(error)throw error;
+  if(CU_ROLE==='teacher'&&data){
+   await sb.from('group_leaders').insert({group_id:data.id,teacher_id:CU_PROFILE.id});
+  }
+  T('Group created','success');
+  CM();
+  await loadSchoolData(schoolId);
+  if(CV==='groups')V('groups');
+ }catch(err){
+  T(err.message||'Failed to create group (you may need staff access or the create-group capability)','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-users-group" style="font-size:11px"></i>Create Group';}
+ }
+}
+
+function mCapabilities(teacherId){
+ const t=D.teachers.find(x=>x.id===teacherId);
+ if(!t){T('Teacher not found','error');return;}
+ const assigned=new Set((D.profileCapabilities||[]).filter(pc=>pc.profile_id===teacherId).map(pc=>pc.capability_id));
+ OM(`Capabilities — ${t.name}`,`
+ <div class="tsm" style="margin-bottom:8px">Extra responsibilities/permissions granted to this staff member, on top of their base role.</div>
+ <div id="capList">
+ ${(D.capabilities||[]).map(c=>`
+  <div class="tog-row"><div><div style="font-size:12px;font-weight:500">${c.label||c.key}</div>${c.description?`<div class="tsm">${c.description}</div>`:''}</div><label class="tog-sw"><input type="checkbox" data-cap="${c.id}" ${assigned.has(c.id)?'checked':''} onchange="toggleCapability('${teacherId}','${c.id}',this.checked)"><div class="t-tr"></div><div class="t-th"></div></label></div>`).join('')||'<div class="tsm">No capabilities defined for this school.</div>'}
+ </div>`,
+ `<button class="btn btn-g" onclick="CM()">Done</button>`);}
+
+async function toggleCapability(teacherId,capId,enable){
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId){T('No school context — please re-login','error');return;}
+ try{
+  if(enable){
+   const {error}=await sb.from('profile_capabilities').upsert({
+    profile_id:teacherId,capability_id:capId,granted_by:CU_PROFILE?.id||null
+   },{onConflict:'profile_id,capability_id'});
+   if(error)throw error;
+  }else{
+   const {error}=await sb.from('profile_capabilities').delete().eq('profile_id',teacherId).eq('capability_id',capId);
+   if(error)throw error;
+  }
+  T(enable?'Capability granted':'Capability revoked','success');
+  await loadSchoolData(schoolId);
+ }catch(err){
+  T(err.message||'Failed to update capability','error');
+ }
+}
+
