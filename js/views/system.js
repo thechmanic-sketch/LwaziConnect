@@ -97,6 +97,23 @@ async function submitSchoolProfile(){
  }
 }
 
+async function submitUpdatePassword(){
+ const pw=document.getElementById('stNewPw').value;
+ if(!pw||pw.length<8){T('Password must be at least 8 characters','error');return;}
+ const btn=document.getElementById('stPwSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Updating...';}
+ try{
+  const {error}=await sb.auth.updateUser({password:pw});
+  if(error)throw error;
+  T('Password updated','success');
+  document.getElementById('stNewPw').value='';
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy" style="font-size:11px"></i>Update Password';}
+ }catch(err){
+  T(err.message||'Failed to update password','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy" style="font-size:11px"></i>Update Password';}
+ }
+}
+
 function rSettings(area){
  area.innerHTML=`<div class="g2" style="align-items:start">
   <div>
@@ -130,8 +147,8 @@ function rSettings(area){
     <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:var(--s);margin-bottom:12px;display:flex;align-items:center;gap:6px"><i class="ti ti-lock" style="color:var(--g)"></i>Security</div>
     ${[['Two-factor authentication','Require OTP on login',false],['Parent portal access','Parents can log in and view child data',true],['Auto-logout after 30 min','Timeout for inactive sessions',true]].map(([l,d,on])=>`
     <div class="tog-row"><div><div style="font-size:12px;font-weight:500">${l}</div><div class="tsm">${d}</div></div><label class="tog-sw"><input type="checkbox" ${on?'checked':''} onchange="T('Setting updated','success')"><div class="t-tr"></div><div class="t-th"></div></label></div>`).join('')}
-    <div class="fg" style="margin-top:10px"><div class="fl">New Password</div><input class="fi" type="password" placeholder="Enter new password"></div>
-    <button class="btn btn-g" onclick="T('Password updated','success')"><i class="ti ti-device-floppy" style="font-size:11px"></i>Update Password</button>
+    <div class="fg" style="margin-top:10px"><div class="fl">New Password</div><input class="fi" id="stNewPw" type="password" placeholder="Enter new password"></div>
+    <button class="btn btn-g" id="stPwSubmitBtn" onclick="submitUpdatePassword()"><i class="ti ti-device-floppy" style="font-size:11px"></i>Update Password</button>
    </div>
   </div>
  </div>`;

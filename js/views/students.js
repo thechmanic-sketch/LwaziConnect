@@ -7,7 +7,7 @@ function rStudents(area){
   <span class="bc">0 selected</span>
   <button class="bbt" onclick="T(selRows.size+' WhatsApp reminders sent','wa')"><i class="ti ti-brand-whatsapp" style="font-size:12px"></i>WhatsApp Reminder</button>
   <button class="bbt" onclick="mGenReports()"><i class="ti ti-certificate" style="font-size:12px"></i>Generate Report Cards</button>
-  <button class="bbt" onclick="T(selRows.size+' records exported','success')"><i class="ti ti-download" style="font-size:12px"></i>Export</button>
+  <button class="bbt" onclick="exportStudentsCsv([...selRows])"><i class="ti ti-download" style="font-size:12px"></i>Export</button>
   <button class="bbt" onclick="T('Attendance marked for '+selRows.size+' students','success')"><i class="ti ti-calendar-check" style="font-size:12px"></i>Mark Attendance</button>
   ${isTeacher?'':`<button class="bbt danger" onclick="deleteStudents([...selRows])"><i class="ti ti-trash" style="font-size:12px"></i>Delete</button>`}
  </div>
@@ -18,7 +18,7 @@ function rStudents(area){
    ${[...new Set(myStudents.map(s=>s.cls))].map(c=>`<div class="chip" onclick="filtStuCls('${c}',this)">${c}</div>`).join('')}
    <div class="chip" onclick="filtStuCls('at-risk',this)" style="border-color:var(--r);color:var(--r)">At Risk</div>
    <div style="margin-left:auto;display:flex;gap:7px">
-    <button class="btn btn-s" onclick="T('CSV exported','success')"><i class="ti ti-download" style="font-size:11px"></i>Export</button>
+    <button class="btn btn-s" onclick="exportStudentsCsv()"><i class="ti ti-download" style="font-size:11px"></i>Export</button>
     ${isTeacher?'':`<button class="btn btn-s" onclick="mImportCSV()"><i class="ti ti-upload" style="font-size:11px"></i>Import CSV</button>
     <button class="btn btn-g" onclick="mAddStu()"><i class="ti ti-user-plus" style="font-size:11px"></i>Add Student</button>`}
    </div>
@@ -64,6 +64,19 @@ async function deleteStudents(ids){
  }catch(err){
   T(err.message||'Failed to delete student(s)','error');
  }
+}
+function exportStudentsCsv(ids){
+ const base=CU_ROLE==='teacher'?D.students.filter(s=>myTeacherClasses().includes(s.cls)):D.students;
+ const rows=(ids&&ids.length)?base.filter(s=>ids.includes(s.id)):base;
+ if(!rows.length){T('No students to export','error');return;}
+ const header=['Name','Class','Gender','DOB','Status','Average','Grade'];
+ const csv=[header.join(','),...rows.map(s=>[s.name,s.cls,s.gender,s.dob,s.status,s.avg,s.grade].map(v=>`"${(v??'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
+ const blob=new Blob([csv],{type:'text/csv'});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;a.download='students_export.csv';a.click();
+ URL.revokeObjectURL(url);
+ T(`${rows.length} record${rows.length===1?'':'s'} exported`,'success');
 }
 function filtStu(q){const base=CU_ROLE==='teacher'?D.students.filter(s=>myTeacherClasses().includes(s.cls)):D.students;rstStu(base.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.id.toLowerCase().includes(q.toLowerCase())));}
 function filtStuCls(cls,el){el.closest('.fbar').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');const base=CU_ROLE==='teacher'?D.students.filter(s=>myTeacherClasses().includes(s.cls)):D.students;rstStu(cls==='at-risk'?base.filter(s=>s.att<80||s.grade==='F'):cls?base.filter(s=>s.cls===cls):base);}
