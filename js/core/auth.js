@@ -154,20 +154,25 @@ async function loadAllSchools() {
 }
 
 async function enterAppAsProfile(profile) {
- CU_PROFILE = profile;
- selRole = profile.role;
- CU_ROLE = profile.role;
- const rp = ROLE_PROFILES[profile.role] || ROLE_PROFILES.admin;
- const ini = profile.initials || initialsFromName(profile.full_name);
-
  if (profile.role === 'superadmin') {
   CU_SCHOOL = null;
   await loadAllSchools();
  } else {
   const { data: schoolRow } = await sb.from('schools').select('*').eq('id', profile.school_id).single();
   CU_SCHOOL = schoolRow || null;
+  if (CU_SCHOOL && CU_SCHOOL.status === 'suspended') {
+   await sb.auth.signOut();
+   T('This school\'s account is currently suspended. Contact your school administrator.', 'error');
+   return;
+  }
   await loadSchoolData(profile.school_id);
  }
+
+ CU_PROFILE = profile;
+ selRole = profile.role;
+ CU_ROLE = profile.role;
+ const rp = ROLE_PROFILES[profile.role] || ROLE_PROFILES.admin;
+ const ini = profile.initials || initialsFromName(profile.full_name);
 
  document.getElementById('loginScreen').style.display = 'none';
  document.getElementById('appWrap').classList.remove('hidden');

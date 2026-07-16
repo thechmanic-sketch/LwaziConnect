@@ -16,14 +16,18 @@ function rSuperAdmin(area){
   </div>
   ${D.schools.map(s=>`<div class="sa-card">
    <div class="av av-m" style="background:var(--gp);color:var(--g)">${s.name.substring(0,2).toUpperCase()}</div>
-   <div class="hdot ${s.health>=85?'g':s.health>=60?'a':'r'}"></div>
-   <div style="flex:1"><div style="font-weight:600;font-size:13px">${s.name}</div><div class="tsm">${s.contact} · Last login: ${s.lastLogin} · Health: ${s.health}%</div></div>
-   <div style="text-align:right;min-width:80px"><div style="font-weight:600">${s.students.toLocaleString()} students</div></div>
+   <div class="hdot ${s.status==='active'?'g':s.status==='trial'?'a':'r'}"></div>
+   <div style="flex:1"><div style="font-weight:600;font-size:13px">${s.name}</div><div class="tsm">${s.students.toLocaleString()} students</div></div>
    <span class="pill ${s.plan==='Enterprise'?'pp':s.plan==='Professional'?'pb':'pg'}">${s.plan}</span>
-   <div style="text-align:right;min-width:76px"><div style="font-family:'Outfit',sans-serif;font-weight:700;color:${s.amount>0?'var(--g)':'var(--sl)'}">${s.amount>0?fmt(s.amount)+'/mo':'Trial'}</div></div>
    <span class="pill ${sc(s.status)}">${sl(s.status)}</span>
-   <div class="flex g6"><i class="ti ti-settings act" onclick="event.stopPropagation();T('Managing ${s.name}','')"></i><i class="ti ti-eye act" onclick="event.stopPropagation();T('Viewing dashboard','')"></i><i class="ti ti-brand-whatsapp act" style="color:var(--wd)" onclick="event.stopPropagation();T('WhatsApp to ${s.contact}','wa')"></i></div>
-  </div>`).join('')}
+   <div class="flex g6">
+    <i class="ti ti-eye act" onclick="event.stopPropagation();mViewSchool('${s.id}')" title="View"></i>
+    <i class="ti ti-edit act" onclick="event.stopPropagation();mEditSchool('${s.id}')" title="Edit"></i>
+    ${s.status==='suspended'
+     ?`<i class="ti ti-player-play act" style="color:var(--g)" onclick="event.stopPropagation();setSchoolStatus('${s.id}','active')" title="Reactivate"></i>`
+     :`<i class="ti ti-player-pause act" style="color:var(--r)" onclick="event.stopPropagation();setSchoolStatus('${s.id}','suspended')" title="Pause (non-payment)"></i>`}
+   </div>
+  </div>`).join('')||'<div class="tsm" style="padding:12px 0">No schools yet.</div>'}
  </div>`;
  setTimeout(()=>bldBar('barRev',['Feb','Mar','Apr','May','Jun','Jul'],[1398,1398,1897,2397,2897,2897],3500,'#1B4332',true),60);
 }
