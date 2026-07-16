@@ -245,14 +245,14 @@ language sql stable security definer set search_path = public as $$
   select school_id from profiles where id = auth.uid();
 $$;
 
-create function public.current_role() returns text
+create function public.my_role() returns text
 language sql stable security definer set search_path = public as $$
   select role from profiles where id = auth.uid();
 $$;
 
 create function public.is_school_staff() returns boolean
 language sql stable security definer set search_path = public as $$
-  select current_role() in ('admin','principal','superadmin');
+  select my_role() in ('admin','principal','superadmin');
 $$;
 
 create function public.has_capability(cap_key text) returns boolean
@@ -312,24 +312,24 @@ alter table calendar_events enable row level security;
 
 -- SCHOOLS: superadmin sees all; everyone else sees only their own school
 create policy schools_select on schools for select
-  using (current_role() = 'superadmin' or id = current_school_id());
+  using (my_role() = 'superadmin' or id = current_school_id());
 create policy schools_manage on schools for all
-  using (current_role() = 'superadmin') with check (current_role() = 'superadmin');
+  using (my_role() = 'superadmin') with check (my_role() = 'superadmin');
 
 -- PROFILES: visible within your school; superadmin sees all;
 -- a user can always see/update their own row
 create policy profiles_select on profiles for select
-  using (current_role() = 'superadmin' or school_id = current_school_id() or id = auth.uid());
+  using (my_role() = 'superadmin' or school_id = current_school_id() or id = auth.uid());
 create policy profiles_update_self on profiles for update
   using (id = auth.uid());
 create policy profiles_manage_staff on profiles for all
-  using (is_school_staff() and (school_id = current_school_id() or current_role() = 'superadmin'))
-  with check (is_school_staff() and (school_id = current_school_id() or current_role() = 'superadmin'));
+  using (is_school_staff() and (school_id = current_school_id() or my_role() = 'superadmin'))
+  with check (is_school_staff() and (school_id = current_school_id() or my_role() = 'superadmin'));
 
 -- CAPABILITIES: readable by everyone authenticated (it's just a lookup list)
 create policy capabilities_select on capabilities for select using (true);
 create policy capabilities_manage on capabilities for all
-  using (current_role() = 'superadmin') with check (current_role() = 'superadmin');
+  using (my_role() = 'superadmin') with check (my_role() = 'superadmin');
 
 -- PROFILE_CAPABILITIES: only principal/admin (of that school) or superadmin can grant/revoke;
 -- the affected teacher and school staff can view
@@ -339,20 +339,20 @@ create policy profile_capabilities_select on profile_capabilities for select
     or is_school_staff()
   );
 create policy profile_capabilities_manage on profile_capabilities for all
-  using (current_role() in ('admin','principal','superadmin'))
-  with check (current_role() in ('admin','principal','superadmin'));
+  using (my_role() in ('admin','principal','superadmin'))
+  with check (my_role() in ('admin','principal','superadmin'));
 
 -- CLASSES: visible school-wide to staff; teachers see all classes in their school
 -- (needed for e.g. picking a class in a dropdown) but write access is staff-only
 create policy classes_select on classes for select
-  using (current_role() = 'superadmin' or school_id = current_school_id());
+  using (my_role() = 'superadmin' or school_id = current_school_id());
 create policy classes_manage on classes for all
   using (is_school_staff() and school_id = current_school_id())
   with check (is_school_staff() and school_id = current_school_id());
 
 create policy teacher_classes_select on teacher_classes for select
   using (
-    exists(select 1 from classes c where c.id = class_id and (current_role()='superadmin' or c.school_id = current_school_id()))
+    exists(select 1 from classes c where c.id = class_id and (my_role()='superadmin' or c.school_id = current_school_id()))
   );
 create policy teacher_classes_manage on teacher_classes for all
   using (is_school_staff()) with check (is_school_staff());
@@ -361,11 +361,11 @@ create policy teacher_classes_manage on teacher_classes for all
 -- parent sees only their own children; student sees only themself
 create policy students_select on students for select
   using (
-    current_role() = 'superadmin'
+    my_role() = 'superadmin'
     or (is_school_staff() and school_id = current_school_id())
-    or (current_role() = 'teacher' and teaches_class(class_id))
-    or (current_role() = 'parent' and is_parent_of(id))
-    or (current_role() = 'student' and profile_id = auth.uid())
+    or (my_role() = 'teacher' and teaches_class(class_id))
+    or (my_role() = 'parent' and is_parent_of(id))
+    or (my_role() = 'student' and profile_id = auth.uid())
   );
 create policy students_manage on students for all
   using (is_school_staff() and school_id = current_school_id())
@@ -381,15 +381,15 @@ create policy parent_students_manage on parent_students for all
 -- CREATION requires the 'create-group' capability (or staff).
 create policy groups_select on groups for select
   using (
-    current_role() = 'superadmin'
+    my_role() = 'superadmin'
     or (is_school_staff() and school_id = current_school_id())
-    or exists(select 1 from group_leaders gl where gl.group_id = id and gl.teacher_id = auth.uid())
+    or exists(select 1 from group_leaders gl where gl.group_id = groups.id and gl.teacher_id = auth.uid())
     or exists(
       select 1 from group_members gm
       join students s on s.id = gm.student_id
-      where gm.group_id = id and (
-        (current_role()='parent' and is_parent_of(s.id))
-        or (current_role()='student' and s.profile_id = auth.uid())
+      where gm.group_id = groups.id and (
+        (my_role()='parent' and is_parent_of(s.id))
+        or (my_role()='student' and s.profile_id = auth.uid())
       )
     )
   );
@@ -402,7 +402,7 @@ create policy groups_insert on groups for insert
 create policy groups_update_own on groups for update
   using (
     is_school_staff()
-    or exists(select 1 from group_leaders gl where gl.group_id = id and gl.teacher_id = auth.uid())
+    or exists(select 1 from group_leaders gl where gl.group_id = groups.id and gl.teacher_id = auth.uid())
   );
 create policy groups_delete_own on groups for delete
   using (
@@ -424,33 +424,33 @@ create policy group_leaders_manage on group_leaders for all
 create policy group_members_select on group_members for select
   using (
     is_school_staff()
-    or exists(select 1 from group_leaders gl where gl.group_id = group_id and gl.teacher_id = auth.uid())
-    or exists(select 1 from groups g where g.id = group_id and g.created_by = auth.uid())
+    or exists(select 1 from group_leaders gl where gl.group_id = group_members.group_id and gl.teacher_id = auth.uid())
+    or exists(select 1 from groups g where g.id = group_members.group_id and g.created_by = auth.uid())
     or exists(
       select 1 from students s where s.id = student_id and (
-        (current_role()='parent' and is_parent_of(s.id))
-        or (current_role()='student' and s.profile_id = auth.uid())
+        (my_role()='parent' and is_parent_of(s.id))
+        or (my_role()='student' and s.profile_id = auth.uid())
       )
     )
   );
 create policy group_members_manage on group_members for all
   using (
     is_school_staff()
-    or exists(select 1 from group_leaders gl where gl.group_id = group_id and gl.teacher_id = auth.uid())
-    or exists(select 1 from groups g where g.id = group_id and g.created_by = auth.uid())
+    or exists(select 1 from group_leaders gl where gl.group_id = group_members.group_id and gl.teacher_id = auth.uid())
+    or exists(select 1 from groups g where g.id = group_members.group_id and g.created_by = auth.uid())
   );
 
 -- ANNOUNCEMENTS: readable by anyone in the school; audience_type narrows what
 -- the frontend chooses to show, but staff/author can always manage
 create policy announcements_select on announcements for select
-  using (current_role() = 'superadmin' or school_id = current_school_id());
+  using (my_role() = 'superadmin' or school_id = current_school_id());
 create policy announcements_insert on announcements for insert
   with check (
     school_id = current_school_id()
     and author_id = auth.uid()
     and (
       is_school_staff()
-      or (current_role() = 'teacher' and audience_type in ('class','group')
+      or (my_role() = 'teacher' and audience_type in ('class','group')
           and (audience_class_id is null or teaches_class(audience_class_id))
           and (audience_group_id is null or exists(select 1 from groups g where g.id = audience_group_id and g.created_by = auth.uid())))
     )
@@ -462,27 +462,27 @@ create policy announcements_delete_own on announcements for delete
 
 -- MESSAGES: only thread participants can read/write
 create policy threads_select on message_threads for select
-  using (exists(select 1 from thread_participants tp where tp.thread_id = id and tp.profile_id = auth.uid()) or is_school_staff());
+  using (exists(select 1 from thread_participants tp where tp.thread_id = message_threads.id and tp.profile_id = auth.uid()) or is_school_staff());
 create policy threads_insert on message_threads for insert
   with check (school_id = current_school_id());
 create policy thread_participants_select on thread_participants for select
   using (profile_id = auth.uid() or is_school_staff());
 create policy thread_participants_manage on thread_participants for all
-  using (exists(select 1 from thread_participants tp where tp.thread_id = thread_id and tp.profile_id = auth.uid()) or is_school_staff());
+  using (profile_id = auth.uid() or is_school_staff());
 create policy messages_select on messages for select
-  using (exists(select 1 from thread_participants tp where tp.thread_id = thread_id and tp.profile_id = auth.uid()) or is_school_staff());
+  using (exists(select 1 from thread_participants tp where tp.thread_id = messages.thread_id and tp.profile_id = auth.uid()) or is_school_staff());
 create policy messages_insert on messages for insert
-  with check (sender_id = auth.uid() and exists(select 1 from thread_participants tp where tp.thread_id = thread_id and tp.profile_id = auth.uid()));
+  with check (sender_id = auth.uid() and exists(select 1 from thread_participants tp where tp.thread_id = messages.thread_id and tp.profile_id = auth.uid()));
 
 -- DOCUMENTS: readable per access_level within the school; managed by staff
 create policy documents_select on documents for select
   using (
-    current_role() = 'superadmin' or (
+    my_role() = 'superadmin' or (
       school_id = current_school_id() and (
         access_level = 'all'
-        or (access_level = 'parents' and current_role() in ('parent','admin','principal'))
-        or (access_level = 'staff' and current_role() in ('teacher','admin','principal'))
-        or (access_level = 'admin' and current_role() in ('admin','principal'))
+        or (access_level = 'parents' and my_role() in ('parent','admin','principal'))
+        or (access_level = 'staff' and my_role() in ('teacher','admin','principal'))
+        or (access_level = 'admin' and my_role() in ('admin','principal'))
       )
     )
   );
@@ -493,10 +493,10 @@ create policy documents_manage on documents for all
 -- INVOICES: staff see all in school; parent sees only their child's; student sees own
 create policy invoices_select on invoices for select
   using (
-    current_role() = 'superadmin'
+    my_role() = 'superadmin'
     or (is_school_staff() and school_id = current_school_id())
-    or (current_role() = 'parent' and is_parent_of(student_id))
-    or (current_role() = 'student' and exists(select 1 from students s where s.id = student_id and s.profile_id = auth.uid()))
+    or (my_role() = 'parent' and is_parent_of(student_id))
+    or (my_role() = 'student' and exists(select 1 from students s where s.id = student_id and s.profile_id = auth.uid()))
   );
 create policy invoices_manage on invoices for all
   using (is_school_staff() and school_id = current_school_id())
@@ -506,14 +506,14 @@ create policy invoices_manage on invoices for all
 -- parent/student see only their child's/own class's homework
 create policy homework_select on homework for select
   using (
-    current_role() = 'superadmin'
+    my_role() = 'superadmin'
     or (is_school_staff() and school_id = current_school_id())
-    or (current_role() = 'teacher' and teaches_class(class_id))
-    or (current_role() = 'parent' and exists(select 1 from students s where s.class_id = homework.class_id and is_parent_of(s.id)))
-    or (current_role() = 'student' and exists(select 1 from students s where s.class_id = homework.class_id and s.profile_id = auth.uid()))
+    or (my_role() = 'teacher' and teaches_class(class_id))
+    or (my_role() = 'parent' and exists(select 1 from students s where s.class_id = homework.class_id and is_parent_of(s.id)))
+    or (my_role() = 'student' and exists(select 1 from students s where s.class_id = homework.class_id and s.profile_id = auth.uid()))
   );
 create policy homework_insert on homework for insert
-  with check (school_id = current_school_id() and (is_school_staff() or (current_role()='teacher' and teaches_class(class_id) and teacher_id = auth.uid())));
+  with check (school_id = current_school_id() and (is_school_staff() or (my_role()='teacher' and teaches_class(class_id) and teacher_id = auth.uid())));
 create policy homework_manage_own on homework for update
   using (is_school_staff() or teacher_id = auth.uid());
 create policy homework_delete_own on homework for delete
@@ -523,20 +523,20 @@ create policy homework_delete_own on homework for delete
 -- parent/student see only their child's/own records
 create policy attendance_select on attendance_records for select
   using (
-    current_role() = 'superadmin'
+    my_role() = 'superadmin'
     or (is_school_staff() and school_id = current_school_id())
-    or (current_role() = 'teacher' and class_id is not null and teaches_class(class_id))
-    or (current_role() = 'parent' and is_parent_of(student_id))
-    or (current_role() = 'student' and exists(select 1 from students s where s.id = student_id and s.profile_id = auth.uid()))
+    or (my_role() = 'teacher' and class_id is not null and teaches_class(class_id))
+    or (my_role() = 'parent' and is_parent_of(student_id))
+    or (my_role() = 'student' and exists(select 1 from students s where s.id = student_id and s.profile_id = auth.uid()))
   );
 create policy attendance_manage on attendance_records for all
-  using (is_school_staff() or (current_role() = 'teacher' and class_id is not null and teaches_class(class_id)))
-  with check (school_id = current_school_id() and (is_school_staff() or (current_role() = 'teacher' and class_id is not null and teaches_class(class_id))));
+  using (is_school_staff() or (my_role() = 'teacher' and class_id is not null and teaches_class(class_id)))
+  with check (school_id = current_school_id() and (is_school_staff() or (my_role() = 'teacher' and class_id is not null and teaches_class(class_id))));
 
 -- CALENDAR: readable school-wide; managed by staff only (per the earlier
 -- decision that parents/students shouldn't create events)
 create policy calendar_select on calendar_events for select
-  using (current_role() = 'superadmin' or school_id = current_school_id());
+  using (my_role() = 'superadmin' or school_id = current_school_id());
 create policy calendar_manage on calendar_events for all
   using (is_school_staff() and school_id = current_school_id())
   with check (is_school_staff() and school_id = current_school_id());
