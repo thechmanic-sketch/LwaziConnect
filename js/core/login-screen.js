@@ -42,15 +42,56 @@ function toggleSuPwVisibility(inputId, iconId) {
  icon.textContent = showing ? 'SHOW' : 'HIDE';
 }
 
-function doSignup() {
+async function doSignup() {
+ const role = document.getElementById('suRole').value;
+ const schoolName = document.getElementById('suSchool').value.trim();
+ const fullName = document.getElementById('suName').value.trim();
+ const email = document.getElementById('suEmail').value.trim();
+ const phone = document.getElementById('suPhone').value.trim();
  const password = document.getElementById('suPassword').value;
  const confirm = document.getElementById('suConfirm').value;
+ if (!schoolName) { T('Enter your school name','error'); return; }
  if (password !== confirm) { T('Passwords do not match','error'); return; }
- const roleLabel = document.getElementById('suRole').selectedOptions[0].textContent;
- const school = document.getElementById('suSchool').value.trim();
- T(`Registration request sent as ${roleLabel} at ${school || 'your school'} — check your email to confirm (demo)`, 'success');
- document.getElementById('signupForm').reset();
- backToRoles();
+ if (password.length < 8) { T('Password must be at least 8 characters','error'); return; }
+
+ const cta = document.getElementById('signupCTA');
+ if (cta) { cta.disabled = true; cta.textContent = 'CREATING ACCOUNT...'; }
+
+ try {
+  let schoolId;
+  const { data: existingId, error: lookupErr } = await sb.rpc('find_school_id_by_name', { p_name: schoolName });
+  if (lookupErr) throw lookupErr;
+
+  if (existingId) {
+   schoolId = existingId;
+  } else if (role === 'principal' || role === 'admin') {
+   const { data: newId, error: createErr } = await sb.rpc('register_school', { p_name: schoolName });
+   if (createErr) throw createErr;
+   schoolId = newId;
+  } else {
+   T('School not found — please check the name with your school office, or ask them to register first.','error');
+   if (cta) { cta.disabled = false; cta.textContent = 'CREATE ACCOUNT'; }
+   return;
+  }
+
+  const { data, error } = await sb.auth.signUp({
+   email, password,
+   options: { data: { role, school_id: schoolId, full_name: fullName, phone } }
+  });
+  if (error) throw error;
+
+  document.getElementById('signupForm').reset();
+  if (data.session) {
+   await loadProfileAndEnter(data.user.id);
+  } else {
+   T('Account created — check your email to confirm, then log in.','success');
+   backToRoles();
+  }
+ } catch (err) {
+  T(err.message || 'Registration failed','error');
+ } finally {
+  if (cta) { cta.disabled = false; cta.textContent = 'CREATE ACCOUNT'; }
+ }
 }
 
 // ══ LOGIN SCREEN — SUPPORT CHAT WIDGET (draggable balloon) ══

@@ -1,7 +1,10 @@
 function subClr(s){const i=SUBS.indexOf(s)%SUB_C.length;const c=SUB_C[i<0?0:i].split('|');return{bg:c[0],fg:c[1]};}
 
-function myTeacher(){return D.teachers.find(t=>t.name===ROLE_PROFILES.teacher.name)||D.teachers[0];}
-function myTeacherClasses(){return myTeacher().classes;}
+function myTeacher(){
+ if(CU_PROFILE)return D.teachers.find(t=>t.profile_id===CU_PROFILE.id||t.id===CU_PROFILE.id)||D.teachers[0];
+ return D.teachers.find(t=>t.name===ROLE_PROFILES.teacher.name)||D.teachers[0];
+}
+function myTeacherClasses(){return myTeacher()?.classes||[];}
 
 // ══ DARK MODE ══
 function applyTheme(theme){
