@@ -11,7 +11,7 @@ function mNewMsg(){OM('New Message',`
 
 function mNewAnn(){OM('New Announcement',`
  <div class="fg"><div class="fl">Title</div><input class="fi" placeholder="Announcement title..."></div>
- <div class="fr"><div class="fg"><div class="fl">Category</div><select class="fs"><option>Urgent</option><option>Academic</option><option>Events</option><option>Finance</option><option>General</option></select></div><div class="fg"><div class="fl">Audience</div><select class="fs"><option>All</option><option>Parents only</option><option>Teachers only</option></select></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Category</div><select class="fs"><option>Urgent</option><option>Academic</option><option>Events</option><option>Finance</option><option>General</option></select></div><div class="fg"><div class="fl">Audience</div><select class="fs"><option>All</option><option>All Parents</option><option>Teachers only</option><option>Students only</option></select></div></div>
  <div class="fg"><div class="fl">Message</div><textarea class="fta" style="height:90px" placeholder="Announcement body..."></textarea></div>
  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:5px">
   <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>WhatsApp</label>

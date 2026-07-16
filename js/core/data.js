@@ -70,6 +70,7 @@ const D={
   {id:2,title:'Term 3 Examination Schedule Released',body:'The Term 3 examination timetable is now available on the portal. Exams run from 11 August to 22 August 2025.',color:'#E9A825',tag:'Academic',date:'Yesterday',audience:'All',sent:624,delivered:610,read:502,wa:true,rsvp:0},
   {id:3,title:'Sports Day — 5 September 2025',body:'Annual Sports Day registrations are now open. Students may participate in athletics, swimming, and team sports.',color:'#1B4332',tag:'Events',date:'3 days ago',audience:'All',sent:624,delivered:598,read:445,wa:false,rsvp:134},
   {id:4,title:'School Fee Reminder — Term 3',body:'Term 3 school fees were due on 1 July 2025. Parents with outstanding balances are requested to contact the finance office urgently.',color:'#5B21B6',tag:'Finance',date:'5 days ago',audience:'Fee Defaulters',sent:48,delivered:44,read:31,wa:true,rsvp:0},
+  {id:5,title:'Library Books Due Back Friday',body:'All learners with borrowed library books must return them by Friday 25 July so we can complete the term stocktake.',color:'#1D6FA4',tag:'Academic',date:'2 days ago',audience:'Students only',sent:624,delivered:601,read:388,wa:false,rsvp:0},
  ],
  documents:[
   {name:'Admission Form 2026.pdf',type:'pdf',size:'245 KB',date:'2025-07-10',cat:'Forms',by:'Admin',access:'All'},

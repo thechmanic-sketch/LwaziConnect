@@ -57,7 +57,17 @@ function sendMsg(id,wa=false){
  T(wa?'Sent via WhatsApp':'Message sent',wa?'wa':'success');
 }
 
+function annVisible(a){
+ if(CU_ROLE==='admin'||CU_ROLE==='principal'||CU_ROLE==='superadmin')return true;
+ if(a.audience==='All')return true;
+ if(CU_ROLE==='teacher')return a.audience==='Teachers only';
+ if(CU_ROLE==='parent')return a.audience==='All Parents'||a.audience==='Fee Defaulters';
+ if(CU_ROLE==='student')return a.audience==='Students only';
+ return false;
+}
 function rAnnouncements(area){
+ const canManage=CU_ROLE==='admin'||CU_ROLE==='principal'||CU_ROLE==='superadmin';
+ const anns=D.announcements.filter(annVisible);
  area.innerHTML=`
  <div class="g3 mb18">
   <div class="sc"><div class="sc-icon ir"><i class="ti ti-alert-circle"></i></div><div class="sc-val">1</div><div class="sc-lbl">Urgent active</div></div>
@@ -65,13 +75,13 @@ function rAnnouncements(area){
   <div class="sc"><div class="sc-icon ig"><i class="ti ti-eye"></i></div><div class="sc-val">78%</div><div class="sc-lbl">Avg read rate</div></div>
  </div>
  <div class="card">
-  <div class="card-head"><div class="card-title"><i class="ti ti-speakerphone"></i>Announcements</div><button class="btn btn-g" onclick="mNewAnn()"><i class="ti ti-plus" style="font-size:11px"></i>New</button></div>
-  ${D.announcements.map(a=>`<div class="ann-item">
+  <div class="card-head"><div class="card-title"><i class="ti ti-speakerphone"></i>Announcements</div>${canManage?'<button class="btn btn-g" onclick="mNewAnn()"><i class="ti ti-plus" style="font-size:11px"></i>New</button>':''}</div>
+  ${anns.map(a=>`<div class="ann-item">
    <div class="ann-bar" style="background:${a.color}"></div>
    <div style="flex:1">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:9px">
      <div class="ann-title">${a.title}</div>
-     <div class="flex g6" style="flex-shrink:0"><i class="ti ti-edit act" onclick="T('Editing','')"></i><i class="ti ti-trash act" style="color:var(--r)" onclick="T('Deleted','error')"></i></div>
+     ${canManage?`<div class="flex g6" style="flex-shrink:0"><i class="ti ti-edit act" onclick="T('Editing','')"></i><i class="ti ti-trash act" style="color:var(--r)" onclick="T('Deleted','error')"></i></div>`:''}
     </div>
     <div class="ann-body">${a.body}</div>
     <div class="ann-meta" style="margin-top:7px">
@@ -79,13 +89,13 @@ function rAnnouncements(area){
      ${a.wa?'<span class="pill pw"><i class="ti ti-brand-whatsapp"></i> WhatsApp</span>':''}
      ${a.rsvp>0?`<span class="pill pb"><i class="ti ti-calendar-check"></i> ${a.rsvp} RSVPs</span>`:''}
      <span class="tsm">${a.date}</span>
-     <div class="dstat"><i class="ti ti-send" style="font-size:10px"></i>${a.sent} sent</div>
+     ${canManage?`<div class="dstat"><i class="ti ti-send" style="font-size:10px"></i>${a.sent} sent</div>
      <div class="dstat"><i class="ti ti-check" style="font-size:10px;color:var(--b)"></i>${a.delivered} delivered</div>
      <div class="dstat"><i class="ti ti-eye" style="font-size:10px;color:var(--g)"></i>${a.read} read</div>
-     <button style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:11px;color:var(--g)" onclick="T('Resent to ${a.sent} recipients','wa')"><i class="ti ti-send" style="font-size:10px;margin-right:2px"></i>Resend</button>
+     <button style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:11px;color:var(--g)" onclick="T('Resent to ${a.sent} recipients','wa')"><i class="ti ti-send" style="font-size:10px;margin-right:2px"></i>Resend</button>`:''}
     </div>
    </div>
-  </div>`).join('')}
+  </div>`).join('')||'<div class="tsm" style="padding:12px 0">No announcements right now.</div>'}
  </div>`;
 }
 

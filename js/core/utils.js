@@ -3,6 +3,23 @@ function subClr(s){const i=SUBS.indexOf(s)%SUB_C.length;const c=SUB_C[i<0?0:i].s
 function myTeacher(){return D.teachers.find(t=>t.name===ROLE_PROFILES.teacher.name)||D.teachers[0];}
 function myTeacherClasses(){return myTeacher().classes;}
 
+// ══ DARK MODE ══
+function applyTheme(theme){
+ document.documentElement.setAttribute('data-theme',theme);
+ const icon=document.getElementById('themeIcon');
+ if(icon)icon.className=theme==='dark'?'ti ti-sun':'ti ti-moon';
+ localStorage.setItem('lc-theme',theme);
+}
+function toggleTheme(){
+ const current=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
+ applyTheme(current==='dark'?'light':'dark');
+}
+(function initTheme(){
+ const saved=localStorage.getItem('lc-theme');
+ const prefersDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+ applyTheme(saved||(prefersDark?'dark':'light'));
+})();
+
 let CV='dashboard',CMsg=1,selRows=new Set();
 
 // ══ CONFIG ══

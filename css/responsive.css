@@ -3,7 +3,7 @@
    ══════════════════════════════════════ */
 
 /* Hamburger button — hidden on desktop */
-.hamburger{display:none;width:34px;height:34px;border-radius:8px;border:1px solid var(--sb);background:#fff;align-items:center;justify-content:center;cursor:pointer;color:var(--s);flex-shrink:0;font-size:18px}
+.hamburger{display:none;width:34px;height:34px;border-radius:8px;border:1px solid var(--sb);background:var(--surface);align-items:center;justify-content:center;cursor:pointer;color:var(--s);flex-shrink:0;font-size:18px}
 
 /* Sidebar close button — hidden on desktop */
 .sidebar-close{display:none;position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;align-items:center;justify-content:center;cursor:pointer;font-size:16px;z-index:2}
