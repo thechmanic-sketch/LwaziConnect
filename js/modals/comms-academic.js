@@ -42,11 +42,17 @@ async function submitAddClass(){
  const btn=document.getElementById('acSubmitBtn');
  if(btn){btn.disabled=true;btn.textContent='Creating...';}
  try{
-  const {error}=await sb.from('classes').insert({
+  const {data:newClass,error}=await sb.from('classes').insert({
    school_id:schoolId,name,room:room||null,capacity,
    homeroom_teacher_id:teacherId||null
-  });
+  }).select().single();
   if(error)throw error;
+  if(teacherId&&newClass){
+   const {error:tcErr}=await sb.from('teacher_classes').insert({
+    teacher_id:teacherId,class_id:newClass.id
+   });
+   if(tcErr)throw tcErr;
+  }
   T('Class created','success');
   CM();
   await loadSchoolData(schoolId);
@@ -60,15 +66,44 @@ async function submitAddClass(){
 function mMarkAtt(){
  const isTeacher=CU_ROLE==='teacher';
  const availClasses=isTeacher?D.classes.filter(c=>myTeacherClasses().includes(c.name)):D.classes;
- const first=(availClasses[0]&&availClasses[0].name)||'Grade 7A';
+ const first=(availClasses[0]&&availClasses[0].name)||'';
  OM('Mark Attendance',`
- <div class="fr" style="margin-bottom:10px"><div class="fg" style="margin-bottom:0"><div class="fl">Class</div><select class="fs" id="maClsSel" onchange="maFilterStudents(this.value)">${availClasses.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg" style="margin-bottom:0"><div class="fl">Date</div><input class="fi" type="date" value="${new Date().toISOString().split('T')[0]}"></div></div>
+ <div class="fr" style="margin-bottom:10px"><div class="fg" style="margin-bottom:0"><div class="fl">Class</div><select class="fs" id="maClsSel" onchange="maFilterStudents(this.value)">${availClasses.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg" style="margin-bottom:0"><div class="fl">Date</div><input class="fi" id="maDate" type="date" value="${new Date().toISOString().split('T')[0]}"></div></div>
  <div style="max-height:250px;overflow-y:auto" id="maStuList">${maStudentRows(first)}</div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Attendance saved. 2 parents notified via WhatsApp','wa');CM()"><i class="ti ti-check" style="font-size:11px"></i>Save Attendance</button>`);}
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" id="maSubmitBtn" onclick="submitAttendance()"><i class="ti ti-check" style="font-size:11px"></i>Save Attendance</button>`);}
 function maStudentRows(clsName){
- return D.students.filter(s=>s.cls===clsName).map(s=>`<div class="flex ic g8" style="padding:6px 0;border-bottom:1px solid var(--sp)"><div class="av av-s" style="background:${s.bg};color:${s.fg}">${s.ini}</div><span style="flex:1;font-size:12px;font-weight:500">${s.name}</span>${[['P','Present'],['A','Absent'],['L','Late'],['E','Excused'],['S','Sick']].map(([o,lbl])=>`<label title="${lbl}" style="cursor:pointer"><input type="radio" name="ma_${s.id}" value="${o}" ${o==='P'?'checked':''} style="display:none"><div class="att-cell att-${o}">${o}</div></label>`).join('')}</div>`).join('');
+ const stus=D.students.filter(s=>s.cls===clsName);
+ if(!stus.length)return '<div class="tsm" style="padding:10px 0">No students in this class.</div>';
+ return stus.map(s=>`<div class="flex ic g8" style="padding:6px 0;border-bottom:1px solid var(--sp)"><div class="av av-s" style="background:${s.bg};color:${s.fg}">${s.ini}</div><span style="flex:1;font-size:12px;font-weight:500">${s.name}</span>${[['P','Present'],['A','Absent'],['L','Late'],['E','Excused'],['S','Sick']].map(([o,lbl])=>`<label title="${lbl}" style="cursor:pointer"><input type="radio" name="ma_${s.id}" value="${o}" ${o==='P'?'checked':''} style="display:none"><div class="att-cell att-${o}">${o}</div></label>`).join('')}</div>`).join('');
 }
 function maFilterStudents(clsName){const el=document.getElementById('maStuList');if(el)el.innerHTML=maStudentRows(clsName);}
+
+async function submitAttendance(){
+ const clsName=document.getElementById('maClsSel').value;
+ const date=document.getElementById('maDate').value;
+ if(!date){T('Pick a date','error');return;}
+ const cls=D.classes.find(c=>c.name===clsName);
+ const stus=D.students.filter(s=>s.cls===clsName);
+ if(!stus.length){T('No students in this class','error');return;}
+ const statusMap={P:'present',A:'absent',L:'late',E:'excused',S:'sick'};
+ const rows=stus.map(s=>{
+  const checked=document.querySelector(`input[name="ma_${s.id}"]:checked`);
+  const code=checked?checked.value:'P';
+  return {school_id:CU_SCHOOL?.id||CU_PROFILE?.school_id,student_id:s.id,class_id:cls?cls._id:null,date,status:statusMap[code],marked_by:CU_PROFILE?.id||null};
+ });
+ const btn=document.getElementById('maSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Saving...';}
+ try{
+  const {error}=await sb.from('attendance_records').upsert(rows,{onConflict:'student_id,date'});
+  if(error)throw error;
+  T('Attendance saved','success');
+  CM();
+  if(CV==='attendance')V('attendance');
+ }catch(err){
+  T(err.message||'Failed to save attendance','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-check" style="font-size:11px"></i>Save Attendance';}
+ }
+}
 
 function mGenReports(){
  const isTeacher=CU_ROLE==='teacher';
