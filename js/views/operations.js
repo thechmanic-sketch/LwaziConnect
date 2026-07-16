@@ -52,7 +52,7 @@ function rHR(area){
   <div class="sc"><div class="sc-icon ig"><i class="ti ti-users"></i></div><div class="sc-val">${D.staff.length}</div><div class="sc-lbl">Total staff</div></div>
   <div class="sc"><div class="sc-icon ia"><i class="ti ti-calendar-off"></i></div><div class="sc-val">${D.staff.filter(s=>s.status==='on-leave').length}</div><div class="sc-lbl">On leave</div></div>
   <div class="sc"><div class="sc-icon ib"><i class="ti ti-file-certificate"></i></div><div class="sc-val">${D.staff.filter(s=>s.contract==='Permanent').length}</div><div class="sc-lbl">Permanent contracts</div></div>
-  <div class="sc"><div class="sc-icon ip"><i class="ti ti-currency-dollar"></i></div><div class="sc-val">R412,000</div><div class="sc-lbl">Monthly payroll</div></div>
+  <div class="sc"><div class="sc-icon ip"><i class="ti ti-currency-dollar"></i></div><div class="sc-val">—</div><div class="sc-lbl">Monthly payroll</div></div>
  </div>
  <div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-id-badge-2"></i>Staff Directory</div><button class="btn btn-g" onclick="mAddStaff()"><i class="ti ti-user-plus" style="font-size:11px"></i>Add Staff Member</button></div>
@@ -119,9 +119,8 @@ function rWebsite(area){
  </div>
  <div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-chart-bar"></i>Website Traffic — Last 30 Days</div></div>
-  <div class="bar-chart" id="barWeb"></div>
+  <div class="tsm" style="padding:20px 0;text-align:center">No traffic data yet.</div>
  </div>`;
- setTimeout(()=>bldBar('barWeb',['Week 1','Week 2','Week 3','Week 4'],[420,510,680,590],700,'#1D6FA4'),60);
 }
 
 // ─── SGB GOVERNANCE ───

@@ -83,13 +83,19 @@ function openSP(s){
    ${SUBS.slice(0,6).map(sub=>{const m=Math.max(30,Math.min(100,Math.floor(s.avg+(Math.random()*20-10))));const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div class="flex ic g8" style="margin-bottom:7px"><span style="width:120px;font-size:11px">${sub}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${m}%;background:${m<50?'var(--r)':m<60?'var(--a)':'var(--g)'}"></div></div><span style="font-size:11px;font-weight:600;width:32px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('')}
   </div>
   <div id="sp3" class="hidden">
-   <div class="fr3 mb14">
-    <div class="sc" style="cursor:default"><div class="sc-val">R2,500</div><div class="sc-lbl">Billed</div></div>
-    <div class="sc" style="cursor:default"><div class="sc-val" style="color:var(--g)">${fmt(2500-s.balance)}</div><div class="sc-lbl">Paid</div></div>
-    <div class="sc" style="cursor:default"><div class="sc-val" style="color:${s.balance>0?'var(--r)':'var(--g)'}">${s.balance>0?fmt(s.balance):'R0'}</div><div class="sc-lbl">Balance</div></div>
+   ${(()=>{
+    const myInv=D.invoices.filter(i=>i.student===s.name);
+    const billed=myInv.reduce((a,i)=>a+i.amount,0);
+    const paid=myInv.reduce((a,i)=>a+i.paid,0);
+    const bal=billed-paid;
+    return `<div class="fr3 mb14">
+    <div class="sc" style="cursor:default"><div class="sc-val">${fmt(billed)}</div><div class="sc-lbl">Billed</div></div>
+    <div class="sc" style="cursor:default"><div class="sc-val" style="color:var(--g)">${fmt(paid)}</div><div class="sc-lbl">Paid</div></div>
+    <div class="sc" style="cursor:default"><div class="sc-val" style="color:${bal>0?'var(--r)':'var(--g)'}">${bal>0?fmt(bal):'R0'}</div><div class="sc-lbl">Balance</div></div>
    </div>
-   ${s.balance>0?`<div class="pay-btn" style="display:inline-flex;padding:8px 13px;font-size:12px;border-radius:7px;margin-bottom:10px" onclick="T('PayFast link sent to ${s.parent} for ${fmt(s.balance)}','success')"><i class="ti ti-link" style="font-size:13px"></i>Send PayFast Link — ${fmt(s.balance)}</div>
-   <div style="background:var(--rp);border:1px solid var(--r);border-radius:7px;padding:10px 13px;font-size:12px;color:var(--rm)"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Outstanding balance of ${fmt(s.balance)}. Reminder sent 3 days ago.</div>`:`<div style="background:var(--gp);border:1px solid var(--gl);border-radius:7px;padding:10px 13px;font-size:12px;color:var(--g)"><i class="ti ti-circle-check" style="margin-right:5px"></i>All fees settled for Term 3 2025.</div>`}
+   ${bal>0?`<div class="pay-btn" style="display:inline-flex;padding:8px 13px;font-size:12px;border-radius:7px;margin-bottom:10px" onclick="T('PayFast link sent to ${s.parent} for ${fmt(bal)}','success')"><i class="ti ti-link" style="font-size:13px"></i>Send PayFast Link — ${fmt(bal)}</div>
+   <div style="background:var(--rp);border:1px solid var(--r);border-radius:7px;padding:10px 13px;font-size:12px;color:var(--rm)"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Outstanding balance of ${fmt(bal)}.</div>`:`<div style="background:var(--gp);border:1px solid var(--gl);border-radius:7px;padding:10px 13px;font-size:12px;color:var(--g)"><i class="ti ti-circle-check" style="margin-right:5px"></i>No outstanding fees.</div>`}`;
+   })()}
   </div>
   <div id="sp4" class="hidden">
    <div class="fr mb14">

@@ -108,6 +108,10 @@ function rDash(area){
 
 function rTeacherDash(area){
  const t=myTeacher();
+ if(!t){
+  area.innerHTML=`<div class="card" style="text-align:center;padding:40px 20px"><div class="tsm">Your teacher record isn't linked yet. Contact your school admin.</div></div>`;
+  return;
+ }
  const myClasses=t.classes;
  const myStudents=D.students.filter(s=>myClasses.includes(s.cls));
  const atRisk=myStudents.filter(s=>s.att<85||s.grade==='F');

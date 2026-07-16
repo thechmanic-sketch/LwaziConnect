@@ -1,15 +1,17 @@
 function rAdmissions(area){
+ const pendingCount=D.admissions.filter(a=>a.status==='pending').length;
+ const approvedCount=D.admissions.filter(a=>a.status==='approved').length;
  area.innerHTML=`
  <div style="background:var(--gp);border:1px solid var(--gl);border-radius:9px;padding:11px 15px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
   <i class="ti ti-link" style="font-size:18px;color:var(--g)"></i>
-  <div style="flex:1"><div style="font-weight:700;font-size:12px;color:var(--g)">Public Application Link Active</div><div class="tsm">apply.durbanprimary.lwaziconnect.co.za — parents can apply from their phone</div></div>
+  <div style="flex:1"><div style="font-weight:700;font-size:12px;color:var(--g)">Public Application Link</div><div class="tsm">Parents can apply from their phone once your admissions link is set up</div></div>
   <button class="btn btn-g" onclick="openPublicForm()"><i class="ti ti-eye" style="font-size:11px"></i>Preview Form</button>
   <button class="btn btn-s" onclick="T('Link copied!','success')"><i class="ti ti-copy" style="font-size:11px"></i>Copy Link</button>
  </div>
  <div class="g3 mb18">
-  <div class="sc"><div class="sc-icon ia"><i class="ti ti-clipboard"></i></div><div class="sc-val">3</div><div class="sc-lbl">Pending Applications</div></div>
-  <div class="sc"><div class="sc-icon ig"><i class="ti ti-circle-check"></i></div><div class="sc-val">12</div><div class="sc-lbl">Approved this term</div></div>
-  <div class="sc"><div class="sc-icon ib"><i class="ti ti-calendar"></i></div><div class="sc-val">2026</div><div class="sc-lbl">Next intake year</div></div>
+  <div class="sc"><div class="sc-icon ia"><i class="ti ti-clipboard"></i></div><div class="sc-val">${pendingCount}</div><div class="sc-lbl">Pending Applications</div></div>
+  <div class="sc"><div class="sc-icon ig"><i class="ti ti-circle-check"></i></div><div class="sc-val">${approvedCount}</div><div class="sc-lbl">Approved this term</div></div>
+  <div class="sc"><div class="sc-icon ib"><i class="ti ti-calendar"></i></div><div class="sc-val">${new Date().getFullYear()+1}</div><div class="sc-lbl">Next intake year</div></div>
  </div>
  <div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-clipboard-list"></i>Applications</div><button class="btn btn-g" onclick="mAddAdmission()"><i class="ti ti-plus" style="font-size:11px"></i>New Application</button></div>

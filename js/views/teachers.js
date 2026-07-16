@@ -1,6 +1,8 @@
 function rTeachers(area){
+ const activeCount=D.teachers.filter(t=>t.status==='active').length;
+ const onLeaveCount=D.teachers.filter(t=>t.status==='on-leave').length;
  area.innerHTML=`
- <div class="g3 mb18"><div class="sc"><div class="sc-icon ig"><i class="ti ti-user-check"></i></div><div class="sc-val">5</div><div class="sc-lbl">Active Staff</div></div><div class="sc"><div class="sc-icon ia"><i class="ti ti-user-minus"></i></div><div class="sc-val">1</div><div class="sc-lbl">On Leave</div></div><div class="sc"><div class="sc-icon ir"><i class="ti ti-school"></i></div><div class="sc-val">1</div><div class="sc-lbl">Sub Needed</div></div></div>
+ <div class="g3 mb18"><div class="sc"><div class="sc-icon ig"><i class="ti ti-user-check"></i></div><div class="sc-val">${activeCount}</div><div class="sc-lbl">Active Staff</div></div><div class="sc"><div class="sc-icon ia"><i class="ti ti-user-minus"></i></div><div class="sc-val">${onLeaveCount}</div><div class="sc-lbl">On Leave</div></div><div class="sc"><div class="sc-icon ir"><i class="ti ti-school"></i></div><div class="sc-val">${onLeaveCount}</div><div class="sc-lbl">Sub Needed</div></div></div>
  <div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-user-check"></i>Teaching Staff</div><button class="btn btn-g" onclick="mAddTeacher()"><i class="ti ti-user-plus" style="font-size:11px"></i>Add Teacher</button></div>
   <div class="tw-wrap"><table class="dt"><thead><tr><th>Teacher</th><th>ID</th><th>Subject(s)</th><th>Classes</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody>

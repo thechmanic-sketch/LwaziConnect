@@ -9,7 +9,11 @@ function genClassSchedule(cls){
 
 function rTimetable(area,clsName){
  area=area||document.getElementById('CA');
- const cls=clsName||(D.classes[0]&&D.classes[0].name)||'Grade 7A';
+ if(!D.classes.length){
+  area.innerHTML=`<div class="card" style="text-align:center;padding:40px 20px"><div class="tsm">No classes yet — add a class first to see a timetable.</div></div>`;
+  return;
+ }
+ const cls=clsName||D.classes[0].name;
  const sched=genClassSchedule(cls);
  area.innerHTML=`<div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-calendar-time"></i>${cls} — Weekly Timetable</div>
@@ -17,7 +21,7 @@ function rTimetable(area,clsName){
   </div>
   <div class="tt-grid">
    <div></div>${TT_DAYS.map(d=>`<div class="tt-head">${d}</div>`).join('')}
-   ${TT_PERIODS.map(p=>{const row=sched[p.l];if(!row)return`<div class="tt-time">${p.t}<br><span style="font-size:7px">${p.l}</span></div><div class="tt-break" style="grid-column:span 5">☕ Break 10:00–11:00</div>`;return`<div class="tt-time">${p.t}<br><span style="font-size:7px">${p.l}</span></div>`+row.map((sub,di)=>{const c=subClr(sub);const tch=D.teachers[di%D.teachers.length];return`<div class="tt-cell" style="background:${c.bg};color:${c.fg}" onclick="T('${sub} — ${tch.name}','')"><div style="font-weight:700;font-size:10px">${sub}</div><div style="font-size:8px;opacity:.6;margin-top:1px">${tch.name.split(' ')[1]}</div></div>`;}).join('');}).join('')}
+   ${TT_PERIODS.map(p=>{const row=sched[p.l];if(!row)return`<div class="tt-time">${p.t}<br><span style="font-size:7px">${p.l}</span></div><div class="tt-break" style="grid-column:span 5">☕ Break 10:00–11:00</div>`;return`<div class="tt-time">${p.t}<br><span style="font-size:7px">${p.l}</span></div>`+row.map((sub,di)=>{const c=subClr(sub);const tch=D.teachers.length?D.teachers[di%D.teachers.length]:null;const tName=tch?tch.name:'Unassigned';return`<div class="tt-cell" style="background:${c.bg};color:${c.fg}" onclick="T('${sub} — ${tName}','')"><div style="font-weight:700;font-size:10px">${sub}</div><div style="font-size:8px;opacity:.6;margin-top:1px">${tch?tch.name.split(' ')[1]||tch.name:'—'}</div></div>`;}).join('');}).join('')}
   </div>
  </div>`;
 }

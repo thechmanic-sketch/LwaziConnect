@@ -1,19 +1,23 @@
 function rCalendar(area){
  const tyClr={academic:'ev-ac',event:'ev-ev',exam:'ev-ex',holiday:'ev-hol'};
+ const now=new Date();
+ const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+ const year=now.getFullYear(),month=now.getMonth(),today=now.getDate();
+ const daysInMonth=new Date(year,month+1,0).getDate();
  area.innerHTML=`<div class="g2 mb18">
   <div class="card">
-   <div class="card-head"><div class="card-title"><i class="ti ti-calendar-event"></i>July 2025</div><div class="flex g6"><div class="ibt" onclick="T('Previous month','')"><i class="ti ti-chevron-left" style="font-size:13px"></i></div><div class="ibt" onclick="T('Next month','')"><i class="ti ti-chevron-right" style="font-size:13px"></i></div></div></div>
+   <div class="card-head"><div class="card-title"><i class="ti ti-calendar-event"></i>${monthNames[month]} ${year}</div><div class="flex g6"><div class="ibt" onclick="T('Previous month','')"><i class="ti ti-chevron-left" style="font-size:13px"></i></div><div class="ibt" onclick="T('Next month','')"><i class="ti ti-chevron-right" style="font-size:13px"></i></div></div></div>
    <div class="cal-grid mb14">${['M','T','W','T','F','S','S'].map(d=>`<div class="cal-head">${d}</div>`).join('')}
-   ${Array.from({length:31},(_,i)=>{const day=i+1;const evts=D.calEvents.filter(e=>parseInt(e.date.split('-')[2])===day);return`<div class="cal-cell${day===17?' today':''}"><div class="cal-num">${day}</div>${evts.map(e=>`<div class="cal-ev ${tyClr[e.type]||''}">${e.title}</div>`).join('')}</div>`;}).join('')}
+   ${Array.from({length:daysInMonth},(_,i)=>{const day=i+1;const evts=D.calEvents.filter(e=>parseInt(e.date.split('-')[2])===day&&parseInt(e.date.split('-')[1])===month+1);return`<div class="cal-cell${day===today?' today':''}"><div class="cal-num">${day}</div>${evts.map(e=>`<div class="cal-ev ${tyClr[e.type]||''}">${e.title}</div>`).join('')}</div>`;}).join('')}
    </div>
   </div>
   <div class="card">
    <div class="card-head"><div class="card-title"><i class="ti ti-list"></i>Upcoming Events</div>${(CU_ROLE==='parent'||CU_ROLE==='student')?'':'<button class="btn btn-g" onclick="mAddEvent()"><i class="ti ti-plus" style="font-size:11px"></i>Add Event</button>'}</div>
-   ${D.calEvents.map(e=>{return`<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--sp)">
-    <div style="background:var(--g);color:#fff;border-radius:7px;padding:5px 7px;text-align:center;flex-shrink:0;min-width:38px"><div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;line-height:1">${e.date.split('-')[2]}</div><div style="font-size:7px;opacity:.6">Jul</div></div>
+   ${D.calEvents.length?D.calEvents.map(e=>{const d=new Date(e.date);return`<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--sp)">
+    <div style="background:var(--g);color:#fff;border-radius:7px;padding:5px 7px;text-align:center;flex-shrink:0;min-width:38px"><div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;line-height:1">${e.date.split('-')[2]}</div><div style="font-size:7px;opacity:.6">${monthNames[d.getMonth()].slice(0,3)}</div></div>
     <div style="flex:1"><div style="font-weight:600;font-size:12px">${e.title}</div><div class="tsm">${e.cls}</div></div>
     <span class="pill ${tyClr[e.type]?.replace('ev-','p')||'pn'}">${e.type}</span>
-   </div>`;}).join('')}
+   </div>`;}).join(''):'<div class="tsm" style="padding:10px 0">No upcoming events.</div>'}
   </div>
  </div>`;
 }
@@ -37,8 +41,10 @@ function rHealth(area){
 }
 
 function rDiscipline(area){
+ const openCount=D.discipline.filter(d=>d.status==='open'||d.status==='pending').length;
+ const resolvedCount=D.discipline.filter(d=>d.status==='resolved').length;
  area.innerHTML=`
- <div class="g3 mb18"><div class="sc"><div class="sc-icon ir"><i class="ti ti-gavel"></i></div><div class="sc-val">3</div><div class="sc-lbl">Incidents this term</div></div><div class="sc"><div class="sc-icon ia"><i class="ti ti-clock"></i></div><div class="sc-val">1</div><div class="sc-lbl">Open / unresolved</div></div><div class="sc"><div class="sc-icon ig"><i class="ti ti-circle-check"></i></div><div class="sc-val">2</div><div class="sc-lbl">Resolved</div></div></div>
+ <div class="g3 mb18"><div class="sc"><div class="sc-icon ir"><i class="ti ti-gavel"></i></div><div class="sc-val">${D.discipline.length}</div><div class="sc-lbl">Incidents this term</div></div><div class="sc"><div class="sc-icon ia"><i class="ti ti-clock"></i></div><div class="sc-val">${openCount}</div><div class="sc-lbl">Open / unresolved</div></div><div class="sc"><div class="sc-icon ig"><i class="ti ti-circle-check"></i></div><div class="sc-val">${resolvedCount}</div><div class="sc-lbl">Resolved</div></div></div>
  <div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-gavel"></i>Incident Log</div><button class="btn btn-g" onclick="mLogInc()"><i class="ti ti-plus" style="font-size:11px"></i>Log Incident</button></div>
   <div class="tw-wrap"><table class="dt"><thead><tr><th>ID</th><th>Student</th><th>Type</th><th>Description</th><th>Date</th><th>Reported by</th><th>Action</th><th>Status</th><th></th></tr></thead><tbody>
