@@ -27,7 +27,7 @@ function rParentPortal(){
   </div>
   <div class="g2 mb18">
    <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-book"></i>Subject Results</div></div>
-   ${SUBS.slice(0,6).map(sub=>{const m=seededMark(s.id+sub,s.avg,18);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div class="flex ic g8" style="margin-bottom:7px"><span style="width:110px;font-size:11px">${sub}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${m}%;background:${m<50?'var(--r)':m<60?'var(--a)':'var(--g)'}"></div></div><span style="font-size:11px;font-weight:700;width:30px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('')}</div>
+   ${SUBS.slice(0,6).map(sub=>{const m=markFor(s,sub,'Term 3',18);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div class="flex ic g8" style="margin-bottom:7px"><span style="width:110px;font-size:11px">${sub}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${m}%;background:${m<50?'var(--r)':m<60?'var(--a)':'var(--g)'}"></div></div><span style="font-size:11px;font-weight:700;width:30px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('')}</div>
    <div>
     <div class="card mb14"><div class="card-head"><div class="card-title"><i class="ti ti-calendar-check"></i>Attendance</div></div>
     <div style="text-align:center;padding:10px 0">

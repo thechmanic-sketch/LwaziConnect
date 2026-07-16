@@ -39,7 +39,7 @@ function rStudentPortal() {
 
 // ── shared fragments reused across the personalized tabs below ──
 function stuMarksHtml(s){
- return ['Mathematics','English','IsiZulu','Natural Sciences','Social Sciences'].map(sub=>{const m=seededMark(s.id+sub,s.avg,18);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="width:120px;font-size:11px;color:var(--sm)">${sub}</span><div style="flex:1;height:6px;background:var(--sp);border-radius:3px;overflow:hidden"><div style="height:100%;width:${m}%;background:${m<50?'var(--r)':m<70?'var(--a)':'var(--g)'};border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;width:32px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('');
+ return ['Mathematics','English','IsiZulu','Natural Sciences','Social Sciences'].map(sub=>{const m=markFor(s,sub,'Term 3',18);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="width:120px;font-size:11px;color:var(--sm)">${sub}</span><div style="flex:1;height:6px;background:var(--sp);border-radius:3px;overflow:hidden"><div style="height:100%;width:${m}%;background:${m<50?'var(--r)':m<70?'var(--a)':'var(--g)'};border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;width:32px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('');
 }
 function stuTimetableHtml(){
  const s=CU_MY_STUDENT;

@@ -17,6 +17,15 @@ function seededMark(seed,base,spread){
  return Math.max(30,Math.min(100,Math.floor(base+(frac*spread-spread/2))));
 }
 
+// Looks up a real mark from the marks table (via D.students[].marks, loaded
+// by loadSchoolData) for the given student+subject+term; falls back to the
+// deterministic placeholder only when no real mark has been entered yet.
+function markFor(s,sub,term,spread){
+ const rec=(s.marks||[]).find(m=>m.subject===sub&&m.term===term);
+ if(rec)return Math.round(Number(rec.mark)/Number(rec.out_of)*100);
+ return seededMark(s.id+sub,s.avg,spread);
+}
+
 // ══ DARK MODE ══
 function applyTheme(theme){
  document.documentElement.setAttribute('data-theme',theme);

@@ -33,7 +33,7 @@ function rcFilterStudents(clsName){
 
 function prevRC(){
  const id=document.getElementById('rcSel')?.value;const s=D.students.find(x=>x.id===id)||D.students[0];
- const marks=SUBS.map(sub=>{const m=seededMark(s.id+sub,s.avg,20);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return{sub,m,g};});
+ const marks=SUBS.map(sub=>{const m=markFor(s,sub,'Term 3',20);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return{sub,m,g};});
  OM('Report Card Preview',`
   <div class="rc-wrap">
    <div class="rc-head"><div class="rc-school">${schoolName()}</div><div class="rc-sub">Term 3 Academic Report · 2025</div></div>

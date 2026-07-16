@@ -106,6 +106,9 @@ async function loadSchoolData(schoolId) {
   sb.from('campuses').select('*').eq('school_id', schoolId),
   sb.from('audit_log').select('*').eq('school_id', schoolId).order('created_at', { ascending: false }).limit(50),
  ]);
+ const { data: marksRaw } = await sb.from('marks').select('*').eq('school_id', schoolId);
+ const { data: timetableRaw } = await sb.from('timetable_slots').select('*').eq('school_id', schoolId);
+ D.timetableSlots = timetableRaw || [];
 
  const classes = classesRaw || [];
  const students = studentsRaw || [];
@@ -125,21 +128,37 @@ async function loadSchoolData(schoolId) {
 
  const classById = Object.fromEntries(classes.map(c => [c.id, c.name]));
 
- D.students = students.map(s => ({
-  id: s.id,
-  name: `${s.first_name} ${s.last_name}`,
-  ini: initialsFromName(`${s.first_name} ${s.last_name}`),
-  bg: '#D8F3DC', fg: '#1B4332',
-  cls: classById[s.class_id] || '—',
-  gender: s.gender || '',
-  dob: s.dob || '',
-  parent: '', phone: '', email: '', addr: '',
-  // Not migrated yet (no marks/invoices/attendance tables wired to the
-  // frontend): placeholder until Analytics/Fees/Attendance are ported.
-  avg: 0, grade: '—', status: s.status, balance: 0, t1: 0, t2: 0, t3: 0, att: 0,
-  medical: s.medical_condition || 'None', blood: s.blood_type || '—',
-  _id: s.id,
- }));
+ const marksList = marksRaw || [];
+ const marksByStudent = {};
+ marksList.forEach(m => { (marksByStudent[m.student_id] = marksByStudent[m.student_id] || []).push(m); });
+ const termAvg = (list, term) => {
+  const rows = list.filter(m => m.term === term);
+  if (!rows.length) return 0;
+  return Math.round(rows.reduce((a, m) => a + (Number(m.mark) / Number(m.out_of)) * 100, 0) / rows.length);
+ };
+ const gradeFor = avg => avg >= 80 ? 'A' : avg >= 70 ? 'B' : avg >= 60 ? 'C' : avg >= 50 ? 'D' : avg > 0 ? 'F' : '—';
+
+ D.students = students.map(s => {
+  const sMarks = marksByStudent[s.id] || [];
+  const avg = sMarks.length ? Math.round(sMarks.reduce((a, m) => a + (Number(m.mark) / Number(m.out_of)) * 100, 0) / sMarks.length) : 0;
+  return {
+   id: s.id,
+   name: `${s.first_name} ${s.last_name}`,
+   ini: initialsFromName(`${s.first_name} ${s.last_name}`),
+   bg: '#D8F3DC', fg: '#1B4332',
+   cls: classById[s.class_id] || '—',
+   gender: s.gender || '',
+   dob: s.dob || '',
+   parent: '', phone: '', email: '', addr: '',
+   avg, grade: gradeFor(avg), status: s.status, balance: 0,
+   t1: termAvg(sMarks, 'Term 1'), t2: termAvg(sMarks, 'Term 2'), t3: termAvg(sMarks, 'Term 3'),
+   // Not migrated yet (no attendance-aggregation table wired to the frontend).
+   att: 0,
+   medical: s.medical_condition || 'None', blood: s.blood_type || '—',
+   marks: sMarks,
+   _id: s.id,
+  };
+ });
 
  D.teachers = teacherProfilesList.map(t => ({
   id: t.id,

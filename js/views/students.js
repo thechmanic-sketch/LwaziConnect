@@ -95,7 +95,7 @@ function openSP(s){
     <div class="sc" style="cursor:default;text-align:center"><div class="sc-val">${s.t2}%</div><div class="sc-lbl">Term 2</div></div>
     <div class="sc" style="cursor:default;text-align:center"><div class="sc-val">${s.t3}%</div><div class="sc-lbl">Term 3</div></div>
    </div>
-   ${SUBS.slice(0,6).map(sub=>{const m=seededMark(s.id+sub,s.avg,20);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div class="flex ic g8" style="margin-bottom:7px"><span style="width:120px;font-size:11px">${sub}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${m}%;background:${m<50?'var(--r)':m<60?'var(--a)':'var(--g)'}"></div></div><span style="font-size:11px;font-weight:600;width:32px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('')}
+   ${SUBS.slice(0,6).map(sub=>{const m=markFor(s,sub,'Term 3',20);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div class="flex ic g8" style="margin-bottom:7px"><span style="width:120px;font-size:11px">${sub}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${m}%;background:${m<50?'var(--r)':m<60?'var(--a)':'var(--g)'}"></div></div><span style="font-size:11px;font-weight:600;width:32px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('')}
   </div>
   <div id="sp3" class="hidden">
    ${(()=>{
