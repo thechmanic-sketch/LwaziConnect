@@ -7,7 +7,7 @@ function rSGB(area){
  </div>
  <div class="g2 mb18">
   <div class="card">
-   <div class="card-head"><div class="card-title"><i class="ti ti-users-group"></i>SGB Members</div><button class="btn btn-g" onclick="T('Member form opened','')"><i class="ti ti-plus" style="font-size:11px"></i>Add Member</button></div>
+   <div class="card-head"><div class="card-title"><i class="ti ti-users-group"></i>SGB Members</div><button class="btn btn-g" onclick="mAddSgbMember()"><i class="ti ti-plus" style="font-size:11px"></i>Add Member</button></div>
    ${D.sgbMembers.map(m=>`<div class="flex ic g8" style="padding:9px 0;border-bottom:1px solid var(--sp)">
     <div class="av av-s" style="background:var(--pp);color:var(--p)">${m.name.split(' ').map(n=>n[0]).slice(-2).join('')}</div>
     <div style="flex:1"><div style="font-size:12px;font-weight:600">${m.name}</div><div class="tsm">${m.role} · ${m.category}</div></div>

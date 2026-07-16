@@ -98,6 +98,14 @@ async function loadSchoolData(schoolId) {
   sb.from('discipline_records').select('*').eq('school_id', schoolId).order('incident_date', { ascending: false }),
   sb.from('invoices').select('*').eq('school_id', schoolId),
  ]);
+ const [{ data: staffRaw }, { data: sgbMembersRaw }, { data: sgbMeetingsRaw }, { data: vehiclesRaw }, { data: campusesRaw }, { data: auditLogRaw }] = await Promise.all([
+  sb.from('staff').select('*').eq('school_id', schoolId),
+  sb.from('sgb_members').select('*').eq('school_id', schoolId),
+  sb.from('sgb_meetings').select('*').eq('school_id', schoolId).order('meeting_date', { ascending: false }),
+  sb.from('vehicles').select('*').eq('school_id', schoolId),
+  sb.from('campuses').select('*').eq('school_id', schoolId),
+  sb.from('audit_log').select('*').eq('school_id', schoolId).order('created_at', { ascending: false }).limit(50),
+ ]);
 
  const classes = classesRaw || [];
  const students = studentsRaw || [];
@@ -196,6 +204,63 @@ async function loadSchoolData(schoolId) {
   paid: Number(i.paid) || 0,
   status: i.status,
   due: i.due_date || '—',
+ }));
+
+ D.staff = (staffRaw || []).map(s => ({
+  id: s.id,
+  name: s.full_name,
+  role: s.role_title || '—',
+  dept: s.department || '—',
+  contract: s.contract_type || '—',
+  startDate: s.start_date || '—',
+  leaveBalance: s.leave_balance || 0,
+  status: s.status,
+ }));
+
+ D.sgbMembers = (sgbMembersRaw || []).map(m => ({
+  id: m.id,
+  name: m.name,
+  role: m.role_title || '—',
+  category: m.category || '—',
+  term: m.term || '—',
+  phone: m.phone || '—',
+ }));
+
+ D.sgbMeetings = (sgbMeetingsRaw || []).map(m => ({
+  id: m.id,
+  date: m.meeting_date,
+  title: m.title,
+  attendance: m.attendance || '—',
+  status: m.status,
+  resolutions: m.resolutions_count || 0,
+ }));
+
+ D.vehicles = (vehiclesRaw || []).map(v => ({
+  id: v.registration,
+  reg: v.registration,
+  driver: v.driver_name || '—',
+  route: v.route || '—',
+  capacity: v.capacity || 0,
+  enrolled: 0,
+  lastService: v.last_service || '—',
+  status: v.status,
+  _id: v.id,
+ }));
+
+ D.campuses = (campusesRaw || []).map(c => ({
+  id: c.id,
+  name: c.name,
+  principal: c.principal_name || '—',
+  type: c.type || '—',
+  students: c.expected_students || 0,
+  status: c.status,
+ }));
+
+ D.auditLog = (auditLogRaw || []).map(l => ({
+  id: l.id,
+  action: l.action,
+  user: teacherProfilesList.find(t => t.id === l.actor_id)?.full_name || (l.actor_id ? '—' : 'System'),
+  time: l.created_at ? new Date(l.created_at).toLocaleString() : '—',
  }));
 
  D.documents = (documentsRaw || []).map(d => ({
