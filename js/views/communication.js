@@ -1,5 +1,5 @@
 function rMessages(area){
- const myMessages=CU_ROLE==='parent'?D.messages.filter(m=>m.from===D.students[0].parent):D.messages;
+ const myMessages=CU_ROLE==='parent'?D.messages.filter(m=>CU_MY_STUDENT&&m.from===CU_MY_STUDENT.parent):D.messages;
  area.innerHTML=`<div style="display:grid;grid-template-columns:276px 1fr;gap:12px;height:calc(100vh-112px);height:calc(100vh - 112px)">
   <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
    <div style="padding:11px 13px;border-bottom:1px solid var(--sb)"><div style="background:var(--sp);border-radius:6px;padding:0 9px;height:28px;display:flex;align-items:center;gap:5px"><i class="ti ti-search" style="font-size:12px;color:var(--sx)"></i><input type="text" placeholder="Search messages..." style="border:none;background:transparent;font-size:12px;color:var(--s);outline:none;width:100%"></div></div>

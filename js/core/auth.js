@@ -2,6 +2,7 @@
 let CU_ROLE = null;
 let CU_PROFILE = null; // real Supabase profile row for the logged-in user: {id, school_id, role, full_name, ...}
 let CU_SCHOOL = null; // real Supabase schools row for the logged-in user's school: {id, name, plan, status, logo_url}
+let CU_MY_STUDENT = null; // for role=student: their own D.students row. For role=parent: their first linked child's D.students row.
 let selRole = null;
 let currentAllowedViews = null;
 
@@ -134,6 +135,25 @@ async function loadSchoolData(schoolId) {
  }));
 }
 
+// Resolve which real D.students row belongs to the logged-in user —
+// their own record (student role, via students.profile_id) or their
+// linked child's record (parent role, via parent_students). Without
+// this, every parent/student saw D.students[0] — an arbitrary row,
+// not necessarily theirs.
+async function loadMyStudent(profile) {
+ if (profile.role === 'student') {
+  const { data: row } = await sb.from('students').select('id').eq('profile_id', profile.id).maybeSingle();
+  return row ? (D.students.find(s => s.id === row.id) || null) : null;
+ }
+ if (profile.role === 'parent') {
+  const { data: links } = await sb.from('parent_students').select('student_id').eq('parent_id', profile.id);
+  const firstId = links && links[0] && links[0].student_id;
+  // TODO: parents with multiple children only see the first linked one for now — needs a child switcher.
+  return firstId ? (D.students.find(s => s.id === firstId) || null) : null;
+ }
+ return null;
+}
+
 // Pull every school on the platform for the Super Admin panel.
 // Billing/CRM fields (contact, amount, health, lastLogin) aren't
 // backed by any table yet, so they're placeholders until that's built.
@@ -166,6 +186,7 @@ async function enterAppAsProfile(profile) {
    return;
   }
   await loadSchoolData(profile.school_id);
+  CU_MY_STUDENT = await loadMyStudent(profile);
  }
 
  CU_PROFILE = profile;

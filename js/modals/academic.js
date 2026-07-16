@@ -1,7 +1,7 @@
 function mEditTT(){OM('Edit Timetable',`
  <div class="fr"><div class="fg"><div class="fl">Class</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Day</div><select class="fs">${TT_DAYS.map(d=>`<option>${d}</option>`).join('')}</select></div></div>
  <div class="fr"><div class="fg"><div class="fl">Period</div><select class="fs">${TT_PERIODS.filter(p=>p.l!=='Break').map(p=>`<option>${p.l}</option>`).join('')}</select></div><div class="fg"><div class="fl">Subject</div><select class="fs">${SUBS.map(s=>`<option>${s}</option>`).join('')}</select></div></div>
- <div class="fg"><div class="fl">Teacher</div><select class="fs">${D.teachers.map(t=>`<option>${t.name}</option>`).join('')}</select></div>`,
+ <div class="fg"><div class="fl">Teacher</div><select class="fs">${D.teachers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select></div>`,
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Timetable updated','success');CM()"><i class="ti ti-calendar-check" style="font-size:11px"></i>Save Changes</button>`);}
 
 function mUploadMarks(){

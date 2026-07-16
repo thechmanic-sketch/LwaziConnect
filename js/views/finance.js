@@ -54,7 +54,7 @@ function rstInv(list){
 function filtInv(status,el){el.closest('.card-head').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');rstInv(status==='all'?D.invoices:D.invoices.filter(i=>i.status===status));}
 
 function rParentFees(area){
- const child=D.students[0];
+ const child=CU_MY_STUDENT;
  if(!child){area.innerHTML='<div class="card" style="text-align:center;padding:40px 20px"><div class="tsm">No child linked to your account yet.</div></div>';return;}
  const myInvoices=D.invoices.filter(i=>i.student===child.name);
  const totalDue=myInvoices.reduce((a,i)=>a+i.amount,0);

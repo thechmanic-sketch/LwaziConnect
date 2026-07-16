@@ -1,10 +1,21 @@
 function subClr(s){const i=SUBS.indexOf(s)%SUB_C.length;const c=SUB_C[i<0?0:i].split('|');return{bg:c[0],fg:c[1]};}
 
 function myTeacher(){
- if(CU_PROFILE)return D.teachers.find(t=>t.profile_id===CU_PROFILE.id||t.id===CU_PROFILE.id)||D.teachers[0];
- return D.teachers.find(t=>t.name===ROLE_PROFILES.teacher.name)||D.teachers[0];
+ if(CU_PROFILE)return D.teachers.find(t=>t.profile_id===CU_PROFILE.id||t.id===CU_PROFILE.id)||null;
+ return D.teachers[0]||null;
 }
 function myTeacherClasses(){return myTeacher()?.classes||[];}
+
+// Deterministic pseudo-mark, used only where no real per-subject marks
+// table exists yet. Same student+subject always yields the same value
+// (unlike Math.random(), which regenerated a different "mark" on every
+// render — actively misleading for something presented as an academic
+// record). This is a placeholder until real marks are wired up.
+function hashSeed(str){let h=0;for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))>>>0;return h;}
+function seededMark(seed,base,spread){
+ const frac=(hashSeed(seed)%1000)/1000;
+ return Math.max(30,Math.min(100,Math.floor(base+(frac*spread-spread/2))));
+}
 
 // ══ DARK MODE ══
 function applyTheme(theme){

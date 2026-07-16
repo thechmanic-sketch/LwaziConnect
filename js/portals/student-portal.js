@@ -1,6 +1,6 @@
 function rStudentPortal() {
  const area = document.getElementById('CA');
- const s = D.students[0];
+ const s = CU_MY_STUDENT;
  if(!s){
   area.innerHTML=`<div class="card" style="text-align:center;padding:40px 20px"><i class="ti ti-user-question" style="font-size:32px;color:var(--sl);display:block;margin-bottom:10px"></i><div style="font-weight:600;margin-bottom:4px">Your student record isn't linked yet</div><div class="tsm">Once the school links your account to your student record, your portal will appear here.</div></div>`;
   document.getElementById('ptitle').textContent='My Portal';
@@ -39,10 +39,10 @@ function rStudentPortal() {
 
 // ── shared fragments reused across the personalized tabs below ──
 function stuMarksHtml(s){
- return ['Mathematics','English','IsiZulu','Natural Sciences','Social Sciences'].map(sub=>{const m=Math.max(40,Math.min(100,Math.floor(s.avg+(Math.random()*18-9))));const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="width:120px;font-size:11px;color:var(--sm)">${sub}</span><div style="flex:1;height:6px;background:var(--sp);border-radius:3px;overflow:hidden"><div style="height:100%;width:${m}%;background:${m<50?'var(--r)':m<70?'var(--a)':'var(--g)'};border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;width:32px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('');
+ return ['Mathematics','English','IsiZulu','Natural Sciences','Social Sciences'].map(sub=>{const m=seededMark(s.id+sub,s.avg,18);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="width:120px;font-size:11px;color:var(--sm)">${sub}</span><div style="flex:1;height:6px;background:var(--sp);border-radius:3px;overflow:hidden"><div style="height:100%;width:${m}%;background:${m<50?'var(--r)':m<70?'var(--a)':'var(--g)'};border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;width:32px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('');
 }
 function stuTimetableHtml(){
- const s=D.students[0];
+ const s=CU_MY_STUDENT;
  const periods=['Period 1','Period 2','Period 3','Period 4','Period 5','Period 6'];
  if(!s||!s.cls)return '<div class="tsm">No timetable available yet.</div>';
  const sched=genClassSchedule(s.cls);
@@ -61,7 +61,7 @@ function stuHeader(title){
 function rStudentSubjects(){
  stuHeader('Subjects & Marks');
  const area=document.getElementById('CA');
- const s=D.students[0];
+ const s=CU_MY_STUDENT;
  if(!s){area.innerHTML='<div class="tsm">No student record linked yet.</div>';return;}
  area.innerHTML=`<div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-book"></i>My Marks — Term 3</div></div>${stuMarksHtml(s)}</div>`;
 }
@@ -75,7 +75,7 @@ function rStudentTimetableView(){
 function rStudentAttendance(){
  stuHeader('Attendance');
  const area=document.getElementById('CA');
- const s=D.students[0];
+ const s=CU_MY_STUDENT;
  if(!s){area.innerHTML='<div class="tsm">No student record linked yet.</div>';return;}
  area.innerHTML=`<div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-calendar-check"></i>My Attendance — Term 3</div></div>
@@ -91,7 +91,7 @@ function rStudentAttendance(){
 function rStudentHomework(){
  stuHeader('Homework');
  const area=document.getElementById('CA');
- const s=D.students[0];
+ const s=CU_MY_STUDENT;
  const tasks=s?D.homework.filter(h=>h.cls===s.cls):[];
  area.innerHTML=`<div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-notebook"></i>My Homework</div></div>

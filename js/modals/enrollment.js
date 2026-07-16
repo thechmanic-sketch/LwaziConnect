@@ -47,7 +47,7 @@ function mAddTeacher(){OM('Add Teacher',`
 function mAddParent(){OM('Add Parent',`
  <div class="fr"><div class="fg"><div class="fl">Full Name</div><input class="fi" placeholder="Parent full name"></div><div class="fg"><div class="fl">Relationship</div><select class="fs"><option>Mother</option><option>Father</option><option>Guardian</option></select></div></div>
  <div class="fr"><div class="fg"><div class="fl">Phone</div><input class="fi" placeholder="071 xxx xxxx"></div><div class="fg"><div class="fl">Email</div><input class="fi" placeholder="email@example.com" type="email"></div></div>
- <div class="fg"><div class="fl">Link to Student(s)</div><select class="fs" multiple style="height:65px">${D.students.map(s=>`<option>${s.name}</option>`).join('')}</select></div>`,
+ <div class="fg"><div class="fl">Link to Student(s)</div><select class="fs" multiple style="height:65px">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>`,
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Parent added. WhatsApp portal invite sent.','wa');CM()">Add Parent</button>`);}
 
 function mAddAdmission(){OM('New Application',`
@@ -59,7 +59,7 @@ function mAddAdmission(){OM('New Application',`
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Application submitted — APP-004 created','success');CM()">Submit Application</button>`);}
 
 function mAddInv(){OM('New Invoice',`
- <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option>${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Term</div><select class="fs"><option>Term 3 — 2025</option><option>Term 4 — 2025</option><option>Term 1 — 2026</option></select></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Term</div><select class="fs"><option>Term 3 — 2025</option><option>Term 4 — 2025</option><option>Term 1 — 2026</option></select></div></div>
  <div class="fr"><div class="fg"><div class="fl">Fee Type</div><select class="fs"><option>Tuition Fees</option><option>Uniform</option><option>Sports Levy</option><option>Stationery</option></select></div><div class="fg"><div class="fl">Amount (R)</div><input class="fi" placeholder="2500" type="number"></div></div>
  <div class="fr"><div class="fg"><div class="fl">Due Date</div><input class="fi" type="date"></div><div class="fg"><div class="fl">Payment Method</div><select class="fs"><option>EFT</option><option>PayFast</option><option>Cash</option></select></div></div>
  <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-top:6px"><input type="checkbox" checked style="accent-color:var(--g)">Send PayFast payment link to parent via WhatsApp</label>`,

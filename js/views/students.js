@@ -9,7 +9,7 @@ function rStudents(area){
   <button class="bbt" onclick="mGenReports()"><i class="ti ti-certificate" style="font-size:12px"></i>Generate Report Cards</button>
   <button class="bbt" onclick="T(selRows.size+' records exported','success')"><i class="ti ti-download" style="font-size:12px"></i>Export</button>
   <button class="bbt" onclick="T('Attendance marked for '+selRows.size+' students','success')"><i class="ti ti-calendar-check" style="font-size:12px"></i>Mark Attendance</button>
-  ${isTeacher?'':`<button class="bbt danger" onclick="T(selRows.size+' students removed','error');selRows=new Set();updBulk()"><i class="ti ti-trash" style="font-size:12px"></i>Delete</button>`}
+  ${isTeacher?'':`<button class="bbt danger" onclick="deleteStudents([...selRows])"><i class="ti ti-trash" style="font-size:12px"></i>Delete</button>`}
  </div>
  <div class="card">
   <div class="fbar">
@@ -46,9 +46,24 @@ function rstStu(list){
    <i class="ti ti-eye act" onclick='openSP(${JSON.stringify(s).replace(/"/g,"'")})'></i>
    <i class="ti ti-brand-whatsapp act" style="color:var(--wd)" onclick="T('WhatsApp to ${s.parent}','wa')"></i>
    <i class="ti ti-edit act" onclick="T('Editing ${s.name}','')"></i>
-   ${isTeacher?'':`<i class="ti ti-trash act" style="color:var(--r)" onclick="T('Removed','error')"></i>`}
+   ${isTeacher?'':`<i class="ti ti-trash act" style="color:var(--r)" onclick="deleteStudents(['${s.id}'])"></i>`}
   </div></td>
  </tr>`).join('');
+}
+async function deleteStudents(ids){
+ if(!ids.length){T('Select at least one student','error');return;}
+ if(!confirm(`Delete ${ids.length} student${ids.length===1?'':'s'}? This can't be undone.`))return;
+ try{
+  const {error}=await sb.from('students').delete().in('id',ids);
+  if(error)throw error;
+  T(`${ids.length} student${ids.length===1?'':'s'} removed`,'success');
+  selRows=new Set();
+  const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+  await loadSchoolData(schoolId);
+  V('students');
+ }catch(err){
+  T(err.message||'Failed to delete student(s)','error');
+ }
 }
 function filtStu(q){const base=CU_ROLE==='teacher'?D.students.filter(s=>myTeacherClasses().includes(s.cls)):D.students;rstStu(base.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.id.toLowerCase().includes(q.toLowerCase())));}
 function filtStuCls(cls,el){el.closest('.fbar').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');const base=CU_ROLE==='teacher'?D.students.filter(s=>myTeacherClasses().includes(s.cls)):D.students;rstStu(cls==='at-risk'?base.filter(s=>s.att<80||s.grade==='F'):cls?base.filter(s=>s.cls===cls):base);}
@@ -80,7 +95,7 @@ function openSP(s){
     <div class="sc" style="cursor:default;text-align:center"><div class="sc-val">${s.t2}%</div><div class="sc-lbl">Term 2</div></div>
     <div class="sc" style="cursor:default;text-align:center"><div class="sc-val">${s.t3}%</div><div class="sc-lbl">Term 3</div></div>
    </div>
-   ${SUBS.slice(0,6).map(sub=>{const m=Math.max(30,Math.min(100,Math.floor(s.avg+(Math.random()*20-10))));const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div class="flex ic g8" style="margin-bottom:7px"><span style="width:120px;font-size:11px">${sub}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${m}%;background:${m<50?'var(--r)':m<60?'var(--a)':'var(--g)'}"></div></div><span style="font-size:11px;font-weight:600;width:32px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('')}
+   ${SUBS.slice(0,6).map(sub=>{const m=seededMark(s.id+sub,s.avg,20);const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return`<div class="flex ic g8" style="margin-bottom:7px"><span style="width:120px;font-size:11px">${sub}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${m}%;background:${m<50?'var(--r)':m<60?'var(--a)':'var(--g)'}"></div></div><span style="font-size:11px;font-weight:600;width:32px;text-align:right">${m}%</span><span class="pill ${gc(g)}">${g}</span></div>`;}).join('')}
   </div>
   <div id="sp3" class="hidden">
    ${(()=>{

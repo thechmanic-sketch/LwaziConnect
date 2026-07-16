@@ -1,5 +1,5 @@
 function mNewMsg(){OM('New Message',`
- <div class="fg"><div class="fl">Send To</div><select class="fs"><option>All Parents</option>${D.classes.map(c=>`<option>${c.name} Parents</option>`).join('')}${D.parents.map(p=>`<option>${p.name}</option>`).join('')}${D.teachers.map(t=>`<option>${t.name}</option>`).join('')}</select></div>
+ <div class="fg"><div class="fl">Send To</div><select class="fs"><option>All Parents</option>${D.classes.map(c=>`<option>${c.name} Parents</option>`).join('')}${D.parents.map(p=>`<option>${p.name}</option>`).join('')}${D.teachers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select></div>
  <div class="fg"><div class="fl">Subject</div><input class="fi" placeholder="Message subject..."></div>
  <div class="fg"><div class="fl">Message</div><textarea class="fta" style="height:90px" placeholder="Type message..."></textarea></div>
  <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -99,7 +99,7 @@ function mAddEvent(){OM('Add Calendar Event',`
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Event added. Parents notified.','success');CM()">Add Event</button>`);}
 
 function mAddHealth(){OM('Add Health Record',`
- <div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
+ <div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
  <div class="fr"><div class="fg"><div class="fl">Medical Condition</div><input class="fi" placeholder="e.g. Asthma or None"></div><div class="fg"><div class="fl">Allergy</div><input class="fi" placeholder="e.g. Peanuts or None"></div></div>
  <div class="fr"><div class="fg"><div class="fl">Blood Type</div><select class="fs"><option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option></select></div><div class="fg"><div class="fl">Medical Aid</div><input class="fi" placeholder="e.g. Discovery Kids"></div></div>
  <div class="fg"><div class="fl">Emergency Contact</div><input class="fi" placeholder="e.g. 071 xxx xxxx (Parent name)"></div>
@@ -107,9 +107,9 @@ function mAddHealth(){OM('Add Health Record',`
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Health record saved','success');CM()">Save Record</button>`);}
 
 function mLogInc(){OM('Log Discipline Incident',`
- <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option>${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Type</div><select class="fs"><option>Misconduct</option><option>Late</option><option>Absent</option><option>Bullying</option><option>Other</option></select></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Type</div><select class="fs"><option>Misconduct</option><option>Late</option><option>Absent</option><option>Bullying</option><option>Other</option></select></div></div>
  <div class="fg"><div class="fl">Description</div><textarea class="fta" placeholder="Describe the incident..."></textarea></div>
- <div class="fr"><div class="fg"><div class="fl">Date</div><input class="fi" type="date" value="${new Date().toISOString().split('T')[0]}"></div><div class="fg"><div class="fl">Reported by</div><select class="fs">${D.teachers.map(t=>`<option>${t.name}</option>`).join('')}</select></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Date</div><input class="fi" type="date" value="${new Date().toISOString().split('T')[0]}"></div><div class="fg"><div class="fl">Reported by</div><select class="fs">${D.teachers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select></div></div>
  <div class="fg"><div class="fl">Action Taken</div><input class="fi" placeholder="e.g. Verbal warning, Parent notified"></div>
  <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-top:5px"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>Notify parent via WhatsApp</label>`,
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Incident logged. Parent notified via WhatsApp.','wa');CM()">Log Incident</button>`);}
