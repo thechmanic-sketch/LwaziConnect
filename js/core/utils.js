@@ -1,5 +1,8 @@
 function subClr(s){const i=SUBS.indexOf(s)%SUB_C.length;const c=SUB_C[i<0?0:i].split('|');return{bg:c[0],fg:c[1]};}
 
+function myTeacher(){return D.teachers.find(t=>t.name===ROLE_PROFILES.teacher.name)||D.teachers[0];}
+function myTeacherClasses(){return myTeacher().classes;}
+
 let CV='dashboard',CMsg=1,selRows=new Set();
 
 // ══ CONFIG ══

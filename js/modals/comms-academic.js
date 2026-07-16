@@ -31,13 +31,25 @@ function mAddClass(){OM('Add Class',`
  <div class="fr"><div class="fg"><div class="fl">Class Teacher</div><select class="fs">${D.teachers.map(t=>`<option>${t.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Max Capacity</div><input class="fi" type="number" placeholder="35"></div></div>`,
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Class created','success');CM()">Create Class</button>`);}
 
-function mMarkAtt(){OM('Mark Attendance',`
- <div class="fr" style="margin-bottom:10px"><div class="fg" style="margin-bottom:0"><div class="fl">Class</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg" style="margin-bottom:0"><div class="fl">Date</div><input class="fi" type="date" value="${new Date().toISOString().split('T')[0]}"></div></div>
- <div style="max-height:250px;overflow-y:auto">${D.students.filter(s=>s.cls==='Grade 7A').map(s=>`<div class="flex ic g8" style="padding:6px 0;border-bottom:1px solid var(--sp)"><div class="av av-s" style="background:${s.bg};color:${s.fg}">${s.ini}</div><span style="flex:1;font-size:12px;font-weight:500">${s.name}</span>${[['P','Present'],['A','Absent'],['L','Late'],['E','Excused'],['S','Sick']].map(([o,lbl])=>`<label title="${lbl}" style="cursor:pointer"><input type="radio" name="ma_${s.id}" value="${o}" ${o==='P'?'checked':''} style="display:none"><div class="att-cell att-${o}">${o}</div></label>`).join('')}</div>`).join('')}</div>`,
+function mMarkAtt(){
+ const isTeacher=CU_ROLE==='teacher';
+ const availClasses=isTeacher?D.classes.filter(c=>myTeacherClasses().includes(c.name)):D.classes;
+ const first=(availClasses[0]&&availClasses[0].name)||'Grade 7A';
+ OM('Mark Attendance',`
+ <div class="fr" style="margin-bottom:10px"><div class="fg" style="margin-bottom:0"><div class="fl">Class</div><select class="fs" id="maClsSel" onchange="maFilterStudents(this.value)">${availClasses.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg" style="margin-bottom:0"><div class="fl">Date</div><input class="fi" type="date" value="${new Date().toISOString().split('T')[0]}"></div></div>
+ <div style="max-height:250px;overflow-y:auto" id="maStuList">${maStudentRows(first)}</div>`,
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Attendance saved. 2 parents notified via WhatsApp','wa');CM()"><i class="ti ti-check" style="font-size:11px"></i>Save Attendance</button>`);}
+function maStudentRows(clsName){
+ return D.students.filter(s=>s.cls===clsName).map(s=>`<div class="flex ic g8" style="padding:6px 0;border-bottom:1px solid var(--sp)"><div class="av av-s" style="background:${s.bg};color:${s.fg}">${s.ini}</div><span style="flex:1;font-size:12px;font-weight:500">${s.name}</span>${[['P','Present'],['A','Absent'],['L','Late'],['E','Excused'],['S','Sick']].map(([o,lbl])=>`<label title="${lbl}" style="cursor:pointer"><input type="radio" name="ma_${s.id}" value="${o}" ${o==='P'?'checked':''} style="display:none"><div class="att-cell att-${o}">${o}</div></label>`).join('')}</div>`).join('');
+}
+function maFilterStudents(clsName){const el=document.getElementById('maStuList');if(el)el.innerHTML=maStudentRows(clsName);}
 
-function mGenReports(){OM('Bulk Generate Report Cards',`
- <div class="fg"><div class="fl">Class</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div>
+function mGenReports(){
+ const isTeacher=CU_ROLE==='teacher';
+ const availClasses=isTeacher?D.classes.filter(c=>myTeacherClasses().includes(c.name)):D.classes;
+ const first=(availClasses[0]&&availClasses[0].name)||'Grade 7A';
+ OM('Bulk Generate Report Cards',`
+ <div class="fg"><div class="fl">Class</div><select class="fs" id="grClsSel" onchange="grUpdateCount(this.value)">${availClasses.map(c=>`<option>${c.name}</option>`).join('')}</select></div>
  <div class="fg"><div class="fl">Term</div><select class="fs"><option>Term 3 — 2025</option><option>Term 2</option><option>Term 1</option></select></div>
  <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
   <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--g)">Generate PDF report cards</label>
@@ -45,8 +57,14 @@ function mGenReports(){OM('Bulk Generate Report Cards',`
   <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--g)">Email to parents</label>
   <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:var(--b)">Track parent acknowledgement</label>
  </div>
- <div style="background:var(--ap);border:1px solid var(--a);border-radius:7px;padding:9px 12px;font-size:11px;color:var(--ad)"><i class="ti ti-info-circle" style="margin-right:4px"></i>This will generate report cards for all 32 students in the selected class and send via WhatsApp + email.</div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('32 report cards generated. Sending via WhatsApp to all parents...','wa');CM()"><i class="ti ti-certificate" style="font-size:11px"></i>Generate & Send All</button>`);}
+ <div style="background:var(--ap);border:1px solid var(--a);border-radius:7px;padding:9px 12px;font-size:11px;color:var(--ad)" id="grCountBox"><i class="ti ti-info-circle" style="margin-right:4px"></i>This will generate report cards for all <span id="grCount">${D.students.filter(s=>s.cls===first).length}</span> students in ${first} and send via WhatsApp + email.</div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T(document.getElementById('grCount').textContent+' report cards generated. Sending via WhatsApp to all parents...','wa');CM()"><i class="ti ti-certificate" style="font-size:11px"></i>Generate & Send All</button>`);}
+function grUpdateCount(clsName){
+ const n=D.students.filter(s=>s.cls===clsName).length;
+ const countEl=document.getElementById('grCount');if(countEl)countEl.textContent=n;
+ const box=document.getElementById('grCountBox');
+ if(box)box.innerHTML=`<i class="ti ti-info-circle" style="margin-right:4px"></i>This will generate report cards for all <span id="grCount">${n}</span> students in ${clsName} and send via WhatsApp + email.`;
+}
 
 function mAddEvent(){OM('Add Calendar Event',`
  <div class="fg"><div class="fl">Event Title</div><input class="fi" placeholder="e.g. Grade 7 Science Projects"></div>

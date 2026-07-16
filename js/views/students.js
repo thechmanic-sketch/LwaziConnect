@@ -1,5 +1,6 @@
 function rStudents(area){
  const isTeacher=CU_ROLE==='teacher';
+ const myStudents=isTeacher?D.students.filter(s=>myTeacherClasses().includes(s.cls)):D.students;
  document.getElementById('topBtn')?.classList.toggle('hidden',isTeacher);
  area.innerHTML=`
  <div class="bulk-bar hidden" id="bulkBar">
@@ -14,7 +15,7 @@ function rStudents(area){
   <div class="fbar">
    <div style="background:#fff;border:1px solid var(--sb);border-radius:7px;padding:0 9px;height:30px;display:flex;align-items:center;gap:6px;min-width:200px"><i class="ti ti-search" style="font-size:12px;color:var(--sx)"></i><input type="text" placeholder="Search students..." style="border:none;background:transparent;font-size:12px;color:var(--s);outline:none;width:100%" oninput="filtStu(this.value)"></div>
    <div class="chip active" onclick="filtStuCls('',this)">All</div>
-   ${[...new Set(D.students.map(s=>s.cls))].map(c=>`<div class="chip" onclick="filtStuCls('${c}',this)">${c}</div>`).join('')}
+   ${[...new Set(myStudents.map(s=>s.cls))].map(c=>`<div class="chip" onclick="filtStuCls('${c}',this)">${c}</div>`).join('')}
    <div class="chip" onclick="filtStuCls('at-risk',this)" style="border-color:var(--r);color:var(--r)">At Risk</div>
    <div style="margin-left:auto;display:flex;gap:7px">
     <button class="btn btn-s" onclick="T('CSV exported','success')"><i class="ti ti-download" style="font-size:11px"></i>Export</button>
@@ -27,7 +28,7 @@ function rStudents(area){
    <tbody id="stuB"></tbody>
   </table></div>
  </div>`;
- rstStu(D.students);
+ rstStu(myStudents);
 }
 
 function rstStu(list){
@@ -49,8 +50,8 @@ function rstStu(list){
   </div></td>
  </tr>`).join('');
 }
-function filtStu(q){rstStu(D.students.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.id.toLowerCase().includes(q.toLowerCase())));}
-function filtStuCls(cls,el){el.closest('.fbar').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');rstStu(cls==='at-risk'?D.students.filter(s=>s.att<80||s.grade==='F'):cls?D.students.filter(s=>s.cls===cls):D.students);}
+function filtStu(q){const base=CU_ROLE==='teacher'?D.students.filter(s=>myTeacherClasses().includes(s.cls)):D.students;rstStu(base.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.id.toLowerCase().includes(q.toLowerCase())));}
+function filtStuCls(cls,el){el.closest('.fbar').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');const base=CU_ROLE==='teacher'?D.students.filter(s=>myTeacherClasses().includes(s.cls)):D.students;rstStu(cls==='at-risk'?base.filter(s=>s.att<80||s.grade==='F'):cls?base.filter(s=>s.cls===cls):base);}
 function openSP(s){
  OM(`${s.name} — Profile`,`
   <div style="background:var(--g);border-radius:9px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
@@ -65,7 +66,7 @@ function openSP(s){
     </div>
    </div>
   </div>
-  <div class="tab-bar"><div class="tab active" onclick="sTab(this,'sp1')">Personal</div><div class="tab" onclick="sTab(this,'sp2')">Academic</div><div class="tab" onclick="sTab(this,'sp3')">Finance</div><div class="tab" onclick="sTab(this,'sp4')">Medical</div></div>
+  <div class="tab-bar"><div class="tab active" onclick="sTab(this,'sp1')">Personal</div><div class="tab" onclick="sTab(this,'sp2')">Academic</div>${CU_ROLE==='teacher'?'':'<div class="tab" onclick="sTab(this,\'sp3\')">Finance</div>'}<div class="tab" onclick="sTab(this,'sp4')">Medical</div></div>
   <div id="sp1">
    <div class="fr3 mb14"><div><div class="tsm fw6">DOB</div><div style="font-size:13px;margin-top:2px">${s.dob}</div></div><div><div class="tsm fw6">Gender</div><div style="font-size:13px;margin-top:2px">${s.gender}</div></div><div><div class="tsm fw6">Class</div><div style="font-size:13px;margin-top:2px">${s.cls}</div></div></div>
    <div class="divider"></div>

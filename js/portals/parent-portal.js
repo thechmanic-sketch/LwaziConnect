@@ -5,7 +5,7 @@ function rParentPortal(){
  <div style="background:var(--g);margin:-20px -20px 0;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
   <div class="flex ic g8"><div class="logo-icon" style="width:26px;height:26px;font-size:11px">L</div><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:#fff">LwaziConnect</div></div>
   <div style="font-size:10px;color:rgba(255,255,255,.4)">Parent Portal</div>
-  <button onclick="switchRole('admin',document.querySelector('.role-btn'))" style="background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:5px;padding:4px 9px;font-size:10px;cursor:pointer">← Back to Admin View</button>
+  <button onclick="doLogout()" style="background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:5px;padding:4px 9px;font-size:10px;cursor:pointer"><i class="ti ti-logout" style="font-size:10px;margin-right:3px"></i>Log Out</button>
  </div>
  <div style="background:var(--g);padding:14px 18px 0;margin:0 -20px">
   <div style="display:flex;align-items:center;gap:12px;padding-bottom:14px">
@@ -36,7 +36,7 @@ function rParentPortal(){
   <div class="card mb18"><div class="card-head"><div class="card-title"><i class="ti ti-files"></i>My Documents</div></div>
   ${D.documents.filter(d=>d.access==='All'||d.access==='Parents').map(d=>`<div class="pp-doc" onclick="T('Downloading ${d.name}','success')"><i class="ti ti-file-type-pdf" style="font-size:18px;color:var(--r)"></i><div style="flex:1"><div style="font-size:12px;font-weight:500">${d.name}</div><div class="tsm">${d.size} · ${d.date}</div></div><i class="ti ti-download act"></i></div>`).join('')}</div>
   <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-message-circle"></i>Messages</div><button class="btn btn-w" onclick="T('Opening WhatsApp with school','wa')"><i class="ti ti-brand-whatsapp" style="font-size:11px"></i>WhatsApp School</button></div>
-  ${D.messages.slice(0,3).map(m=>`<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--sp);cursor:pointer" onclick="T('Opening message','')"><div class="av av-s" style="background:var(--gp);color:var(--g)">DPS</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Durban Primary School</div><div style="font-size:11px;color:var(--sl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${m.thread[0].text}</div></div><div class="tsm">${m.time}</div></div>`).join('')}
+  ${D.messages.filter(m=>m.from===s.parent).slice(0,3).map(m=>`<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--sp);cursor:pointer" onclick="V('messages')"><div class="av av-s" style="background:var(--gp);color:var(--g)">DPS</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Durban Primary School</div><div style="font-size:11px;color:var(--sl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${m.thread[0].text}</div></div><div class="tsm">${m.time}</div></div>`).join('')||'<div class="tsm" style="padding:9px 0">No messages yet.</div>'}
   </div>
  </div>`;
  document.getElementById('ptitle').textContent='Parent Portal — '+s.name;

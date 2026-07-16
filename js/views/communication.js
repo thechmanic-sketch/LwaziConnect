@@ -92,18 +92,21 @@ function rAnnouncements(area){
 function rDocuments(area){
  const ic={pdf:'ti-file-type-pdf',xlsx:'ti-file-spreadsheet'};const icol={pdf:'var(--r)',xlsx:'var(--b)'};
  const acCol={All:'pg',Parents:'pb',Staff:'pa',Admin:'pr'};
+ const canManage=CU_ROLE==='admin'||CU_ROLE==='principal'||CU_ROLE==='superadmin';
+ const visibleAccess=canManage?['All','Parents','Staff','Admin']:CU_ROLE==='teacher'?['All','Staff']:['All','Parents'];
+ const docs=D.documents.filter(d=>visibleAccess.includes(d.access));
  area.innerHTML=`<div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-files"></i>Document Library</div>
-   <div class="flex g8"><select class="fs" style="width:140px;height:28px;font-size:11px"><option>All Categories</option><option>Forms</option><option>Finance</option><option>Policies</option><option>Academic</option><option>HR</option></select><button class="btn btn-g" onclick="mUploadDoc()"><i class="ti ti-upload" style="font-size:11px"></i>Upload</button></div>
+   <div class="flex g8"><select class="fs" style="width:140px;height:28px;font-size:11px"><option>All Categories</option><option>Forms</option><option>Finance</option><option>Policies</option><option>Academic</option><option>HR</option></select>${canManage?'<button class="btn btn-g" onclick="mUploadDoc()"><i class="ti ti-upload" style="font-size:11px"></i>Upload</button>':''}</div>
   </div>
   <div style="background:var(--ap);border:1px solid var(--a);border-radius:7px;padding:9px 12px;font-size:11px;color:var(--ad);margin-bottom:12px"><i class="ti ti-lock" style="margin-right:4px"></i><strong>Role-based access active.</strong> Documents restricted by: Admin → Staff → Parents → Students.</div>
   <div class="tw-wrap"><table class="dt"><thead><tr><th>Document</th><th>Category</th><th>Access</th><th>Size</th><th>Uploaded by</th><th>Date</th><th>Actions</th></tr></thead><tbody>
-  ${D.documents.map(d=>`<tr>
+  ${docs.map(d=>`<tr>
    <td><div class="flex ic g8"><i class="ti ${ic[d.type]||'ti-file'}" style="font-size:19px;color:${icol[d.type]||'var(--sl)'}"></i><span style="font-weight:500">${d.name}</span></div></td>
    <td><span class="pill pn">${d.cat}</span></td>
    <td><span class="pill ${acCol[d.access]||'pn'}"><i class="ti ti-lock" style="font-size:9px"></i>${d.access}</span></td>
    <td class="tsm">${d.size}</td><td>${d.by}</td><td>${d.date}</td>
-   <td><div class="flex g6"><i class="ti ti-eye act" onclick="T('Previewing ${d.name}','')"></i><i class="ti ti-download act" onclick="T('Downloading ${d.name}','success')"></i><i class="ti ti-share act" onclick="T('Shared via WhatsApp','wa')"></i><i class="ti ti-trash act" style="color:var(--r)" onclick="T('Deleted','error')"></i></div></td>
+   <td><div class="flex g6"><i class="ti ti-eye act" onclick="T('Previewing ${d.name}','')"></i><i class="ti ti-download act" onclick="T('Downloading ${d.name}','success')"></i><i class="ti ti-share act" onclick="T('Shared via WhatsApp','wa')"></i>${canManage?'<i class="ti ti-trash act" style="color:var(--r)" onclick="T(\'Deleted\',\'error\')"></i>':''}</div></td>
   </tr>`).join('')}
   </tbody></table></div>
  </div>`;

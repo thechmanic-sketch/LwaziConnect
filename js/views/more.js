@@ -8,7 +8,7 @@ function rCalendar(area){
    </div>
   </div>
   <div class="card">
-   <div class="card-head"><div class="card-title"><i class="ti ti-list"></i>Upcoming Events</div><button class="btn btn-g" onclick="mAddEvent()"><i class="ti ti-plus" style="font-size:11px"></i>Add Event</button></div>
+   <div class="card-head"><div class="card-title"><i class="ti ti-list"></i>Upcoming Events</div>${(CU_ROLE==='parent'||CU_ROLE==='student')?'':'<button class="btn btn-g" onclick="mAddEvent()"><i class="ti ti-plus" style="font-size:11px"></i>Add Event</button>'}</div>
    ${D.calEvents.map(e=>{return`<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--sp)">
     <div style="background:var(--g);color:#fff;border-radius:7px;padding:5px 7px;text-align:center;flex-shrink:0;min-width:38px"><div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;line-height:1">${e.date.split('-')[2]}</div><div style="font-size:7px;opacity:.6">Jul</div></div>
     <div style="flex:1"><div style="font-weight:600;font-size:12px">${e.title}</div><div class="tsm">${e.cls}</div></div>

@@ -1,16 +1,17 @@
 // ─── HOMEWORK ───
 function rHomework(area){
+ const hw=CU_ROLE==='teacher'?D.homework.filter(h=>myTeacherClasses().includes(h.cls)):D.homework;
  area.innerHTML=`
  <div class="g4 mb18">
-  <div class="sc"><div class="sc-icon ig"><i class="ti ti-notebook"></i></div><div class="sc-val">${D.homework.length}</div><div class="sc-lbl">Active assignments</div></div>
-  <div class="sc"><div class="sc-icon ir"><i class="ti ti-alert-circle"></i></div><div class="sc-val">${D.homework.filter(h=>h.status==='overdue').length}</div><div class="sc-lbl">Overdue</div></div>
-  <div class="sc"><div class="sc-icon ib"><i class="ti ti-chart-bar"></i></div><div class="sc-val">${Math.round(D.homework.reduce((a,h)=>a+h.completion,0)/D.homework.length)}%</div><div class="sc-lbl">Avg completion rate</div></div>
+  <div class="sc"><div class="sc-icon ig"><i class="ti ti-notebook"></i></div><div class="sc-val">${hw.length}</div><div class="sc-lbl">Active assignments</div></div>
+  <div class="sc"><div class="sc-icon ir"><i class="ti ti-alert-circle"></i></div><div class="sc-val">${hw.filter(h=>h.status==='overdue').length}</div><div class="sc-lbl">Overdue</div></div>
+  <div class="sc"><div class="sc-icon ib"><i class="ti ti-chart-bar"></i></div><div class="sc-val">${hw.length?Math.round(hw.reduce((a,h)=>a+h.completion,0)/hw.length):0}%</div><div class="sc-lbl">Avg completion rate</div></div>
   <div class="sc"><div class="sc-icon iw"><i class="ti ti-brand-whatsapp"></i></div><div class="sc-val">312</div><div class="sc-lbl">Parents reminded today</div></div>
  </div>
  <div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-notebook"></i>Homework & Assignments</div><button class="btn btn-g" onclick="mSetHomework()"><i class="ti ti-plus" style="font-size:11px"></i>Set Homework</button></div>
   <div class="tw-wrap"><table class="dt"><thead><tr><th>Assignment</th><th>Subject</th><th>Class</th><th>Teacher</th><th>Due Date</th><th>Completion</th><th>Status</th><th>Actions</th></tr></thead><tbody>
-  ${D.homework.map(h=>`<tr>
+  ${hw.map(h=>`<tr>
    <td style="font-weight:600">${h.title}</td><td>${h.subject}</td><td>${h.cls}</td><td>${h.teacher}</td><td>${h.due}</td>
    <td><div class="flex ic g6"><div class="pw-bar" style="width:60px"><div class="pb-bar" style="width:${h.completion}%;background:${h.completion<60?'var(--r)':h.completion<80?'var(--a)':'var(--g)'}"></div></div><span style="font-size:11px">${h.completion}%</span></div></td>
    <td><span class="pill ${h.status==='overdue'?'pr':'pg'}">${h.status==='overdue'?'Overdue':'Active'}</span></td>

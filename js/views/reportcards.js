@@ -1,11 +1,14 @@
 function rReportCards(area){
+ const isTeacher=CU_ROLE==='teacher';
+ const availClasses=isTeacher?D.classes.filter(c=>myTeacherClasses().includes(c.name)):D.classes;
+ const availStudents=isTeacher?D.students.filter(s=>myTeacherClasses().includes(s.cls)):D.students;
  area.innerHTML=`
  <div class="g2 mb18">
   <div class="card">
    <div class="card-head"><div class="card-title"><i class="ti ti-certificate"></i>Generate Report Cards</div></div>
-   <div class="fg"><div class="fl">Class</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div>
+   <div class="fg"><div class="fl">Class</div><select class="fs" id="rcClsSel" onchange="rcFilterStudents(this.value)">${availClasses.map(c=>`<option>${c.name}</option>`).join('')}</select></div>
    <div class="fg"><div class="fl">Term</div><select class="fs"><option>Term 3 — 2025</option><option>Term 2</option><option>Term 1</option></select></div>
-   <div class="fg"><div class="fl">Student</div><select class="fs" id="rcSel">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+   <div class="fg"><div class="fl">Student</div><select class="fs" id="rcSel">${availStudents.filter(s=>!availClasses.length||s.cls===availClasses[0].name).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
    <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px">
     <button class="btn btn-g w100" style="justify-content:center" onclick="prevRC()"><i class="ti ti-eye" style="font-size:11px"></i>Preview Report Card</button>
     <button class="btn btn-w w100" style="justify-content:center" onclick="T('Report card sent via WhatsApp to parent','wa')"><i class="ti ti-brand-whatsapp" style="font-size:11px"></i>Send via WhatsApp</button>
@@ -15,13 +18,18 @@ function rReportCards(area){
   </div>
   <div class="card">
    <div class="card-head"><div class="card-title"><i class="ti ti-chart-bar"></i>Class Performance</div></div>
-   ${D.classes.map(c=>{const stus=D.students.filter(s=>s.cls===c.name);const avg=stus.length?Math.round(stus.reduce((a,s)=>a+s.avg,0)/stus.length):0;return`<div class="flex ic g8" style="margin-bottom:8px"><span style="width:74px;font-size:11px">${c.name}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${avg}%;background:${avg>=75?'var(--g)':avg>=60?'var(--a)':'var(--r)'}"></div></div><span style="font-size:11px;font-weight:600;width:34px;text-align:right">${avg}%</span></div>`;}).join('')}
+   ${availClasses.map(c=>{const stus=D.students.filter(s=>s.cls===c.name);const avg=stus.length?Math.round(stus.reduce((a,s)=>a+s.avg,0)/stus.length):0;return`<div class="flex ic g8" style="margin-bottom:8px"><span style="width:74px;font-size:11px">${c.name}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${avg}%;background:${avg>=75?'var(--g)':avg>=60?'var(--a)':'var(--r)'}"></div></div><span style="font-size:11px;font-weight:600;width:34px;text-align:right">${avg}%</span></div>`;}).join('')}
    <div class="divider"></div>
    <div class="card-title" style="margin-bottom:9px"><i class="ti ti-send"></i>WhatsApp Delivery</div>
    <div class="flex ic g8 mb14" style="margin-bottom:7px"><i class="ti ti-circle-check" style="color:var(--g)"></i><span style="flex:1;font-size:12px">Grade 5A — 36 sent</span><span class="wast read"><i class="ti ti-checks"></i>All read</span></div>
    <div class="flex ic g8"><i class="ti ti-clock" style="color:var(--a)"></i><span style="flex:1;font-size:12px">Grade 7A — Pending</span><button class="btn btn-w" style="height:22px;font-size:10px" onclick="T('Sending 32 reports via WhatsApp','wa')">Send Now</button></div>
   </div>
  </div>`;
+}
+
+function rcFilterStudents(clsName){
+ const sel=document.getElementById('rcSel');if(!sel)return;
+ sel.innerHTML=D.students.filter(s=>s.cls===clsName).map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
 }
 
 function prevRC(){

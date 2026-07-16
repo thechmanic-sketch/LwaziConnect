@@ -1,4 +1,9 @@
-function rAttendance(area){
+function rAttendance(area,clsName){
+ const isTeacher=CU_ROLE==='teacher';
+ const availClasses=isTeacher?D.classes.filter(c=>myTeacherClasses().includes(c.name)):D.classes;
+ const cls=clsName||(availClasses[0]&&availClasses[0].name)||'Grade 7A';
+ const clsStudents=D.students.filter(s=>s.cls===cls);
+ const atRiskInClass=clsStudents.filter(s=>s.att<80).sort((a,b)=>a.att-b.att)[0];
  area.innerHTML=`
  <div class="g4 mb18">
   <div class="sc"><div class="sc-icon ig"><i class="ti ti-users"></i></div><div class="sc-val">576</div><div class="sc-lbl">Present today</div></div>
@@ -8,11 +13,11 @@ function rAttendance(area){
  </div>
  <div class="g2 mb18">
   <div class="card">
-   <div class="card-head"><div class="card-title"><i class="ti ti-calendar-check"></i>Mark — Grade 7A</div>
-    <div class="flex g8"><select class="fs" style="width:130px;height:26px;font-size:11px">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select><button class="btn btn-g" style="height:26px;font-size:10px" onclick="T('Attendance saved. 2 parents notified via WhatsApp','wa')"><i class="ti ti-check" style="font-size:10px"></i>Save</button></div>
+   <div class="card-head"><div class="card-title"><i class="ti ti-calendar-check"></i>Mark — ${cls}</div>
+    <div class="flex g8"><select class="fs" style="width:130px;height:26px;font-size:11px" onchange="rAttendance(null,this.value)">${availClasses.map(c=>`<option ${c.name===cls?'selected':''}>${c.name}</option>`).join('')}</select><button class="btn btn-g" style="height:26px;font-size:10px" onclick="T('Attendance saved. 2 parents notified via WhatsApp','wa')"><i class="ti ti-check" style="font-size:10px"></i>Save</button></div>
    </div>
    <div style="max-height:290px;overflow-y:auto">
-   ${D.students.filter(s=>s.cls==='Grade 7A').map(s=>`
+   ${clsStudents.map(s=>`
     <div class="flex ic g8" style="padding:6px 0;border-bottom:1px solid var(--sp)">
      <div class="av av-s" style="background:${s.bg};color:${s.fg}">${s.ini}</div>
      <span style="flex:1;font-size:12px;font-weight:500">${s.name}</span>
@@ -22,13 +27,11 @@ function rAttendance(area){
    </div>
   </div>
   <div class="card">
-   <div class="card-head"><div class="card-title"><i class="ti ti-calendar-stats"></i>July 2025 — Amahle Dlamini</div></div>
-   <div class="cal-grid mb14" style="margin-bottom:8px">${['M','T','W','T','F','S','S'].map(d=>`<div class="cal-head">${d}</div>`).join('')}
-   ${Array.from({length:31},(_,i)=>{const day=i+1;const ss=['P','P','P','P','P',null,null,'P','P','P','A','P','P',null,null,'P','L','P'];const s=ss[i]||null;return s?`<div class="att-cell att-${s}" style="width:100%;border-radius:4px" onclick="T('July ${day}: ${s==='P'?'Present':s==='A'?'Absent':'Late'}','')"><span style="font-size:8px">${day}</span></div>`:`<div style="min-height:22px;border-radius:4px;background:${day>17?'var(--sp)':'#fff'};display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--sx)">${day}</div>`;}).join('')}
-   </div>
-   <div style="background:var(--rp);border:1px solid var(--r);border-radius:7px;padding:8px 11px;font-size:11px;color:var(--rm)">
-    <i class="ti ti-alert-triangle" style="margin-right:4px"></i><strong>Kabelo Mokoena</strong> at 72% — below threshold. <strong>WhatsApp auto-alert sent to parent.</strong>
-   </div>
+   <div class="card-head"><div class="card-title"><i class="ti ti-calendar-stats"></i>${cls} — July 2025</div></div>
+   <div class="tsm" style="margin-bottom:10px">Class average attendance: <strong>${clsStudents.length?Math.round(clsStudents.reduce((a,s)=>a+s.att,0)/clsStudents.length):0}%</strong></div>
+   ${atRiskInClass?`<div style="background:var(--rp);border:1px solid var(--r);border-radius:7px;padding:8px 11px;font-size:11px;color:var(--rm)">
+    <i class="ti ti-alert-triangle" style="margin-right:4px"></i><strong>${atRiskInClass.name}</strong> at ${atRiskInClass.att}% — below threshold. <strong>WhatsApp auto-alert sent to parent.</strong>
+   </div>`:`<div style="background:var(--gp);border:1px solid var(--gl);border-radius:7px;padding:8px 11px;font-size:11px;color:var(--g)"><i class="ti ti-circle-check" style="margin-right:4px"></i>No students below the 80% attendance threshold in this class.</div>`}
   </div>
  </div>`;
 }
