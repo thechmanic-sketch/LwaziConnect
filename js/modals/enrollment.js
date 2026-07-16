@@ -59,9 +59,37 @@ function mAddAdmission(){OM('New Application',`
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Application submitted — APP-004 created','success');CM()">Submit Application</button>`);}
 
 function mAddInv(){OM('New Invoice',`
- <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Term</div><select class="fs"><option>Term 3 — 2025</option><option>Term 4 — 2025</option><option>Term 1 — 2026</option></select></div></div>
- <div class="fr"><div class="fg"><div class="fl">Fee Type</div><select class="fs"><option>Tuition Fees</option><option>Uniform</option><option>Sports Levy</option><option>Stationery</option></select></div><div class="fg"><div class="fl">Amount (R)</div><input class="fi" placeholder="2500" type="number"></div></div>
- <div class="fr"><div class="fg"><div class="fl">Due Date</div><input class="fi" type="date"></div><div class="fg"><div class="fl">Payment Method</div><select class="fs"><option>EFT</option><option>PayFast</option><option>Cash</option></select></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs" id="aivStu">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Term</div><select class="fs" id="aivTerm"><option>Term 3 — 2025</option><option>Term 4 — 2025</option><option>Term 1 — 2026</option></select></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Fee Type</div><select class="fs" id="aivType"><option>Tuition Fees</option><option>Uniform</option><option>Sports Levy</option><option>Stationery</option></select></div><div class="fg"><div class="fl">Amount (R)</div><input class="fi" id="aivAmt" placeholder="2500" type="number"></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Due Date</div><input class="fi" id="aivDue" type="date"></div><div class="fg"><div class="fl">Payment Method</div><select class="fs"><option>EFT</option><option>PayFast</option><option>Cash</option></select></div></div>
  <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-top:6px"><input type="checkbox" checked style="accent-color:var(--g)">Send PayFast payment link to parent via WhatsApp</label>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Invoice created. PayFast link sent to parent.','success');CM()"><i class="ti ti-receipt" style="font-size:11px"></i>Create Invoice</button>`);}
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="aivSubmitBtn" onclick="submitAddInvoice()"><i class="ti ti-receipt" style="font-size:11px"></i>Create Invoice</button>`);}
+
+async function submitAddInvoice(){
+ const studentId=document.getElementById('aivStu').value;
+ const term=document.getElementById('aivTerm').value;
+ const feeType=document.getElementById('aivType').value;
+ const amount=parseFloat(document.getElementById('aivAmt').value);
+ const dueDate=document.getElementById('aivDue').value;
+ if(!studentId){T('Select a student','error');return;}
+ if(!amount||amount<=0){T('Enter a valid amount','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('aivSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Creating...';}
+ try{
+  const {error}=await sb.from('invoices').insert({
+   school_id:schoolId,student_id:studentId,term:`${feeType} — ${term}`,
+   amount,paid:0,status:'pending',due_date:dueDate||null
+  });
+  if(error)throw error;
+  T('Invoice created','success');
+  CM();
+  await loadSchoolData(schoolId);
+  V(CV);
+ }catch(err){
+  T(err.message||'Failed to create invoice','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-receipt" style="font-size:11px"></i>Create Invoice';}
+ }
+}
 

@@ -134,18 +134,71 @@ function mAddEvent(){OM('Add Calendar Event',`
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Event added. Parents notified.','success');CM()">Add Event</button>`);}
 
 function mAddHealth(){OM('Add Health Record',`
- <div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
- <div class="fr"><div class="fg"><div class="fl">Medical Condition</div><input class="fi" placeholder="e.g. Asthma or None"></div><div class="fg"><div class="fl">Allergy</div><input class="fi" placeholder="e.g. Peanuts or None"></div></div>
- <div class="fr"><div class="fg"><div class="fl">Blood Type</div><select class="fs"><option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option></select></div><div class="fg"><div class="fl">Medical Aid</div><input class="fi" placeholder="e.g. Discovery Kids"></div></div>
- <div class="fg"><div class="fl">Emergency Contact</div><input class="fi" placeholder="e.g. 071 xxx xxxx (Parent name)"></div>
- <div class="fg"><div class="fl">Family Doctor</div><input class="fi" placeholder="Dr. Name — 031 xxx xxxx"></div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Health record saved','success');CM()">Save Record</button>`);}
+ <div class="fg"><div class="fl">Student</div><select class="fs" id="ahStu">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+ <div class="fr"><div class="fg"><div class="fl">Medical Condition</div><input class="fi" id="ahCond" placeholder="e.g. Asthma or None"></div><div class="fg"><div class="fl">Allergy</div><input class="fi" id="ahAllergy" placeholder="e.g. Peanuts or None"></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Blood Type</div><select class="fs" id="ahBlood"><option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option></select></div><div class="fg"><div class="fl">Medical Aid</div><input class="fi" id="ahAid" placeholder="e.g. Discovery Kids"></div></div>
+ <div class="fg"><div class="fl">Emergency Contact</div><input class="fi" id="ahContact" placeholder="e.g. 071 xxx xxxx (Parent name)"></div>
+ <div class="fg"><div class="fl">Family Doctor</div><input class="fi" id="ahDoc" placeholder="Dr. Name — 031 xxx xxxx"></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="ahSubmitBtn" onclick="submitAddHealth()">Save Record</button>`);}
+
+async function submitAddHealth(){
+ const studentId=document.getElementById('ahStu').value;
+ if(!studentId){T('Select a student','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('ahSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Saving...';}
+ try{
+  const {error}=await sb.from('health_records').upsert({
+   school_id:schoolId,student_id:studentId,
+   medical_condition:document.getElementById('ahCond').value.trim()||null,
+   allergy:document.getElementById('ahAllergy').value.trim()||null,
+   blood_type:document.getElementById('ahBlood').value||null,
+   medical_aid:document.getElementById('ahAid').value.trim()||null,
+   emergency_contact:document.getElementById('ahContact').value.trim()||null,
+   doctor:document.getElementById('ahDoc').value.trim()||null
+  },{onConflict:'student_id'});
+  if(error)throw error;
+  T('Health record saved','success');
+  CM();
+ }catch(err){
+  T(err.message||'Failed to save health record','error');
+  if(btn){btn.disabled=false;btn.innerHTML='Save Record';}
+ }
+}
 
 function mLogInc(){OM('Log Discipline Incident',`
- <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Type</div><select class="fs"><option>Misconduct</option><option>Late</option><option>Absent</option><option>Bullying</option><option>Other</option></select></div></div>
- <div class="fg"><div class="fl">Description</div><textarea class="fta" placeholder="Describe the incident..."></textarea></div>
- <div class="fr"><div class="fg"><div class="fl">Date</div><input class="fi" type="date" value="${new Date().toISOString().split('T')[0]}"></div><div class="fg"><div class="fl">Reported by</div><select class="fs">${D.teachers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select></div></div>
- <div class="fg"><div class="fl">Action Taken</div><input class="fi" placeholder="e.g. Verbal warning, Parent notified"></div>
+ <div class="fr"><div class="fg"><div class="fl">Student</div><select class="fs" id="liStu">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Type</div><select class="fs" id="liType"><option>Misconduct</option><option>Late</option><option>Absent</option><option>Bullying</option><option>Other</option></select></div></div>
+ <div class="fg"><div class="fl">Description</div><textarea class="fta" id="liDesc" placeholder="Describe the incident..."></textarea></div>
+ <div class="fr"><div class="fg"><div class="fl">Date</div><input class="fi" id="liDate" type="date" value="${new Date().toISOString().split('T')[0]}"></div><div class="fg"><div class="fl">Reported by</div><select class="fs" id="liReporter">${D.teachers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select></div></div>
+ <div class="fg"><div class="fl">Action Taken</div><input class="fi" id="liAction" placeholder="e.g. Verbal warning, Parent notified"></div>
  <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-top:5px"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>Notify parent via WhatsApp</label>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Incident logged. Parent notified via WhatsApp.','wa');CM()">Log Incident</button>`);}
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="liSubmitBtn" onclick="submitLogIncident()">Log Incident</button>`);}
+
+async function submitLogIncident(){
+ const studentId=document.getElementById('liStu').value;
+ const type=document.getElementById('liType').value;
+ const description=document.getElementById('liDesc').value.trim();
+ const date=document.getElementById('liDate').value;
+ const reportedBy=document.getElementById('liReporter').value;
+ const actionTaken=document.getElementById('liAction').value.trim();
+ if(!studentId){T('Select a student','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('liSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Saving...';}
+ try{
+  const {error}=await sb.from('discipline_records').insert({
+   school_id:schoolId,student_id:studentId,type,description:description||null,
+   incident_date:date||new Date().toISOString().split('T')[0],
+   reported_by:reportedBy||CU_PROFILE?.id||null,action_taken:actionTaken||null
+  });
+  if(error)throw error;
+  T('Incident logged','success');
+  CM();
+ }catch(err){
+  T(err.message||'Failed to log incident','error');
+  if(btn){btn.disabled=false;btn.innerHTML='Log Incident';}
+ }
+}
 

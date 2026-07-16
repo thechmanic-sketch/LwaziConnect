@@ -1,10 +1,37 @@
-function mSetHomework(){OM('Set Homework',`
- <div class="fr"><div class="fg"><div class="fl">Class</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Subject</div><select class="fs">${SUBS.map(s=>`<option>${s}</option>`).join('')}</select></div></div>
- <div class="fg"><div class="fl">Assignment Title</div><input class="fi" placeholder="e.g. Algebra Worksheet — Chapter 4"></div>
- <div class="fg"><div class="fl">Instructions</div><textarea class="fta" placeholder="Describe the homework..."></textarea></div>
- <div class="fr"><div class="fg"><div class="fl">Due Date</div><input class="fi" type="date"></div><div class="fg"><div class="fl">Attachment</div><button class="btn btn-s w100" style="justify-content:center" onclick="T('File attached','success')"><i class="ti ti-paperclip" style="font-size:11px"></i>Attach File</button></div></div>
+function mSetHomework(){
+ const availClasses=CU_ROLE==='teacher'?D.classes.filter(c=>myTeacherClasses().includes(c.name)):D.classes;
+ OM('Set Homework',`
+ <div class="fr"><div class="fg"><div class="fl">Class</div><select class="fs" id="shwCls">${availClasses.map(c=>`<option value="${c._id}">${c.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Subject</div><select class="fs" id="shwSub">${SUBS.map(s=>`<option>${s}</option>`).join('')}</select></div></div>
+ <div class="fg"><div class="fl">Assignment Title</div><input class="fi" id="shwTitle" placeholder="e.g. Algebra Worksheet — Chapter 4"></div>
+ <div class="fr"><div class="fg"><div class="fl">Due Date</div><input class="fi" id="shwDue" type="date"></div><div class="fg"><div class="fl">Attachment</div><button class="btn btn-s w100" style="justify-content:center" onclick="T('File attached','success')"><i class="ti ti-paperclip" style="font-size:11px"></i>Attach File</button></div></div>
  <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--wd)"><i class="ti ti-brand-whatsapp" style="color:var(--wd)"></i>Notify parents via WhatsApp</label>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Homework set and parents notified','wa');CM()"><i class="ti ti-notebook" style="font-size:11px"></i>Set Homework</button>`);}
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="shwSubmitBtn" onclick="submitSetHomework()"><i class="ti ti-notebook" style="font-size:11px"></i>Set Homework</button>`);}
+
+async function submitSetHomework(){
+ const classId=document.getElementById('shwCls').value;
+ const subject=document.getElementById('shwSub').value;
+ const title=document.getElementById('shwTitle').value.trim();
+ const dueDate=document.getElementById('shwDue').value;
+ if(!classId){T('Select a class','error');return;}
+ if(!title){T('Enter an assignment title','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId||!CU_PROFILE){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('shwSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Saving...';}
+ try{
+  const {error}=await sb.from('homework').insert({
+   school_id:schoolId,class_id:classId,teacher_id:CU_PROFILE.id,
+   subject,title,due_date:dueDate||null,status:'active'
+  });
+  if(error)throw error;
+  T('Homework set','success');
+  CM();
+  if(typeof V==='function')V(CV);
+ }catch(err){
+  T(err.message||'Failed to set homework','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-notebook" style="font-size:11px"></i>Set Homework';}
+ }
+}
 
 function mNewBroadcast(){OM('New Broadcast',`
  <div class="fr"><div class="fg"><div class="fl">Channel</div><select class="fs"><option>WhatsApp</option><option>Email</option><option>SMS</option><option>All Channels</option></select></div><div class="fg"><div class="fl">Audience</div><select class="fs"><option>All Parents</option><option>All Staff</option>${D.classes.map(c=>`<option>${c.name} Parents</option>`).join('')}</select></div></div>
