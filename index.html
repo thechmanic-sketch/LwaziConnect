@@ -97,7 +97,14 @@
      </div>
      <div class="ab-field">
       <label for="suSchool">Your School</label>
-      <input id="suSchool" type="text" placeholder="e.g. Durban Primary School" required>
+      <select class="ab-select" id="suSchool" onchange="toggleNewSchoolField()" required>
+       <option value="" selected disabled>Loading schools...</option>
+       <option value="__new__">My school isn't listed — register it</option>
+      </select>
+     </div>
+     <div class="ab-field hidden" id="suNewSchoolWrap">
+      <label for="suNewSchoolName">New School Name</label>
+      <input id="suNewSchoolName" type="text" placeholder="e.g. Durban Primary School">
      </div>
      <div class="ab-field">
       <label for="suName">Your Full Name</label>

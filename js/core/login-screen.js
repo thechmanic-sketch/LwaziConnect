@@ -3,8 +3,30 @@ function openSignup() {
  document.getElementById('lsFormView').classList.add('hidden');
  document.getElementById('lsStaffView').classList.add('hidden');
  document.getElementById('lsSignupView').classList.remove('hidden');
+ loadSchoolsForSignup();
  const school = document.getElementById('suSchool');
  if (school) school.focus();
+}
+
+async function loadSchoolsForSignup() {
+ const sel = document.getElementById('suSchool');
+ if (!sel || sel.dataset.loaded) return;
+ try {
+  const { data, error } = await sb.rpc('list_schools');
+  if (error) throw error;
+  const opts = (data || []).map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  sel.innerHTML = `<option value="" selected disabled>Select your school...</option>${opts}<option value="__new__">My school isn't listed — register it</option>`;
+  sel.dataset.loaded = '1';
+ } catch (err) {
+  sel.innerHTML = `<option value="" selected disabled>Could not load schools</option><option value="__new__">My school isn't listed — register it</option>`;
+ }
+}
+
+function toggleNewSchoolField() {
+ const sel = document.getElementById('suSchool');
+ const wrap = document.getElementById('suNewSchoolWrap');
+ if (!sel || !wrap) return;
+ wrap.classList.toggle('hidden', sel.value !== '__new__');
 }
 
 function backToRoles() {
@@ -44,13 +66,15 @@ function toggleSuPwVisibility(inputId, iconId) {
 
 async function doSignup() {
  const role = document.getElementById('suRole').value;
- const schoolName = document.getElementById('suSchool').value.trim();
+ const schoolSel = document.getElementById('suSchool').value;
+ const newSchoolName = document.getElementById('suNewSchoolName').value.trim();
  const fullName = document.getElementById('suName').value.trim();
  const email = document.getElementById('suEmail').value.trim();
  const phone = document.getElementById('suPhone').value.trim();
  const password = document.getElementById('suPassword').value;
  const confirm = document.getElementById('suConfirm').value;
- if (!schoolName) { T('Enter your school name','error'); return; }
+ if (!schoolSel) { T('Select your school','error'); return; }
+ if (schoolSel === '__new__' && !newSchoolName) { T('Enter your new school\'s name','error'); return; }
  if (password !== confirm) { T('Passwords do not match','error'); return; }
  if (password.length < 8) { T('Password must be at least 8 characters','error'); return; }
 
@@ -59,19 +83,17 @@ async function doSignup() {
 
  try {
   let schoolId;
-  const { data: existingId, error: lookupErr } = await sb.rpc('find_school_id_by_name', { p_name: schoolName });
-  if (lookupErr) throw lookupErr;
-
-  if (existingId) {
-   schoolId = existingId;
-  } else if (role === 'principal' || role === 'admin') {
-   const { data: newId, error: createErr } = await sb.rpc('register_school', { p_name: schoolName });
+  if (schoolSel === '__new__') {
+   if (role !== 'principal' && role !== 'admin') {
+    T('Only a Principal or Admin can register a new school — ask them to register first, then select it here.','error');
+    if (cta) { cta.disabled = false; cta.textContent = 'CREATE ACCOUNT'; }
+    return;
+   }
+   const { data: newId, error: createErr } = await sb.rpc('register_school', { p_name: newSchoolName });
    if (createErr) throw createErr;
    schoolId = newId;
   } else {
-   T('School not found — please check the name with your school office, or ask them to register first.','error');
-   if (cta) { cta.disabled = false; cta.textContent = 'CREATE ACCOUNT'; }
-   return;
+   schoolId = schoolSel;
   }
 
   const { data, error } = await sb.auth.signUp({
