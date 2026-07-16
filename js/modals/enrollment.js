@@ -44,11 +44,37 @@ function mAddTeacher(){OM('Add Teacher',`
  </div>`,
  `<button class="btn btn-g" onclick="CM()">Got it</button>`);}
 
-function mAddParent(){OM('Add Parent',`
- <div class="fr"><div class="fg"><div class="fl">Full Name</div><input class="fi" placeholder="Parent full name"></div><div class="fg"><div class="fl">Relationship</div><select class="fs"><option>Mother</option><option>Father</option><option>Guardian</option></select></div></div>
- <div class="fr"><div class="fg"><div class="fl">Phone</div><input class="fi" placeholder="071 xxx xxxx"></div><div class="fg"><div class="fl">Email</div><input class="fi" placeholder="email@example.com" type="email"></div></div>
- <div class="fg"><div class="fl">Link to Student(s)</div><select class="fs" multiple style="height:65px">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-w" onclick="T('Parent added. WhatsApp portal invite sent.','wa');CM()">Add Parent</button>`);}
+function mAddParent(){OM('Link Parent to Student',`
+ <div style="background:var(--ap);border:1px solid var(--a);border-radius:7px;padding:11px 13px;font-size:12px;color:var(--ad);margin-bottom:4px"><i class="ti ti-info-circle" style="margin-right:4px"></i>Parent accounts are self-registered for security — a parent needs their own login. Once they've registered, link their account to their child here.</div>
+ ${D.parents.length?`
+ <div class="fg" style="margin-top:8px"><div class="fl">Parent (already registered)</div><select class="fs" id="apParent">${D.parents.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
+ <div class="fg"><div class="fl">Link to Student(s)</div><select class="fs" id="apStudents" multiple style="height:65px">${D.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>`
+ :`<div class="tsm" style="margin-top:10px">No parent accounts have registered for ${typeof schoolName==='function'?schoolName():'your school'} yet. Ask them to register via the login page's Register link, choosing Parent as their role.</div>`}`,
+ D.parents.length
+  ?`<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="apSubmitBtn" onclick="submitLinkParent()"><i class="ti ti-link" style="font-size:11px"></i>Link Parent</button>`
+  :`<button class="btn btn-g" onclick="CM()">Got it</button>`);}
+
+async function submitLinkParent(){
+ const parentId=document.getElementById('apParent').value;
+ const studentIds=[...document.getElementById('apStudents').selectedOptions].map(o=>o.value);
+ if(!parentId){T('Select a parent','error');return;}
+ if(!studentIds.length){T('Select at least one student','error');return;}
+ const btn=document.getElementById('apSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Linking...';}
+ try{
+  const rows=studentIds.map(sid=>({parent_id:parentId,student_id:sid}));
+  const {error}=await sb.from('parent_students').upsert(rows,{onConflict:'parent_id,student_id'});
+  if(error)throw error;
+  T('Parent linked to student(s)','success');
+  CM();
+  const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+  await loadSchoolData(schoolId);
+  if(CV==='parents')V('parents');
+ }catch(err){
+  T(err.message||'Failed to link parent','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-link" style="font-size:11px"></i>Link Parent';}
+ }
+}
 
 function mAddAdmission(){OM('New Application',`
  <div class="step-ind"><div class="step-it"><div class="sc2 cur">1</div><div class="sl2 cur">Applicant</div></div><div class="sc3 pend"></div><div class="step-it"><div class="sc2 pend">2</div><div class="sl2 pend">Parent</div></div><div class="sc3 pend"></div><div class="step-it"><div class="sc2 pend">3</div><div class="sl2 pend">Documents</div></div></div>

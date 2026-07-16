@@ -84,18 +84,22 @@ async function loadProfileAndEnter(userId) {
 // app. Superadmin spans schools, so it isn't school-scoped here.
 async function loadSchoolData(schoolId) {
  if (!schoolId) return;
- const [{ data: classesRaw }, { data: studentsRaw }, { data: teacherProfiles }, { data: teacherLinks }, { data: admissionsRaw }] = await Promise.all([
+ const [{ data: classesRaw }, { data: studentsRaw }, { data: teacherProfiles }, { data: teacherLinks }, { data: admissionsRaw }, { data: parentProfiles }, { data: parentLinks }] = await Promise.all([
   sb.from('classes').select('*').eq('school_id', schoolId),
   sb.from('students').select('*').eq('school_id', schoolId),
   sb.from('profiles').select('*').eq('school_id', schoolId).eq('role','teacher'),
   sb.from('teacher_classes').select('*'),
   sb.from('admissions').select('*').eq('school_id', schoolId).order('submitted_at', { ascending: false }),
+  sb.from('profiles').select('*').eq('school_id', schoolId).eq('role','parent'),
+  sb.from('parent_students').select('*'),
  ]);
 
  const classes = classesRaw || [];
  const students = studentsRaw || [];
  const teacherProfilesList = teacherProfiles || [];
  const links = teacherLinks || [];
+ const parentProfilesList = parentProfiles || [];
+ const pLinks = parentLinks || [];
 
  D.classes = classes.map(c => ({
   name: c.name,
@@ -134,6 +138,21 @@ async function loadSchoolData(schoolId) {
   phone: t.phone || '', email: '', status: 'active', joined: '',
   profile_id: t.id,
  }));
+
+ const studentById = Object.fromEntries(D.students.map(s => [s.id, s]));
+ D.parents = parentProfilesList.map(p => {
+  const childIds = pLinks.filter(l => l.parent_id === p.id).map(l => l.student_id);
+  const childNames = childIds.map(id => studentById[id]?.name).filter(Boolean);
+  childIds.forEach(id => { if (studentById[id]) studentById[id].parent = p.full_name; });
+  return {
+   id: p.id,
+   name: p.full_name,
+   ini: initialsFromName(p.full_name),
+   bg: '#EFF6FF', fg: '#1D6FA4',
+   children: childNames,
+   phone: p.phone || '', email: '', portal: true, status: 'active',
+  };
+ });
 
  D.admissions = (admissionsRaw || []).map(a => ({
   id: a.id,
