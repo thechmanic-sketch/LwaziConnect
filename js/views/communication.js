@@ -116,9 +116,45 @@ function rDocuments(area){
    <td><span class="pill pn">${d.cat}</span></td>
    <td><span class="pill ${acCol[d.access]||'pn'}"><i class="ti ti-lock" style="font-size:9px"></i>${d.access}</span></td>
    <td class="tsm">${d.size}</td><td>${d.by}</td><td>${d.date}</td>
-   <td><div class="flex g6"><i class="ti ti-eye act" onclick="T('Previewing ${d.name}','')"></i><i class="ti ti-download act" onclick="T('Downloading ${d.name}','success')"></i><i class="ti ti-share act" onclick="T('Shared via WhatsApp','wa')"></i>${canManage?'<i class="ti ti-trash act" style="color:var(--r)" onclick="T(\'Deleted\',\'error\')"></i>':''}</div></td>
+   <td><div class="flex g6"><i class="ti ti-eye act" onclick="openDocument('${d.id}')"></i><i class="ti ti-download act" onclick="downloadDocument('${d.id}')"></i><i class="ti ti-share act" onclick="T('Shared via WhatsApp','wa')"></i>${canManage?`<i class="ti ti-trash act" style="color:var(--r)" onclick="deleteDocument('${d.id}')"></i>`:''}</div></td>
   </tr>`).join('')}
   </tbody></table></div>
  </div>`;
+}
+
+async function openDocument(id){
+ const doc=D.documents.find(d=>d.id===id);
+ if(!doc||!doc.storagePath){T('Document not found','error');return;}
+ const {data,error}=await sb.storage.from('documents').createSignedUrl(doc.storagePath,300);
+ if(error||!data){T(error?.message||'Failed to open document','error');return;}
+ window.open(data.signedUrl,'_blank');
+}
+
+async function downloadDocument(id){
+ const doc=D.documents.find(d=>d.id===id);
+ if(!doc||!doc.storagePath){T('Document not found','error');return;}
+ const {data,error}=await sb.storage.from('documents').createSignedUrl(doc.storagePath,300,{download:doc.name});
+ if(error||!data){T(error?.message||'Failed to download document','error');return;}
+ window.open(data.signedUrl,'_blank');
+}
+
+async function deleteDocument(id){
+ const doc=D.documents.find(d=>d.id===id);
+ if(!doc)return;
+ if(!confirm(`Delete "${doc.name}"? This can't be undone.`))return;
+ try{
+  if(doc.storagePath){
+   const {error:sErr}=await sb.storage.from('documents').remove([doc.storagePath]);
+   if(sErr)throw sErr;
+  }
+  const {error}=await sb.from('documents').delete().eq('id',id);
+  if(error)throw error;
+  T('Document deleted','success');
+  const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+  await loadSchoolData(schoolId);
+  V('documents');
+ }catch(err){
+  T(err.message||'Failed to delete document','error');
+ }
 }
 

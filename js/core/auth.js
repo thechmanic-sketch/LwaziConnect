@@ -84,7 +84,7 @@ async function loadProfileAndEnter(userId) {
 // app. Superadmin spans schools, so it isn't school-scoped here.
 async function loadSchoolData(schoolId) {
  if (!schoolId) return;
- const [{ data: classesRaw }, { data: studentsRaw }, { data: teacherProfiles }, { data: teacherLinks }, { data: admissionsRaw }, { data: parentProfiles }, { data: parentLinks }] = await Promise.all([
+ const [{ data: classesRaw }, { data: studentsRaw }, { data: teacherProfiles }, { data: teacherLinks }, { data: admissionsRaw }, { data: parentProfiles }, { data: parentLinks }, { data: documentsRaw }] = await Promise.all([
   sb.from('classes').select('*').eq('school_id', schoolId),
   sb.from('students').select('*').eq('school_id', schoolId),
   sb.from('profiles').select('*').eq('school_id', schoolId).eq('role','teacher'),
@@ -92,6 +92,7 @@ async function loadSchoolData(schoolId) {
   sb.from('admissions').select('*').eq('school_id', schoolId).order('submitted_at', { ascending: false }),
   sb.from('profiles').select('*').eq('school_id', schoolId).eq('role','parent'),
   sb.from('parent_students').select('*'),
+  sb.from('documents').select('*, uploader:profiles(full_name)').eq('school_id', schoolId).order('created_at', { ascending: false }),
  ]);
 
  const classes = classesRaw || [];
@@ -153,6 +154,18 @@ async function loadSchoolData(schoolId) {
    phone: p.phone || '', email: '', portal: true, status: 'active',
   };
  });
+
+ D.documents = (documentsRaw || []).map(d => ({
+  id: d.id,
+  name: d.name,
+  type: (d.name.split('.').pop() || '').toLowerCase(),
+  cat: d.category || 'General',
+  access: d.access_level === 'all' ? 'All' : d.access_level.charAt(0).toUpperCase() + d.access_level.slice(1),
+  by: d.uploader?.full_name || '—',
+  date: d.created_at ? d.created_at.split('T')[0] : '—',
+  size: '',
+  storagePath: d.storage_path,
+ }));
 
  D.admissions = (admissionsRaw || []).map(a => ({
   id: a.id,

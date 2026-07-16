@@ -48,9 +48,39 @@ async function submitNewAnn(){
 }
 
 function mUploadDoc(){OM('Upload Document',`
- <div class="drop-zone" onclick="T('File picker opened','')"><i class="ti ti-cloud-upload" style="font-size:30px;color:var(--gl);display:block;margin-bottom:7px"></i><div style="font-weight:600;font-size:13px;color:var(--s);margin-bottom:3px">Click to upload or drag and drop</div><div class="tsm">PDF, DOCX, XLSX, JPG — max 10MB</div></div>
- <div class="fr" style="margin-top:10px"><div class="fg"><div class="fl">Category</div><select class="fs"><option>Forms</option><option>Finance</option><option>Policies</option><option>Academic</option><option>HR</option></select></div><div class="fg"><div class="fl">Access Level</div><select class="fs"><option>All</option><option>Parents</option><option>Staff</option><option>Admin only</option></select></div></div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Document uploaded','success');CM()"><i class="ti ti-upload" style="font-size:11px"></i>Upload</button>`);}
+ <div class="drop-zone" onclick="document.getElementById('udFile').click()"><input type="file" id="udFile" style="display:none" onchange="document.getElementById('udFileName').textContent=this.files[0]?this.files[0].name:'No file selected'"><i class="ti ti-cloud-upload" style="font-size:30px;color:var(--gl);display:block;margin-bottom:7px"></i><div style="font-weight:600;font-size:13px;color:var(--s);margin-bottom:3px">Click to upload or drag and drop</div><div class="tsm" id="udFileName">PDF, DOCX, XLSX, JPG — max 10MB</div></div>
+ <div class="fr" style="margin-top:10px"><div class="fg"><div class="fl">Category</div><select class="fs" id="udCat"><option>Forms</option><option>Finance</option><option>Policies</option><option>Academic</option><option>HR</option></select></div><div class="fg"><div class="fl">Access Level</div><select class="fs" id="udAccess"><option value="all">All</option><option value="parents">Parents</option><option value="staff">Staff</option><option value="admin">Admin only</option></select></div></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="udSubmitBtn" onclick="submitUploadDoc()"><i class="ti ti-upload" style="font-size:11px"></i>Upload</button>`);}
+
+async function submitUploadDoc(){
+ const fileInput=document.getElementById('udFile');
+ const file=fileInput.files[0];
+ if(!file){T('Choose a file','error');return;}
+ if(file.size>10*1024*1024){T('File exceeds 10MB limit','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId||!CU_PROFILE){T('No school context — please re-login','error');return;}
+ const category=document.getElementById('udCat').value;
+ const accessLevel=document.getElementById('udAccess').value;
+ const btn=document.getElementById('udSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Uploading...';}
+ try{
+  const path=`${schoolId}/${Date.now()}-${file.name}`;
+  const {error:upErr}=await sb.storage.from('documents').upload(path,file);
+  if(upErr)throw upErr;
+  const {error}=await sb.from('documents').insert({
+   school_id:schoolId,name:file.name,category,access_level:accessLevel,
+   uploaded_by:CU_PROFILE.id,storage_path:path
+  });
+  if(error)throw error;
+  T('Document uploaded','success');
+  CM();
+  await loadSchoolData(schoolId);
+  if(CV==='documents')V('documents');
+ }catch(err){
+  T(err.message||'Failed to upload document','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-upload" style="font-size:11px"></i>Upload';}
+ }
+}
 
 function mAddClass(){OM('Add Class',`
  <div class="fr"><div class="fg"><div class="fl">Class Name</div><input class="fi" id="acName" placeholder="e.g. Grade 4A"></div><div class="fg"><div class="fl">Room</div><input class="fi" id="acRoom" placeholder="e.g. Room 5"></div></div>
