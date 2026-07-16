@@ -27,9 +27,35 @@ function mUploadDoc(){OM('Upload Document',`
  `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Document uploaded','success');CM()"><i class="ti ti-upload" style="font-size:11px"></i>Upload</button>`);}
 
 function mAddClass(){OM('Add Class',`
- <div class="fr"><div class="fg"><div class="fl">Class Name</div><input class="fi" placeholder="e.g. Grade 4A"></div><div class="fg"><div class="fl">Room</div><input class="fi" placeholder="e.g. Room 5"></div></div>
- <div class="fr"><div class="fg"><div class="fl">Class Teacher</div><select class="fs">${D.teachers.map(t=>`<option>${t.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Max Capacity</div><input class="fi" type="number" placeholder="35"></div></div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Class created','success');CM()">Create Class</button>`);}
+ <div class="fr"><div class="fg"><div class="fl">Class Name</div><input class="fi" id="acName" placeholder="e.g. Grade 4A"></div><div class="fg"><div class="fl">Room</div><input class="fi" id="acRoom" placeholder="e.g. Room 5"></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Class Teacher</div><select class="fs" id="acTeacher"><option value="">Unassigned</option>${D.teachers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Max Capacity</div><input class="fi" id="acCap" type="number" placeholder="35"></div></div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="acSubmitBtn" onclick="submitAddClass()">Create Class</button>`);}
+
+async function submitAddClass(){
+ const name=document.getElementById('acName').value.trim();
+ const room=document.getElementById('acRoom').value.trim();
+ const teacherId=document.getElementById('acTeacher').value;
+ const capacity=parseInt(document.getElementById('acCap').value)||null;
+ if(!name){T('Enter a class name','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('acSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Creating...';}
+ try{
+  const {error}=await sb.from('classes').insert({
+   school_id:schoolId,name,room:room||null,capacity,
+   homeroom_teacher_id:teacherId||null
+  });
+  if(error)throw error;
+  T('Class created','success');
+  CM();
+  await loadSchoolData(schoolId);
+  V(CV);
+ }catch(err){
+  T(err.message||'Failed to create class','error');
+  if(btn){btn.disabled=false;btn.textContent='Create Class';}
+ }
+}
 
 function mMarkAtt(){
  const isTeacher=CU_ROLE==='teacher';

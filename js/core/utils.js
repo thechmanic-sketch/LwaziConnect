@@ -39,7 +39,7 @@ function V(v){
  document.getElementById('ptitle').textContent=c.t;
  document.getElementById('topLbl').textContent=c.a;
  document.getElementById('topIco').className=`ti ${c.i}`;
- document.getElementById('topBtn')?.classList.toggle('hidden',CU_ROLE==='parent'||CU_ROLE==='student'||(v==='timetable'&&CU_ROLE==='teacher'));
+ document.getElementById('topBtn')?.classList.toggle('hidden',CU_ROLE==='parent'||CU_ROLE==='student'||(CU_ROLE==='teacher'&&(v==='timetable'||v==='classes')));
  const area=document.getElementById('CA');area.innerHTML='';
  const fn={dashboard:rDash,students:rStudents,admissions:rAdmissions,parents:rParents,classes:rClasses,teachers:rTeachers,subjects:rSubjects,timetable:rTimetable,attendance:rAttendance,reportcards:rReportCards,fees:rFees,messages:rMessages,announcements:rAnnouncements,documents:rDocuments,calendar:rCalendar,health:rHealth,discipline:rDiscipline,analytics:rAnalytics,superadmin:rSuperAdmin,licensing:rLicensing,settings:rSettings,
  aiassist:rAI,idcards:rIDCards,homework:rHomework,commscentre:rCommsCentre,hr:rHR,transport:rTransport,website:rWebsite,sgb:rSGB,compliance:rCompliance,enterprise:rEnterprise};

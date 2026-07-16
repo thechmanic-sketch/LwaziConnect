@@ -1,21 +1,48 @@
 // ══ ALL MODALS ══
 function mAddStu(){OM('Add New Student',`
- <div class="fr"><div class="fg"><div class="fl">First Name</div><input class="fi" placeholder="e.g. Amahle"></div><div class="fg"><div class="fl">Last Name</div><input class="fi" placeholder="e.g. Dlamini"></div></div>
- <div class="fr"><div class="fg"><div class="fl">Date of Birth</div><input class="fi" type="date"></div><div class="fg"><div class="fl">Gender</div><select class="fs"><option>Female</option><option>Male</option></select></div></div>
- <div class="fr"><div class="fg"><div class="fl">Class</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Home Language</div><select class="fs"><option>IsiZulu</option><option>English</option><option>IsiXhosa</option></select></div></div>
- <div class="divider"></div>
- <div style="font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--sl);margin-bottom:9px">Parent / Guardian</div>
- <div class="fr"><div class="fg"><div class="fl">Full Name</div><input class="fi" placeholder="Parent full name"></div><div class="fg"><div class="fl">Phone</div><input class="fi" placeholder="071 xxx xxxx"></div></div>
- <div class="fr"><div class="fg"><div class="fl">Email</div><input class="fi" placeholder="parent@email.com" type="email"></div><div class="fg"><div class="fl">Relationship</div><select class="fs"><option>Mother</option><option>Father</option><option>Guardian</option></select></div></div>
- <div class="fg"><div class="fl">Home Address</div><input class="fi" placeholder="Full address"></div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Student registered successfully','success');CM()"><i class="ti ti-user-plus" style="font-size:11px"></i>Register Student</button>`);}
+ <div class="fr"><div class="fg"><div class="fl">First Name</div><input class="fi" id="asuFirst" placeholder="e.g. Amahle"></div><div class="fg"><div class="fl">Last Name</div><input class="fi" id="asuLast" placeholder="e.g. Dlamini"></div></div>
+ <div class="fr"><div class="fg"><div class="fl">Date of Birth</div><input class="fi" id="asuDob" type="date"></div><div class="fg"><div class="fl">Gender</div><select class="fs" id="asuGender"><option>Female</option><option>Male</option></select></div></div>
+ <div class="fg"><div class="fl">Class</div><select class="fs" id="asuClass">${D.classes.length?D.classes.map(c=>`<option value="${c._id}">${c.name}</option>`).join(''):'<option value="">No classes yet — add one first</option>'}</select></div>
+ <div class="tsm" style="margin-top:4px">Parent linking happens once the parent registers their own account and the school links them to this student.</div>`,
+ `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" id="asuSubmitBtn" onclick="submitAddStudent()"><i class="ti ti-user-plus" style="font-size:11px"></i>Register Student</button>`);}
+
+async function submitAddStudent(){
+ const firstName=document.getElementById('asuFirst').value.trim();
+ const lastName=document.getElementById('asuLast').value.trim();
+ const dob=document.getElementById('asuDob').value;
+ const gender=document.getElementById('asuGender').value;
+ const classId=document.getElementById('asuClass').value;
+ if(!firstName||!lastName){T('Enter first and last name','error');return;}
+ const schoolId=CU_SCHOOL?.id||CU_PROFILE?.school_id;
+ if(!schoolId){T('No school context — please re-login','error');return;}
+ const btn=document.getElementById('asuSubmitBtn');
+ if(btn){btn.disabled=true;btn.textContent='Saving...';}
+ try{
+  const {error}=await sb.from('students').insert({
+   school_id:schoolId,first_name:firstName,last_name:lastName,
+   dob:dob||null,gender,class_id:classId||null,status:'active'
+  });
+  if(error)throw error;
+  T('Student registered','success');
+  CM();
+  await loadSchoolData(schoolId);
+  if(CU_ROLE==='teacher'||CU_ROLE==='admin'||CU_ROLE==='principal')V(CV);
+ }catch(err){
+  T(err.message||'Failed to register student','error');
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-user-plus" style="font-size:11px"></i>Register Student';}
+ }
+}
 
 function mAddTeacher(){OM('Add Teacher',`
- <div class="fr"><div class="fg"><div class="fl">First Name</div><input class="fi" placeholder="First name"></div><div class="fg"><div class="fl">Last Name</div><input class="fi" placeholder="Last name"></div></div>
- <div class="fg"><div class="fl">Subjects</div><select class="fs" multiple style="height:65px">${SUBS.map(s=>`<option>${s}</option>`).join('')}</select></div>
- <div class="fr"><div class="fg"><div class="fl">Assigned Class</div><select class="fs">${D.classes.map(c=>`<option>${c.name}</option>`).join('')}</select></div><div class="fg"><div class="fl">Phone</div><input class="fi" placeholder="071 xxx xxxx"></div></div>
- <div class="fg"><div class="fl">Email</div><input class="fi" placeholder="teacher@school.edu.za" type="email"></div>`,
- `<button class="btn btn-s" onclick="CM()">Cancel</button><button class="btn btn-g" onclick="T('Teacher added','success');CM()">Add Teacher</button>`);}
+ <div style="background:var(--ap);border:1px solid var(--a);border-radius:7px;padding:11px 13px;font-size:12px;color:var(--ad);margin-bottom:4px"><i class="ti ti-info-circle" style="margin-right:4px"></i>Teacher accounts are self-registered for security — a teacher account needs its own login, which can't be created on their behalf here.</div>
+ <div class="fg" style="margin-top:12px"><div class="fl">Tell them to register at your login page:</div>
+  <ol style="font-size:12px;color:var(--sm);padding-left:18px;line-height:1.8">
+   <li>Click <strong>Register</strong> on the login screen</li>
+   <li>Choose <strong>Teacher</strong> as their role</li>
+   <li>Select <strong>${typeof schoolName==='function'?schoolName():'your school'}</strong> from the school dropdown</li>
+  </ol>
+ </div>`,
+ `<button class="btn btn-g" onclick="CM()">Got it</button>`);}
 
 function mAddParent(){OM('Add Parent',`
  <div class="fr"><div class="fg"><div class="fl">Full Name</div><input class="fi" placeholder="Parent full name"></div><div class="fg"><div class="fl">Relationship</div><select class="fs"><option>Mother</option><option>Father</option><option>Guardian</option></select></div></div>
