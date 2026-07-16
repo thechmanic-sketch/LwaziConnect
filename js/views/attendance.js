@@ -6,15 +6,15 @@ function rAttendance(area,clsName){
  const atRiskInClass=clsStudents.filter(s=>s.att<80).sort((a,b)=>a.att-b.att)[0];
  area.innerHTML=`
  <div class="g4 mb18">
-  <div class="sc"><div class="sc-icon ig"><i class="ti ti-users"></i></div><div class="sc-val">576</div><div class="sc-lbl">Present today</div></div>
-  <div class="sc"><div class="sc-icon ir"><i class="ti ti-user-x"></i></div><div class="sc-val">48</div><div class="sc-lbl">Absent today</div><div class="sc-trend" style="color:var(--wd)"><i class="ti ti-brand-whatsapp" style="font-size:10px"></i>12 parents auto-notified</div></div>
-  <div class="sc"><div class="sc-icon ia"><i class="ti ti-clock"></i></div><div class="sc-val">14</div><div class="sc-lbl">Late arrivals</div></div>
-  <div class="sc"><div class="sc-icon ib"><i class="ti ti-chart-bar"></i></div><div class="sc-val">91%</div><div class="sc-lbl">Term avg</div><div class="sc-trend tw"><i class="ti ti-target" style="font-size:10px"></i>Target: 95%</div></div>
+  <div class="sc"><div class="sc-icon ig"><i class="ti ti-users"></i></div><div class="sc-val">0</div><div class="sc-lbl">Present today</div></div>
+  <div class="sc"><div class="sc-icon ir"><i class="ti ti-user-x"></i></div><div class="sc-val">0</div><div class="sc-lbl">Absent today</div></div>
+  <div class="sc"><div class="sc-icon ia"><i class="ti ti-clock"></i></div><div class="sc-val">0</div><div class="sc-lbl">Late arrivals</div></div>
+  <div class="sc"><div class="sc-icon ib"><i class="ti ti-chart-bar"></i></div><div class="sc-val">${D.students.length?Math.round(D.students.reduce((a,s)=>a+s.att,0)/D.students.length):0}%</div><div class="sc-lbl">Term avg</div><div class="sc-trend tw"><i class="ti ti-target" style="font-size:10px"></i>Target: 95%</div></div>
  </div>
  <div class="g2 mb18">
   <div class="card">
    <div class="card-head"><div class="card-title"><i class="ti ti-calendar-check"></i>Mark — ${cls}</div>
-    <div class="flex g8"><select class="fs" style="width:130px;height:26px;font-size:11px" onchange="rAttendance(null,this.value)">${availClasses.map(c=>`<option ${c.name===cls?'selected':''}>${c.name}</option>`).join('')}</select><button class="btn btn-g" style="height:26px;font-size:10px" onclick="T('Attendance saved. 2 parents notified via WhatsApp','wa')"><i class="ti ti-check" style="font-size:10px"></i>Save</button></div>
+    <div class="flex g8"><select class="fs" style="width:130px;height:26px;font-size:11px" onchange="rAttendance(null,this.value)">${availClasses.map(c=>`<option ${c.name===cls?'selected':''}>${c.name}</option>`).join('')}</select><button class="btn btn-g" style="height:26px;font-size:10px" onclick="T('Attendance saved','wa')"><i class="ti ti-check" style="font-size:10px"></i>Save</button></div>
    </div>
    <div style="max-height:290px;overflow-y:auto">
    ${clsStudents.map(s=>`

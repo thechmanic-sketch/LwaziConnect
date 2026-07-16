@@ -34,7 +34,7 @@ function appApprove(id,btn){
 function openPublicForm(){
  OM('Online Application Form Preview',`
   <div style="background:var(--g);border-radius:9px;padding:18px;text-align:center;margin-bottom:14px">
-   <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:17px;color:#fff">Durban Primary School</div>
+   <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:17px;color:#fff">${schoolName()}</div>
    <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px">Online Admission Application 2026</div>
   </div>
   <div class="tsm" style="text-align:center;margin-bottom:14px;color:var(--ad)">This is what parents see on their phone when they click the application link</div>

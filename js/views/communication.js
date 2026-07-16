@@ -70,9 +70,9 @@ function rAnnouncements(area){
  const anns=D.announcements.filter(annVisible);
  area.innerHTML=`
  <div class="g3 mb18">
-  <div class="sc"><div class="sc-icon ir"><i class="ti ti-alert-circle"></i></div><div class="sc-val">1</div><div class="sc-lbl">Urgent active</div></div>
-  <div class="sc"><div class="sc-icon iw"><i class="ti ti-brand-whatsapp"></i></div><div class="sc-val">2,847</div><div class="sc-lbl">WhatsApp msgs sent</div></div>
-  <div class="sc"><div class="sc-icon ig"><i class="ti ti-eye"></i></div><div class="sc-val">78%</div><div class="sc-lbl">Avg read rate</div></div>
+  <div class="sc"><div class="sc-icon ir"><i class="ti ti-alert-circle"></i></div><div class="sc-val">${anns.filter(a=>a.tag==='Urgent').length}</div><div class="sc-lbl">Urgent active</div></div>
+  <div class="sc"><div class="sc-icon iw"><i class="ti ti-brand-whatsapp"></i></div><div class="sc-val">${anns.reduce((a,x)=>a+(x.sent||0),0)}</div><div class="sc-lbl">WhatsApp msgs sent</div></div>
+  <div class="sc"><div class="sc-icon ig"><i class="ti ti-eye"></i></div><div class="sc-val">${(()=>{const t=anns.reduce((a,x)=>a+(x.sent||0),0);return t?Math.round(anns.reduce((a,x)=>a+(x.read||0),0)/t*100):0;})()}%</div><div class="sc-lbl">Avg read rate</div></div>
  </div>
  <div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-speakerphone"></i>Announcements</div>${canManage?'<button class="btn btn-g" onclick="mNewAnn()"><i class="ti ti-plus" style="font-size:11px"></i>New</button>':''}</div>

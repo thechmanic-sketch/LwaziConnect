@@ -1,8 +1,11 @@
 // ══ ROLE SYSTEM ══
 let CU_ROLE = null;
 let CU_PROFILE = null; // real Supabase profile row for the logged-in user: {id, school_id, role, full_name, ...}
+let CU_SCHOOL = null; // real Supabase schools row for the logged-in user's school: {id, name, plan, status, logo_url}
 let selRole = null;
 let currentAllowedViews = null;
+
+function schoolName(){ return (CU_SCHOOL && CU_SCHOOL.name) || 'Your School'; }
 
 const ROLE_PROFILES = {
  superadmin: {name:'Themba Moyo',ini:'TM',bg:'#FEF3C7',fg:'#B45309',label:'Super Admin',nav:['dashboard','students','admissions','parents','classes','teachers','subjects','timetable','attendance','reportcards','fees','messages','announcements','documents','calendar','health','discipline','analytics','superadmin','enterprise','licensing','settings','aiassist','idcards','homework','commscentre','hr','transport','sgb','compliance']},
@@ -157,8 +160,14 @@ async function enterAppAsProfile(profile) {
  const rp = ROLE_PROFILES[profile.role] || ROLE_PROFILES.admin;
  const ini = profile.initials || initialsFromName(profile.full_name);
 
- if (profile.role === 'superadmin') await loadAllSchools();
- else await loadSchoolData(profile.school_id);
+ if (profile.role === 'superadmin') {
+  CU_SCHOOL = null;
+  await loadAllSchools();
+ } else {
+  const { data: schoolRow } = await sb.from('schools').select('*').eq('id', profile.school_id).single();
+  CU_SCHOOL = schoolRow || null;
+  await loadSchoolData(profile.school_id);
+ }
 
  document.getElementById('loginScreen').style.display = 'none';
  document.getElementById('appWrap').classList.remove('hidden');
@@ -168,6 +177,10 @@ async function enterAppAsProfile(profile) {
  document.getElementById('sideName').textContent = profile.full_name || rp.name;
  document.getElementById('sideRoleLabel').textContent = rp.label;
  document.getElementById('roleBadgeTxt').textContent = rp.label;
+ const sideSchoolName = document.getElementById('sideSchoolName');
+ const sideSchoolPlan = document.getElementById('sideSchoolPlan');
+ if (sideSchoolName) sideSchoolName.textContent = profile.role === 'superadmin' ? 'Platform Admin' : schoolName();
+ if (sideSchoolPlan) sideSchoolPlan.textContent = CU_SCHOOL ? `${CU_SCHOOL.plan} · ${CU_SCHOOL.status}` : '';
  buildRoleNav(rp.nav);
  const topBtn = document.getElementById('topBtn');
  if (topBtn) topBtn.classList.toggle('hidden', profile.role === 'parent' || profile.role === 'student');

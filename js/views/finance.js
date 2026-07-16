@@ -1,16 +1,26 @@
 function rFees(area){
  if(CU_ROLE==='parent')return rParentFees(area);
+ const paidTotal=D.invoices.filter(i=>i.status==='paid').reduce((a,i)=>a+i.paid,0);
+ const partialTotal=D.invoices.filter(i=>i.status==='partial').reduce((a,i)=>a+i.paid,0);
+ const partialCount=D.invoices.filter(i=>i.status==='partial').length;
+ const outstandingTotal=D.invoices.reduce((a,i)=>a+(i.amount-i.paid),0);
+ const overdueCount=D.invoices.filter(i=>i.amount>i.paid).length;
+ const totalBilled=D.invoices.reduce((a,i)=>a+i.amount,0);
+ const collectionRate=totalBilled?Math.round((paidTotal/totalBilled)*100):0;
+ const methodGroups={};
+ D.invoices.forEach(i=>{methodGroups[i.method]=methodGroups[i.method]||{total:0,count:0};methodGroups[i.method].total+=i.paid;methodGroups[i.method].count++;});
+ const methodColors={EFT:'var(--b)',PayFast:'var(--g)',Cash:'var(--ad)'};
  area.innerHTML=`
  <div class="g3 mb18">
-  <div class="sc"><div class="sc-icon ig"><i class="ti ti-circle-check"></i></div><div class="sc-val">R112,500</div><div class="sc-lbl">Collected — Term 3</div><div class="sc-trend tu"><i class="ti ti-trending-up" style="font-size:10px"></i>75% collection rate</div></div>
-  <div class="sc"><div class="sc-icon ia"><i class="ti ti-clock"></i></div><div class="sc-val">R26,500</div><div class="sc-lbl">Partially paid</div><div class="sc-trend tw"><i class="ti ti-users" style="font-size:10px"></i>12 students</div></div>
-  <div class="sc"><div class="sc-icon ir"><i class="ti ti-alert-triangle"></i></div><div class="sc-val">R37,000</div><div class="sc-lbl">Outstanding</div>
-   <div style="margin-top:6px"><button class="btn btn-w" style="height:22px;font-size:10px;width:100%;justify-content:center" onclick="T('WhatsApp reminders sent to 8 parents','wa')"><i class="ti ti-brand-whatsapp" style="font-size:10px"></i>Remind All</button></div>
+  <div class="sc"><div class="sc-icon ig"><i class="ti ti-circle-check"></i></div><div class="sc-val">${fmt(paidTotal)}</div><div class="sc-lbl">Collected — Term 3</div><div class="sc-trend tu"><i class="ti ti-trending-up" style="font-size:10px"></i>${collectionRate}% collection rate</div></div>
+  <div class="sc"><div class="sc-icon ia"><i class="ti ti-clock"></i></div><div class="sc-val">${fmt(partialTotal)}</div><div class="sc-lbl">Partially paid</div><div class="sc-trend tw"><i class="ti ti-users" style="font-size:10px"></i>${partialCount} students</div></div>
+  <div class="sc"><div class="sc-icon ir"><i class="ti ti-alert-triangle"></i></div><div class="sc-val">${fmt(outstandingTotal)}</div><div class="sc-lbl">Outstanding</div>
+   <div style="margin-top:6px"><button class="btn btn-w" style="height:22px;font-size:10px;width:100%;justify-content:center" onclick="T('WhatsApp reminders sent to ${overdueCount} parents','wa')"><i class="ti ti-brand-whatsapp" style="font-size:10px"></i>Remind All</button></div>
   </div>
  </div>
  <div class="card mb18">
   <div class="card-head"><div class="card-title"><i class="ti ti-chart-bar"></i>Payment Methods</div></div>
-  <div class="g3">${[['EFT','R68,500','5 payments','var(--b)'],['PayFast','R31,000','3 payments','var(--g)'],['Cash','R13,000','2 payments','var(--ad)']].map(([m,a,c,col])=>`<div class="sc" style="cursor:default"><div class="sc-icon" style="background:${col}22;color:${col}"><i class="ti ti-credit-card"></i></div><div class="sc-val" style="color:${col}">${a}</div><div class="sc-lbl">${m} · ${c}</div></div>`).join('')}</div>
+  <div class="g3">${Object.keys(methodGroups).length?Object.entries(methodGroups).map(([m,g])=>`<div class="sc" style="cursor:default"><div class="sc-icon" style="background:${(methodColors[m]||'var(--sl)')}22;color:${methodColors[m]||'var(--sl)'}"><i class="ti ti-credit-card"></i></div><div class="sc-val" style="color:${methodColors[m]||'var(--sl)'}">${fmt(g.total)}</div><div class="sc-lbl">${m} · ${g.count} payment${g.count===1?'':'s'}</div></div>`).join(''):'<div class="tsm">No payments recorded yet.</div>'}</div>
  </div>
  <div class="card">
   <div class="card-head"><div class="card-title"><i class="ti ti-receipt-2"></i>Invoice Records</div>
@@ -45,6 +55,7 @@ function filtInv(status,el){el.closest('.card-head').querySelectorAll('.chip').f
 
 function rParentFees(area){
  const child=D.students[0];
+ if(!child){area.innerHTML='<div class="card" style="text-align:center;padding:40px 20px"><div class="tsm">No child linked to your account yet.</div></div>';return;}
  const myInvoices=D.invoices.filter(i=>i.student===child.name);
  const totalDue=myInvoices.reduce((a,i)=>a+i.amount,0);
  const totalPaid=myInvoices.reduce((a,i)=>a+i.paid,0);
@@ -72,7 +83,7 @@ function rParentFees(area){
 function openInv(id){
  const inv=D.invoices.find(i=>i.id===id);if(!inv)return;const bal=inv.amount-inv.paid;
  OM(`Invoice ${inv.id}`,`
-  <div style="background:var(--g);border-radius:8px;padding:12px 16px;margin-bottom:14px"><div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;color:#fff">Durban Primary School</div><div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:1px">Tax Invoice · ${inv.id} · ${inv.date}</div></div>
+  <div style="background:var(--g);border-radius:8px;padding:12px 16px;margin-bottom:14px"><div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;color:#fff">${schoolName()}</div><div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:1px">Tax Invoice · ${inv.id} · ${inv.date}</div></div>
   <div class="fr3 mb14"><div><div class="tsm fw6">Student</div><div style="font-size:13px;margin-top:2px">${inv.student}</div></div><div><div class="tsm fw6">Class</div><div style="font-size:13px;margin-top:2px">${inv.cls}</div></div><div><div class="tsm fw6">Term</div><div style="font-size:13px;margin-top:2px">${inv.term}</div></div></div>
   <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px"><tr style="background:var(--sp)"><th style="padding:6px 9px;text-align:left;font-size:9px;text-transform:uppercase;color:var(--sl)">Description</th><th style="padding:6px 9px;text-align:right">Amount</th></tr><tr><td style="padding:8px 9px;border-bottom:1px solid var(--sp)">Tuition — ${inv.term}</td><td style="padding:8px 9px;text-align:right;font-weight:600">${fmt(inv.amount)}</td></tr><tr><td style="padding:8px 9px;color:var(--g)">Paid (${inv.method})</td><td style="padding:8px 9px;text-align:right;color:var(--g);font-weight:600">− ${fmt(inv.paid)}</td></tr><tr style="background:${bal>0?'var(--rp)':'var(--gp)'}"><td style="padding:8px 9px;font-weight:700;color:${bal>0?'var(--r)':'var(--g)'}">Balance</td><td style="padding:8px 9px;text-align:right;font-weight:800;font-size:15px;font-family:Outfit;color:${bal>0?'var(--r)':'var(--g)'}">${bal>0?fmt(bal):'PAID IN FULL'}</td></tr></table>
   ${bal>0?`<div class="pay-btn" style="display:flex;justify-content:center;padding:9px;font-size:12px;border-radius:7px" onclick="T('PayFast link for ${fmt(bal)} sent to parent','success')"><i class="ti ti-link" style="font-size:14px"></i>Send PayFast Link — ${fmt(bal)}</div>`:''}`,

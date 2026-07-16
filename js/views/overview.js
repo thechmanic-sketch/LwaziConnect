@@ -6,19 +6,24 @@ function rDash(area){
  if(CU_ROLE==='teacher')return rTeacherDash(area);
  const atRisk=D.students.filter(s=>s.att<85||s.grade==='F');
  const def=D.invoices.filter(i=>i.status!=='paid');
+ const pendingAdmissions=D.admissions.filter(a=>a.status==='pending').length;
+ const activeTeachers=D.teachers.filter(t=>t.status==='active').length;
+ const onLeaveTeachers=D.teachers.filter(t=>t.status==='on-leave').length;
+ const totalOutstanding=D.invoices.reduce((a,i)=>a+(i.amount-i.paid),0);
+ const avgAtt=D.students.length?Math.round(D.students.reduce((a,s)=>a+s.att,0)/D.students.length):0;
  area.innerHTML=`
  <div class="alert-banner">
   <span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-right:3px">Alerts</span>
   <div class="al-item red" onclick="V('attendance')"><i class="ti ti-user-exclamation"></i>${atRisk.length} students need attention</div>
   <div class="al-item amb" onclick="V('fees')"><i class="ti ti-receipt"></i>${def.length} fee accounts overdue</div>
-  <div class="al-item amb" onclick="V('admissions')"><i class="ti ti-clipboard"></i>3 pending applications</div>
-  <div class="al-item" onclick="openWA()"><i class="ti ti-brand-whatsapp" style="color:#DCF8C6"></i>WhatsApp: 2,847 msgs this month</div>
+  <div class="al-item amb" onclick="V('admissions')"><i class="ti ti-clipboard"></i>${pendingAdmissions} pending applications</div>
+  <div class="al-item" onclick="openWA()"><i class="ti ti-brand-whatsapp" style="color:#DCF8C6"></i>WhatsApp updates</div>
  </div>
  <div class="g4 mb18">
-  <div class="sc" onclick="V('students')"><div class="sc-icon ig"><i class="ti ti-users"></i></div><div class="sc-val" id="sv1">0</div><div class="sc-lbl">Total Students</div><div class="sc-trend tu"><i class="ti ti-trending-up" style="font-size:10px"></i>+12 this term</div></div>
-  <div class="sc" onclick="V('teachers')"><div class="sc-icon ib"><i class="ti ti-user-check"></i></div><div class="sc-val" id="sv2">0</div><div class="sc-lbl">Active Teachers</div><div class="sc-trend tu"><i class="ti ti-circle-check" style="font-size:10px"></i>5 active · 1 leave</div></div>
-  <div class="sc" onclick="V('attendance')"><div class="sc-icon ia"><i class="ti ti-calendar-check"></i></div><div class="sc-val" id="sv3">0%</div><div class="sc-lbl">Avg Attendance</div><div class="sc-trend tw"><i class="ti ti-minus" style="font-size:10px"></i>−2% vs last week</div></div>
-  <div class="sc" onclick="V('fees')"><div class="sc-icon ir"><i class="ti ti-receipt-2"></i></div><div class="sc-val" id="sv4">R0</div><div class="sc-lbl">Fees Outstanding</div><div class="sc-trend tw"><i class="ti ti-alert-circle" style="font-size:10px"></i>8 accounts overdue</div></div>
+  <div class="sc" onclick="V('students')"><div class="sc-icon ig"><i class="ti ti-users"></i></div><div class="sc-val" id="sv1">0</div><div class="sc-lbl">Total Students</div></div>
+  <div class="sc" onclick="V('teachers')"><div class="sc-icon ib"><i class="ti ti-user-check"></i></div><div class="sc-val" id="sv2">0</div><div class="sc-lbl">Active Teachers</div><div class="sc-trend tu"><i class="ti ti-circle-check" style="font-size:10px"></i>${activeTeachers} active · ${onLeaveTeachers} leave</div></div>
+  <div class="sc" onclick="V('attendance')"><div class="sc-icon ia"><i class="ti ti-calendar-check"></i></div><div class="sc-val" id="sv3">0%</div><div class="sc-lbl">Avg Attendance</div></div>
+  <div class="sc" onclick="V('fees')"><div class="sc-icon ir"><i class="ti ti-receipt-2"></i></div><div class="sc-val" id="sv4">R0</div><div class="sc-lbl">Fees Outstanding</div><div class="sc-trend tw"><i class="ti ti-alert-circle" style="font-size:10px"></i>${def.length} accounts overdue</div></div>
  </div>
  <div class="g2 mb18">
   <div class="card">
@@ -38,14 +43,25 @@ function rDash(area){
  <div class="g2 mb18">
   <div class="card">
    <div class="card-head"><div class="card-title"><i class="ti ti-receipt-2"></i>Fee Collection — Term 3</div><span class="tsm" style="cursor:pointer;color:var(--g)" onclick="V('fees')">Details →</span></div>
-   <div style="display:flex;align-items:center;gap:18px">
-    <svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#F3F4F6" stroke-width="13"/><circle cx="50" cy="50" r="38" fill="none" stroke="#1B4332" stroke-width="13" stroke-dasharray="179 239" stroke-dashoffset="60" stroke-linecap="round"/><circle cx="50" cy="50" r="38" fill="none" stroke="#E9A825" stroke-width="13" stroke-dasharray="42 239" stroke-dashoffset="-119" stroke-linecap="round"/><text x="50" y="47" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="17" fill="#1B4332">75%</text><text x="50" y="59" text-anchor="middle" font-size="8" fill="#6B7280">collected</text></svg>
+   ${(()=>{
+    const paidTotal=D.invoices.filter(i=>i.status==='paid').reduce((a,i)=>a+i.paid,0);
+    const partialTotal=D.invoices.filter(i=>i.status==='partial').reduce((a,i)=>a+i.paid,0);
+    const outstandingTotal=D.invoices.reduce((a,i)=>a+(i.amount-i.paid),0);
+    const totalBilled=D.invoices.reduce((a,i)=>a+i.amount,0);
+    const paidPct=totalBilled?Math.round((paidTotal/totalBilled)*100):0;
+    const partialPct=totalBilled?Math.round((partialTotal/totalBilled)*100):0;
+    const circumference=239;
+    const paidLen=Math.round(circumference*paidPct/100);
+    const partialLen=Math.round(circumference*partialPct/100);
+    return `<div style="display:flex;align-items:center;gap:18px">
+    <svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#F3F4F6" stroke-width="13"/><circle cx="50" cy="50" r="38" fill="none" stroke="#1B4332" stroke-width="13" stroke-dasharray="${paidLen} ${circumference}" stroke-dashoffset="60" stroke-linecap="round"/><circle cx="50" cy="50" r="38" fill="none" stroke="#E9A825" stroke-width="13" stroke-dasharray="${partialLen} ${circumference}" stroke-dashoffset="${60-paidLen}" stroke-linecap="round"/><text x="50" y="47" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="17" fill="#1B4332">${paidPct}%</text><text x="50" y="59" text-anchor="middle" font-size="8" fill="#6B7280">collected</text></svg>
     <div style="flex:1">
-     <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><div style="width:10px;height:10px;border-radius:2px;background:var(--g);flex-shrink:0"></div><div style="flex:1;font-size:11px">Paid in full</div><strong style="font-size:12px">R112,500</strong></div>
-     <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><div style="width:10px;height:10px;border-radius:2px;background:var(--a);flex-shrink:0"></div><div style="flex:1;font-size:11px">Partial</div><strong style="font-size:12px">R26,500</strong></div>
-     <div style="display:flex;align-items:center;gap:7px"><div style="width:10px;height:10px;border-radius:2px;background:var(--sb);flex-shrink:0"></div><div style="flex:1;font-size:11px">Outstanding</div><strong style="font-size:12px;color:var(--r)">R37,000</strong></div>
+     <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><div style="width:10px;height:10px;border-radius:2px;background:var(--g);flex-shrink:0"></div><div style="flex:1;font-size:11px">Paid in full</div><strong style="font-size:12px">${fmt(paidTotal)}</strong></div>
+     <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><div style="width:10px;height:10px;border-radius:2px;background:var(--a);flex-shrink:0"></div><div style="flex:1;font-size:11px">Partial</div><strong style="font-size:12px">${fmt(partialTotal)}</strong></div>
+     <div style="display:flex;align-items:center;gap:7px"><div style="width:10px;height:10px;border-radius:2px;background:var(--sb);flex-shrink:0"></div><div style="flex:1;font-size:11px">Outstanding</div><strong style="font-size:12px;color:var(--r)">${fmt(outstandingTotal)}</strong></div>
     </div>
-   </div>
+   </div>`;
+   })()}
   </div>
   <div class="card">
    <div class="card-head"><div class="card-title"><i class="ti ti-bolt"></i>Quick Actions</div></div>
@@ -79,12 +95,14 @@ function rDash(area){
   </tr>`;}).join('')}
   </tbody></table></div>
  </div>`;
- aN('sv1',624);aN('sv2',28);
+ aN('sv1',D.students.length);aN('sv2',activeTeachers);
  let a=0,f=0;
- const at=setInterval(()=>{a=Math.min(a+3,91);const e=document.getElementById('sv3');if(e)e.textContent=a+'%';if(a>=91)clearInterval(at);},32);
- const ft=setInterval(()=>{f=Math.min(f+800,37000);const e=document.getElementById('sv4');if(e)e.textContent=fmt(f);if(f>=37000)clearInterval(ft);},22);
- const cls=[{l:'Grade 7A',p:94,c:'var(--g)'},{l:'Grade 7B',p:90,c:'var(--g)'},{l:'Grade 6A',p:91,c:'var(--g)'},{l:'Grade 6B',p:85,c:'var(--a)'},{l:'Grade 5A',p:97,c:'var(--g)'},{l:'Grade 5B',p:85,c:'var(--a)'}];
- document.getElementById('attBars').innerHTML=cls.map(c=>`<div class="flex ic g8" style="margin-bottom:8px"><span style="width:70px;font-size:11px">${c.l}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:0%;background:${c.c}" data-w="${c.p}"></div></div><span class="tsm" style="width:28px;text-align:right">${c.p}%</span></div>`).join('');
+ const at=setInterval(()=>{a=Math.min(a+3,avgAtt);const e=document.getElementById('sv3');if(e)e.textContent=a+'%';if(a>=avgAtt)clearInterval(at);},32);
+ const ft=setInterval(()=>{f=Math.min(f+800,totalOutstanding);const e=document.getElementById('sv4');if(e)e.textContent=fmt(f);if(f>=totalOutstanding)clearInterval(ft);},22);
+ if(avgAtt===0){const e=document.getElementById('sv3');if(e)e.textContent='0%';}
+ if(totalOutstanding===0){const e=document.getElementById('sv4');if(e)e.textContent='R0';}
+ const cls=D.classes.map(c=>{const stus=D.students.filter(s=>s.cls===c.name);const p=stus.length?Math.round(stus.reduce((a,s)=>a+s.att,0)/stus.length):0;return{l:c.name,p,c:p>=90?'var(--g)':'var(--a)'};});
+ document.getElementById('attBars').innerHTML=cls.length?cls.map(c=>`<div class="flex ic g8" style="margin-bottom:8px"><span style="width:70px;font-size:11px">${c.l}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:0%;background:${c.c}" data-w="${c.p}"></div></div><span class="tsm" style="width:28px;text-align:right">${c.p}%</span></div>`).join(''):'<div class="tsm">No classes yet.</div>';
  setTimeout(()=>document.querySelectorAll('.pb-bar').forEach(b=>{b.style.width=b.dataset.w+'%';}),80);
 }
 

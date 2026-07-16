@@ -38,29 +38,35 @@ function aiAnswer(q){
  const ql=q.toLowerCase();
  const atRisk=D.students.filter(s=>s.att<85||s.grade==='F'||s.grade==='D');
  const defaulters=D.invoices.filter(i=>i.status!=='paid');
+ const avgAtt=D.students.length?Math.round(D.students.reduce((a,s)=>a+s.att,0)/D.students.length):0;
+ const totalOutstanding=D.invoices.reduce((a,i)=>a+(i.amount-i.paid),0);
  if(ql.includes('risk')||ql.includes('intervention')||ql.includes('support')){
+  if(!atRisk.length)return `No learners are currently flagged as at-risk. Nothing to intervene on right now.`;
   return `I found <strong>${atRisk.length} learners</strong> who need attention: ${atRisk.map(s=>`<strong>${s.name}</strong> (${s.cls}, ${s.att}% attendance, Grade ${s.grade})`).join(', ')}. The most urgent is <strong>${atRisk[0]?.name||'none'}</strong> — attendance has dropped below the 80% threshold and academic average is failing. I'd recommend scheduling a parent meeting this week. Want me to draft an intervention plan?`;
  }
  if(ql.includes('fee')||ql.includes('defaulter')||ql.includes('outstanding')||ql.includes('owing')){
+  if(!defaulters.length)return `No outstanding fee accounts right now — everyone's up to date.`;
   const total=defaulters.reduce((a,i)=>a+(i.amount-i.paid),0);
   return `There are <strong>${defaulters.length} accounts</strong> with outstanding balances totalling <strong>R${total.toLocaleString()}</strong>. The largest is <strong>${defaulters[0]?.student}</strong> owing R${(defaulters[0].amount-defaulters[0].paid).toLocaleString()}. I can send WhatsApp payment reminders with PayFast links to all of them right now — just say the word.`;
  }
  if(ql.includes('attendance')){
+  if(!D.students.length)return `No attendance data on record yet.`;
   const low=D.students.filter(s=>s.att<85);
-  return `School-wide attendance is averaging <strong>91%</strong>, which is below your 95% target. <strong>${low.length} learners</strong> are below 85%, concentrated mostly in Grade 6B. The biggest concern is <strong>${low[0]?.name}</strong> at ${low[0]?.att}%. Pattern detected: absences cluster on Mondays — worth investigating whether this links to transport or family circumstances.`;
+  return `School-wide attendance is averaging <strong>${avgAtt}%</strong>, target is 95%. <strong>${low.length} learners</strong> are below 85%${low[0]?` — the biggest concern is <strong>${low[0].name}</strong> at ${low[0].att}%`:''}.`;
  }
  if(ql.includes('report comment')||ql.includes('comment')){
   return `Here's a draft comment for a strong learner: <em>"Demonstrates exceptional academic discipline and consistently produces work of a high standard. A pleasure to teach — keep up the excellent effort."</em> For a struggling learner: <em>"Shows potential but requires additional support to reach grade-level expectations. Recommend a structured homework routine and regular check-ins with the class teacher."</em> Want me to generate comments for a specific class?`;
  }
  if(ql.includes('best')||ql.includes('top')||ql.includes('performing')){
+  if(!D.students.length)return `No student marks on record yet to rank classes by.`;
   const byClass={};D.students.forEach(s=>{byClass[s.cls]=byClass[s.cls]||[];byClass[s.cls].push(s.avg);});
   const ranked=Object.entries(byClass).map(([c,v])=>({c,avg:Math.round(v.reduce((a,b)=>a+b,0)/v.length)})).sort((a,b)=>b.avg-a.avg);
-  return `<strong>${ranked[0].c}</strong> is your top performing class with a <strong>${ranked[0].avg}% average</strong>. Grade 5A consistently shows the strongest results this term, driven by high attendance (97%) correlating directly with academic performance. Want a full ranked breakdown of all classes?`;
+  return `<strong>${ranked[0].c}</strong> is your top performing class with a <strong>${ranked[0].avg}% average</strong>. Want a full ranked breakdown of all classes?`;
  }
  if(ql.includes('hello')||ql.includes('hi ')||ql==='hi'){
-  return `Hello! I have full visibility into your school's data — 624 learners, attendance, marks, fees, and behaviour records. What would you like to know?`;
+  return `Hello! I have visibility into your school's data — ${D.students.length} learners on record, attendance, marks, fees, and behaviour records. What would you like to know?`;
  }
- return `Based on current school data: 624 learners enrolled, 91% average attendance, R37,000 in outstanding fees, and ${atRisk.length} learners flagged for academic or attendance support. Try asking me something more specific — like "which Grade 7 learners need help in Maths" — and I'll search across all records to answer.`;
+ return `Based on current school data: ${D.students.length} learners enrolled, ${avgAtt}% average attendance, ${fmt(totalOutstanding)} in outstanding fees, and ${atRisk.length} learners flagged for academic or attendance support. Try asking me something more specific — like "which Grade 7 learners need help in Maths" — and I'll search across all records to answer.`;
 }
 
 // ─── DIGITAL LEARNER ID CARDS ───
@@ -70,14 +76,14 @@ function rIDCards(area){
   <i class="ti ti-id" style="font-size:18px;color:var(--g)"></i>
   <div style="flex:1"><div style="font-weight:700;font-size:12px;color:var(--g)">Digital Learner ID Cards</div><div class="tsm">QR-coded ID for verification, emergency info access, and gate check-in</div></div>
   <span class="phase-badge ph1">Phase 1</span>
-  <button class="btn btn-g" onclick="T('Batch of 624 ID cards queued for printing','success')"><i class="ti ti-printer" style="font-size:11px"></i>Print All</button>
+  <button class="btn btn-g" onclick="T('Batch of '+D.students.length+' ID cards queued for printing','success')"><i class="ti ti-printer" style="font-size:11px"></i>Print All</button>
  </div>
  <div class="g3">
   ${D.students.map(s=>`
   <div>
    <div class="id-card">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1">
-     <div><div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:13px">Durban Primary School</div><div style="font-size:9px;opacity:.6;margin-top:1px">Learner Identification Card</div></div>
+     <div><div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:13px">${schoolName()}</div><div style="font-size:9px;opacity:.6;margin-top:1px">Learner Identification Card</div></div>
      <div class="logo-icon" style="width:26px;height:26px;font-size:11px">L</div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:16px;position:relative;z-index:1">

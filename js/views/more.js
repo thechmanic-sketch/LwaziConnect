@@ -61,7 +61,7 @@ function rAnalytics(area){
   <div class="g2 mb18">
    <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-chart-bar"></i>Avg Mark by Class</div><button class="btn btn-s" style="height:26px;font-size:10px" onclick="T('Exported','success')"><i class="ti ti-download" style="font-size:10px"></i>Export</button></div><div class="bar-chart" id="barAc"></div></div>
    <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-chart-pie"></i>Grade Distribution</div></div>
-    ${[['A','80–100',D.students.filter(s=>s.grade==='A').length,'#1B4332'],['B','70–79',D.students.filter(s=>s.grade==='B').length,'#1D6FA4'],['C','60–69',D.students.filter(s=>s.grade==='C').length,'#E9A825'],['F','0–49',D.students.filter(s=>s.grade==='F').length,'#DC2626']].map(([g,r,c,col])=>`<div class="flex ic g8" style="margin-bottom:8px"><span class="pill" style="background:${col}22;color:${col};width:26px;justify-content:center;font-size:10px">${g}</span><span class="tsm" style="width:52px">${r}%</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${Math.round(c/D.students.length*100)}%;background:${col}"></div></div><span style="font-size:12px;font-weight:700;width:18px">${c}</span></div>`).join('')}
+    ${[['A','80–100',D.students.filter(s=>s.grade==='A').length,'#1B4332'],['B','70–79',D.students.filter(s=>s.grade==='B').length,'#1D6FA4'],['C','60–69',D.students.filter(s=>s.grade==='C').length,'#E9A825'],['F','0–49',D.students.filter(s=>s.grade==='F').length,'#DC2626']].map(([g,r,c,col])=>`<div class="flex ic g8" style="margin-bottom:8px"><span class="pill" style="background:${col}22;color:${col};width:26px;justify-content:center;font-size:10px">${g}</span><span class="tsm" style="width:52px">${r}%</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${D.students.length?Math.round(c/D.students.length*100):0}%;background:${col}"></div></div><span style="font-size:12px;font-weight:700;width:18px">${c}</span></div>`).join('')}
    </div>
   </div>
   <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-trending-up"></i>Term-on-Term Progress</div></div>
@@ -70,24 +70,22 @@ function rAnalytics(area){
    </tbody></table></div>
   </div>
  </div>
- <div id="an2" class="hidden"><div class="g4 mb18">${D.classes.map((c,i)=>`<div class="sc"><div class="sc-val">${[94,90,91,85,97,85][i]}%</div><div class="sc-lbl">${c.name}</div><div class="pw-bar" style="margin-top:5px"><div class="pb-bar" style="width:${[94,90,91,85,97,85][i]}%;background:${[94,90,91,85,97,85][i]>=90?'var(--g)':'var(--a)'}"></div></div></div>`).join('')}</div>
-  <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-calendar-stats"></i>Monthly Trend</div><div style="font-size:11px;color:var(--r);display:flex;align-items:center;gap:4px"><i class="ti ti-target"></i>Target: 95%</div></div><div class="bar-chart" id="barAt"></div></div>
+ <div id="an2" class="hidden"><div class="g4 mb18">${D.classes.length?D.classes.map(c=>{const stus=D.students.filter(s=>s.cls===c.name);const p=stus.length?Math.round(stus.reduce((a,s)=>a+s.att,0)/stus.length):0;return`<div class="sc"><div class="sc-val">${p}%</div><div class="sc-lbl">${c.name}</div><div class="pw-bar" style="margin-top:5px"><div class="pb-bar" style="width:${p}%;background:${p>=90?'var(--g)':'var(--a)'}"></div></div></div>`;}).join(''):'<div class="tsm">No classes yet.</div>'}</div>
+  <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-calendar-stats"></i>Monthly Trend</div><div style="font-size:11px;color:var(--r);display:flex;align-items:center;gap:4px"><i class="ti ti-target"></i>Target: 95%</div></div><div class="tsm" style="padding:20px 0;text-align:center">No historical attendance data yet.</div></div>
  </div>
- <div id="an3" class="hidden"><div class="g3 mb18"><div class="sc"><div class="sc-val">R176,000</div><div class="sc-lbl">Total billed</div></div><div class="sc"><div class="sc-val">R112,500</div><div class="sc-lbl">Collected</div></div><div class="sc"><div class="sc-val" style="color:var(--r)">R37,000</div><div class="sc-lbl">Outstanding</div></div></div>
-  <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-chart-bar"></i>Collections by Month</div></div><div class="bar-chart" id="barFi"></div></div>
+ <div id="an3" class="hidden"><div class="g3 mb18"><div class="sc"><div class="sc-val">${fmt(D.invoices.reduce((a,i)=>a+i.amount,0))}</div><div class="sc-lbl">Total billed</div></div><div class="sc"><div class="sc-val">${fmt(D.invoices.reduce((a,i)=>a+i.paid,0))}</div><div class="sc-lbl">Collected</div></div><div class="sc"><div class="sc-val" style="color:var(--r)">${fmt(D.invoices.reduce((a,i)=>a+(i.amount-i.paid),0))}</div><div class="sc-lbl">Outstanding</div></div></div>
+  <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-chart-bar"></i>Collections by Month</div></div><div class="tsm" style="padding:20px 0;text-align:center">No historical collections data yet.</div></div>
  </div>
- <div id="an4" class="hidden"><div class="g4 mb18"><div class="sc"><div class="sc-val">624</div><div class="sc-lbl">Students</div><div class="sc-trend tu"><i class="ti ti-trending-up" style="font-size:10px"></i>+8% YoY</div></div><div class="sc"><div class="sc-val">28</div><div class="sc-lbl">Staff</div></div><div class="sc"><div class="sc-val">91%</div><div class="sc-lbl">Attendance avg</div></div><div class="sc"><div class="sc-val" style="color:var(--wd)">2,847</div><div class="sc-lbl">WhatsApp msgs/mo</div></div></div>
-  <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-chart-line"></i>Enrolment Growth</div></div><div class="bar-chart" id="barGr"></div></div>
+ <div id="an4" class="hidden"><div class="g4 mb18"><div class="sc"><div class="sc-val">${D.students.length}</div><div class="sc-lbl">Students</div></div><div class="sc"><div class="sc-val">${D.teachers.length}</div><div class="sc-lbl">Staff</div></div><div class="sc"><div class="sc-val">${D.students.length?Math.round(D.students.reduce((a,s)=>a+s.att,0)/D.students.length):0}%</div><div class="sc-lbl">Attendance avg</div></div><div class="sc"><div class="sc-val" style="color:var(--wd)">0</div><div class="sc-lbl">WhatsApp msgs/mo</div></div></div>
+  <div class="card"><div class="card-head"><div class="card-title"><i class="ti ti-chart-line"></i>Enrolment Growth</div></div><div class="tsm" style="padding:20px 0;text-align:center">No historical enrolment data yet.</div></div>
  </div>`;
- setTimeout(()=>{bldBar('barAc',['Gr7A','Gr7B','Gr6A','Gr6B','Gr5A','Gr5B'],[82,78,73,64,86,79],100,'#1B4332');},60);
+ if(D.classes.length){
+  const perClass=D.classes.map(c=>{const stus=D.students.filter(s=>s.cls===c.name);return stus.length?Math.round(stus.reduce((a,s)=>a+s.avg,0)/stus.length):0;});
+  setTimeout(()=>{bldBar('barAc',D.classes.map(c=>c.name),perClass,100,'#1B4332');},60);
+ }
 }
 function anT(el,id){
  el.closest('.tab-bar').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
  ['an1','an2','an3','an4'].forEach(x=>{const e=document.getElementById(x);if(e)e.classList.toggle('hidden',x!==id);});
- setTimeout(()=>{
-  if(id==='an2')bldBar('barAt',['Jan','Feb','Mar','Apr','May','Jun','Jul'],[93,91,88,94,90,92,91],100,'#1D6FA4');
-  if(id==='an3')bldBar('barFi',['Jan','Feb','Mar','Apr','May','Jun','Jul'],[15000,18000,22000,19000,25000,28000,22000],30000,'#E9A825',true);
-  if(id==='an4')bldBar('barGr',['2019','2020','2021','2022','2023','2024','2025'],[480,495,510,540,570,598,624],700,'#52B788');
- },60);
 }
 

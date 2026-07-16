@@ -21,8 +21,7 @@ function rReportCards(area){
    ${availClasses.map(c=>{const stus=D.students.filter(s=>s.cls===c.name);const avg=stus.length?Math.round(stus.reduce((a,s)=>a+s.avg,0)/stus.length):0;return`<div class="flex ic g8" style="margin-bottom:8px"><span style="width:74px;font-size:11px">${c.name}</span><div class="pw-bar" style="flex:1"><div class="pb-bar" style="width:${avg}%;background:${avg>=75?'var(--g)':avg>=60?'var(--a)':'var(--r)'}"></div></div><span style="font-size:11px;font-weight:600;width:34px;text-align:right">${avg}%</span></div>`;}).join('')}
    <div class="divider"></div>
    <div class="card-title" style="margin-bottom:9px"><i class="ti ti-send"></i>WhatsApp Delivery</div>
-   <div class="flex ic g8 mb14" style="margin-bottom:7px"><i class="ti ti-circle-check" style="color:var(--g)"></i><span style="flex:1;font-size:12px">Grade 5A — 36 sent</span><span class="wast read"><i class="ti ti-checks"></i>All read</span></div>
-   <div class="flex ic g8"><i class="ti ti-clock" style="color:var(--a)"></i><span style="flex:1;font-size:12px">Grade 7A — Pending</span><button class="btn btn-w" style="height:22px;font-size:10px" onclick="T('Sending 32 reports via WhatsApp','wa')">Send Now</button></div>
+   <div class="tsm">No report cards sent yet.</div>
   </div>
  </div>`;
 }
@@ -37,7 +36,7 @@ function prevRC(){
  const marks=SUBS.map(sub=>{const m=Math.max(30,Math.min(100,Math.floor(s.avg+(Math.random()*20-10))));const g=m>=80?'A':m>=70?'B':m>=60?'C':m>=50?'D':'F';return{sub,m,g};});
  OM('Report Card Preview',`
   <div class="rc-wrap">
-   <div class="rc-head"><div class="rc-school">Durban Primary School</div><div class="rc-sub">Term 3 Academic Report · 2025</div></div>
+   <div class="rc-head"><div class="rc-school">${schoolName()}</div><div class="rc-sub">Term 3 Academic Report · 2025</div></div>
    <div class="rc-body">
     <div class="rc-info mb14"><div class="rc-ib"><div class="rc-il">Student</div><div class="rc-iv">${s.name}</div></div><div class="rc-ib"><div class="rc-il">Student ID</div><div class="rc-iv">${s.id}</div></div><div class="rc-ib"><div class="rc-il">Class</div><div class="rc-iv">${s.cls}</div></div><div class="rc-ib"><div class="rc-il">Average</div><div class="rc-iv" style="color:var(--g)">${s.avg}% — Grade ${s.grade}</div></div></div>
     <div class="rc-row rc-rh"><div>Subject</div><div>Term 1</div><div>Term 2</div><div>Term 3</div><div>Grade</div></div>

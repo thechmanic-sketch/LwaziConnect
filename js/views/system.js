@@ -72,7 +72,7 @@ function rSettings(area){
   <div>
    <div class="card mb14">
     <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:var(--s);margin-bottom:12px;display:flex;align-items:center;gap:6px"><i class="ti ti-building-school" style="color:var(--g)"></i>School Profile</div>
-    <div class="fg"><div class="fl">School Name</div><input class="fi" value="Durban Primary School"></div>
+    <div class="fg"><div class="fl">School Name</div><input class="fi" value="${schoolName()}"></div>
     <div class="fr"><div class="fg"><div class="fl">Phone</div><input class="fi" value="031 100 2000"></div><div class="fg"><div class="fl">Email</div><input class="fi" value="admin@durbanprimary.edu.za"></div></div>
     <div class="fg"><div class="fl">Address</div><input class="fi" value="Private Bag X01, Durban, 4001"></div>
     <div class="fr"><div class="fg"><div class="fl">Province</div><select class="fs"><option>KwaZulu-Natal</option><option>Gauteng</option><option>Western Cape</option></select></div><div class="fg"><div class="fl">School Type</div><select class="fs"><option>Primary School</option><option>High School</option><option>Combined</option></select></div></div>

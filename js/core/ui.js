@@ -14,16 +14,16 @@ function CM(){document.getElementById('MB').classList.add('hidden');}
 function openWA(){OM('WhatsApp Business Centre',`
  <div style="background:var(--wp);border:1px solid var(--w);border-radius:9px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
   <i class="ti ti-brand-whatsapp" style="font-size:26px;color:var(--wd)"></i>
-  <div><div style="font-weight:700;color:var(--wd)">Connected — WhatsApp Business API</div><div class="tsm">+27 31 100 2000 · Durban Primary School</div></div>
+  <div><div style="font-weight:700;color:var(--wd)">Connected — WhatsApp Business API</div><div class="tsm">${schoolName()}</div></div>
   <span class="pill pg" style="margin-left:auto">Live</span>
  </div>
  <div class="g3" style="margin-bottom:14px">
-  <div class="sc" style="cursor:default"><div class="sc-val" style="color:var(--wd)">2,847</div><div class="sc-lbl">Messages this month</div></div>
-  <div class="sc" style="cursor:default"><div class="sc-val">94%</div><div class="sc-lbl">Delivery rate</div></div>
-  <div class="sc" style="cursor:default"><div class="sc-val" style="color:var(--b)">78%</div><div class="sc-lbl">Read rate</div></div>
+  <div class="sc" style="cursor:default"><div class="sc-val" style="color:var(--wd)">0</div><div class="sc-lbl">Messages this month</div></div>
+  <div class="sc" style="cursor:default"><div class="sc-val">—</div><div class="sc-lbl">Delivery rate</div></div>
+  <div class="sc" style="cursor:default"><div class="sc-val" style="color:var(--b)">—</div><div class="sc-lbl">Read rate</div></div>
  </div>
  <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--sl);margin-bottom:9px">Quick Broadcasts</div>
- ${[['Fee reminder to defaulters','48 parents','ti-receipt'],['Report card ready','312 parents','ti-certificate'],['Exam timetable','All parents','ti-calendar'],['Sports day RSVP','312 parents','ti-trophy']].map(([t,r,ic])=>`
+ ${[['Fee reminder to defaulters','Fee defaulters','ti-receipt'],['Report card ready','All parents','ti-certificate'],['Exam timetable','All parents','ti-calendar'],['Sports day RSVP','All parents','ti-trophy']].map(([t,r,ic])=>`
  <div style="display:flex;align-items:center;gap:9px;background:var(--sp);border-radius:7px;padding:9px 12px;cursor:pointer;margin-bottom:7px;transition:background .15s" onmouseover="this.style.background='var(--wp)'" onmouseout="this.style.background='var(--sp)'" onclick="T('WhatsApp broadcast sent to ${r}','wa')">
   <i class="ti ${ic}" style="font-size:17px;color:var(--wd)"></i>
   <div style="flex:1"><div style="font-weight:600;font-size:12px">${t}</div><div class="tsm">${r}</div></div>

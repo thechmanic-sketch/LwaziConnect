@@ -1,6 +1,11 @@
 // ══ PARENT PORTAL ══
 function rParentPortal(){
  const s=D.students[0];
+ if(!s){
+  document.getElementById('CA').innerHTML=`<div class="card" style="text-align:center;padding:40px 20px"><i class="ti ti-user-question" style="font-size:32px;color:var(--sl);display:block;margin-bottom:10px"></i><div style="font-weight:600;margin-bottom:4px">No child linked to your account yet</div><div class="tsm">Once the school links your child's record to your account, it'll appear here.</div></div>`;
+  document.getElementById('ptitle').textContent='Parent Portal';
+  return;
+ }
  document.getElementById('CA').innerHTML=`
  <div style="background:var(--g);margin:-20px -20px 0;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
   <div class="flex ic g8"><div class="logo-icon" style="width:26px;height:26px;font-size:11px">L</div><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:#fff">LwaziConnect</div></div>

@@ -48,7 +48,7 @@ function V(v){
 
 function topAction(){
  const A={dashboard:openQuickAdd,students:mAddStu,admissions:mAddAdmission,parents:mAddParent,teachers:mAddTeacher,fees:mAddInv,messages:mNewMsg,announcements:mNewAnn,documents:mUploadDoc,classes:mAddClass,attendance:mMarkAtt,reportcards:mGenReports,calendar:mAddEvent,health:mAddHealth,discipline:mLogInc,analytics:()=>T('Report exported','success'),settings:()=>T('Settings saved','success'),licensing:mUpgrade,superadmin:mAddSchool,timetable:mEditTT,subjects:mUploadMarks,
- aiassist:()=>{document.getElementById('aiInput')?.focus();},idcards:()=>T('Batch of 624 ID cards queued for printing','success'),homework:mSetHomework,commscentre:mNewBroadcast,hr:mAddStaff,transport:mAddVehicle,website:()=>T('Website changes published live','success'),sgb:mSchedMeeting,compliance:()=>T('Manual backup started — complete in ~2 minutes','success'),enterprise:mAddCampus};
+ aiassist:()=>{document.getElementById('aiInput')?.focus();},idcards:()=>T('Batch of '+D.students.length+' ID cards queued for printing','success'),homework:mSetHomework,commscentre:mNewBroadcast,hr:mAddStaff,transport:mAddVehicle,website:()=>T('Website changes published live','success'),sgb:mSchedMeeting,compliance:()=>T('Manual backup started — complete in ~2 minutes','success'),enterprise:mAddCampus};
  (A[CV]||openQuickAdd)();
 }
 
